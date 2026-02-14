@@ -7442,7 +7442,14 @@
         homeEditProjectId = newId;
         renderHomeView();
       }
-      document.getElementById("homeFab")?.addEventListener("click", createNewProject);
+      document.addEventListener("click", (e) => {
+        if (!e.target.closest("#homeFab") && !e.target.closest(".home-fab")) return;
+        const homeView = document.getElementById("homeView");
+        if (!homeView?.classList.contains("active")) return;
+        e.preventDefault();
+        e.stopPropagation();
+        createNewProject();
+      });
       (function initViewCycling() {
         const viewSelect = document.getElementById("viewMode");
         if (!viewSelect) return;
