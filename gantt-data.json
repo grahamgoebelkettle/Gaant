@@ -32,7 +32,7 @@
     },
     {
       "id": "p-1771140111963",
-      "name": "Untitled project",
+      "name": "888 8888",
       "createdAt": 1771140111963
     }
   ],
@@ -322,8 +322,92 @@
       "custom_palettes": []
     },
     "p-1771140111963": {
-      "tasks": [],
-      "settings": {},
+      "tasks": [
+        {
+          "task": "Research",
+          "phase": "discovery",
+          "phaseSecondary": null,
+          "party": "Unassigned",
+          "start": "2/2",
+          "end": "3/1",
+          "startDate": "2026-02-02T07:00:00.000Z",
+          "endDate": "2026-03-01T07:00:00.000Z",
+          "star": false,
+          "overview": "",
+          "subTasks": [],
+          "blockers": [],
+          "links": [],
+          "dependsOn": null
+        },
+        {
+          "task": "Design",
+          "phase": "ideation",
+          "phaseSecondary": null,
+          "party": "Unassigned",
+          "start": "3/1",
+          "end": "3/28",
+          "startDate": "2026-03-01T07:00:00.000Z",
+          "endDate": "2026-03-28T07:00:00.000Z",
+          "star": false,
+          "overview": "",
+          "subTasks": [],
+          "blockers": [],
+          "links": [],
+          "dependsOn": 0
+        },
+        {
+          "task": "Review",
+          "phase": "development",
+          "phaseSecondary": null,
+          "party": "Unassigned",
+          "start": "3/28",
+          "end": "4/24",
+          "startDate": "2026-03-28T07:00:00.000Z",
+          "endDate": "2026-04-24T07:00:00.000Z",
+          "star": false,
+          "overview": "",
+          "subTasks": [],
+          "blockers": [],
+          "links": [],
+          "dependsOn": 1
+        },
+        {
+          "task": "Build",
+          "phase": "review",
+          "phaseSecondary": null,
+          "party": "Unassigned",
+          "start": "4/24",
+          "end": "5/21",
+          "startDate": "2026-04-24T07:00:00.000Z",
+          "endDate": "2026-05-21T07:00:00.000Z",
+          "star": false,
+          "overview": "",
+          "subTasks": [],
+          "blockers": [],
+          "links": [],
+          "dependsOn": 2
+        },
+        {
+          "task": "Launch",
+          "phase": "delivery",
+          "phaseSecondary": null,
+          "party": "Unassigned",
+          "start": "5/21",
+          "end": "6/17",
+          "startDate": "2026-05-21T07:00:00.000Z",
+          "endDate": "2026-06-17T07:00:00.000Z",
+          "star": false,
+          "overview": "",
+          "subTasks": [],
+          "blockers": [],
+          "links": [],
+          "dependsOn": 3
+        }
+      ],
+      "settings": {
+        "title": "888 8888",
+        "description": ""
+      },
       "view": "default",
       "custom_palettes": []
     }
