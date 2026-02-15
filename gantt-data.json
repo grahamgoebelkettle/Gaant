@@ -52,15 +52,15 @@
         "description": "new description",
         "phases": [
           {
-            "id": "discovery",
-            "name": "Discovery",
-            "color": "#f01997",
-            "sprints": 2
-          },
-          {
             "id": "ideation",
             "name": "Ideation",
             "color": "#16a34a",
+            "sprints": 2
+          },
+          {
+            "id": "discovery",
+            "name": "Discovery",
+            "color": "#f01997",
             "sprints": 2
           },
           {
