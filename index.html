@@ -8831,7 +8831,10 @@
         function updateHomeStatus() {
           var synced = isSynced();
           if (statusDot) { statusDot.className = "home-shared-file-status-dot " + (synced ? "synced" : "local"); }
-          if (statusText) statusText.textContent = synced ? "Synced with GitHub" : "Local";
+          if (statusText) {
+            statusText.textContent = synced ? "Synced with GitHub" : "";
+            statusText.style.display = synced ? "" : "none";
+          }
           var openBtn = document.getElementById("sharedFileOpenModal");
           if (openBtn) openBtn.style.display = synced ? "none" : "";
         }
@@ -8863,9 +8866,8 @@
         updateHomeStatus();
         function sharedJsonFetchOptions() {
           return {
-            cache: "no-store",
             credentials: "omit",
-            headers: { "Cache-Control": "no-cache", "Pragma": "no-cache" }
+            referrerPolicy: "no-referrer"
           };
         }
         function sharedJsonUrl(u) {
@@ -8885,13 +8887,24 @@
           return m ? { owner: m[1], repo: m[2], branch: m[3], path: m[4] } : null;
         }
         var sharedFetchFailCount = 0;
-        function fetchViaGitHubRestApi(gh) {
+        function fetchViaGitHubRestApi(gh, token) {
           var pathEnc = gh.path.split("/").map(function (p) { return encodeURIComponent(p); }).join("/");
           var apiUrl = "https://api.github.com/repos/" + encodeURIComponent(gh.owner) + "/" + encodeURIComponent(gh.repo) + "/contents/" + pathEnc + "?ref=" + encodeURIComponent(gh.branch);
-          return fetch(apiUrl, {
-            cache: "no-store",
-            credentials: "omit",
-            headers: { "Accept": "application/vnd.github.raw" }
+          function doFetch(useToken) {
+            var headers = { "Accept": "application/vnd.github.raw" };
+            if (useToken && token && token.trim()) {
+              var authHeader = /^ghp_/.test(token.trim()) ? "token " + token.trim() : "Bearer " + token.trim();
+              headers["Authorization"] = authHeader;
+            }
+            return fetch(apiUrl, {
+              credentials: "omit",
+              referrerPolicy: "no-referrer",
+              headers: headers
+            });
+          }
+          return doFetch(false).then(function (r) {
+            if (r.status === 401 && token && token.trim()) return doFetch(true);
+            return r;
           }).then(function (r) {
             if (!r.ok) throw new Error(r.status + " " + r.statusText);
             return r.text().then(function (text) {
@@ -8905,7 +8918,6 @@
           var authHeader = /^ghp_/.test(token) ? "token " + token : "Bearer " + token;
           return fetch("https://api.github.com/graphql", {
             method: "POST",
-            cache: "no-store",
             credentials: "omit",
             headers: {
               "Content-Type": "application/json",
@@ -8928,17 +8940,8 @@
           try { token = localStorage.getItem(GITHUB_TOKEN_KEY); } catch (e) {}
           token = (token && token.trim()) || null;
           var fetchPromise;
-          if (gh && token) {
-            fetchPromise = fetchViaGitHubGraphQL(gh, token).then(function (res) {
-              if (res.errors && res.errors.length) throw new Error(res.errors[0].message || "GraphQL error");
-              var obj = res.data && res.data.repository && res.data.repository.object;
-              if (!obj || !obj.text) return null;
-              if (obj.oid === lastFetchedOid) return { skip: true };
-              lastFetchedOid = obj.oid;
-              try { return JSON.parse(obj.text); } catch (e) { return null; }
-            });
-          } else if (gh) {
-            fetchPromise = fetchViaGitHubRestApi(gh).then(function (data) {
+          if (gh) {
+            fetchPromise = fetchViaGitHubRestApi(gh, token).then(function (data) {
               if (data && data.projects) lastFetchedOid = null;
               return data;
             });
@@ -8977,6 +8980,12 @@
             });
         }
         window.__fetchSharedUpdates = fetchSharedUpdates;
+        window.__doLoadFromStoredUrl = function () {
+          try {
+            var u = localStorage.getItem(SHARED_FILE_URL_KEY);
+            if (u && u.trim()) doLoad(u.trim());
+          } catch (e) {}
+        };
         setInterval(fetchSharedUpdates, SHARED_FILE_POLL_MS);
         document.addEventListener("visibilitychange", function () { if (document.visibilityState === "visible") fetchSharedUpdates(); });
         if (isSynced()) setTimeout(fetchSharedUpdates, 2000);
@@ -8988,16 +8997,8 @@
           try { token = localStorage.getItem(GITHUB_TOKEN_KEY); } catch (e) {}
           token = (token && token.trim()) || null;
           var loadPromise;
-          if (gh && token) {
-            loadPromise = fetchViaGitHubGraphQL(gh, token).then(function (res) {
-              if (res.errors && res.errors.length) throw new Error(res.errors[0].message || "GraphQL error");
-              var obj = res.data && res.data.repository && res.data.repository.object;
-              if (!obj || !obj.text) throw new Error("File not found");
-              lastFetchedOid = obj.oid;
-              return JSON.parse(obj.text);
-            });
-          } else if (gh) {
-            loadPromise = fetchViaGitHubRestApi(gh).then(function (data) {
+          if (gh) {
+            loadPromise = fetchViaGitHubRestApi(gh, token).then(function (data) {
               if (!data) throw new Error("File not found or inaccessible (is the repo public?)");
               return data;
             });
@@ -9057,14 +9058,29 @@
           var pathEnc = gh.path.split("/").map(function (p) { return encodeURIComponent(p); }).join("/");
           var api = "https://api.github.com/repos/" + encodeURIComponent(gh.owner) + "/" + encodeURIComponent(gh.repo) + "/contents/" + pathEnc;
           var authHeader = /^ghp_/.test(token) ? "token " + token : "Bearer " + token;
-          var fetchOpts = { cache: "no-store", credentials: "omit", mode: "cors", referrerPolicy: "no-referrer" };
+          var fetchOpts = { credentials: "omit", mode: "cors", referrerPolicy: "no-referrer" };
           function getSha() {
-            return fetch(api + "?ref=" + encodeURIComponent(gh.branch), Object.assign({ method: "GET", headers: { "Accept": "application/vnd.github.v3+json", "Authorization": authHeader } }, fetchOpts))
+            return fetch(api + "?ref=" + encodeURIComponent(gh.branch) + "&_=" + Date.now(), Object.assign({ method: "GET", headers: { "Accept": "application/vnd.github.v3+json", "Authorization": authHeader } }, fetchOpts))
               .then(function (r) {
                 return r.text().then(function (text) {
                   if (r.status === 404) return { sha: null };
                   if (!r.ok) throw new Error(readErrorFromBody(text, r.status));
-                  try { var d = JSON.parse(text); return { sha: d.sha }; } catch (e) { throw new Error("Invalid response from GitHub."); }
+                  try {
+                    var d = JSON.parse(text);
+                    var shaVal = d.sha;
+                    if (Array.isArray(d)) {
+                      var baseName = gh.path.split("/").pop();
+                      var found = d.find(function (x) { return x.name === baseName || x.path === gh.path; });
+                      shaVal = found ? found.sha : null;
+                    }
+                    if (!shaVal && (d.projects || d.boards)) {
+                      throw new Error("Could not read file metadata. Try Load/Refresh first, then Push.");
+                    }
+                    return { sha: shaVal || null };
+                  } catch (e) {
+                    if (e && e.message && e.message.indexOf("Could not read") === 0) throw e;
+                    throw new Error("Invalid response from GitHub.");
+                  }
                 });
               });
           }
@@ -9090,8 +9106,12 @@
               return doPut(o.sha);
             })
             .then(function (r) {
-              if (r.status === 409) {
-                return getSha().then(function (o) { return doPut(o && o.sha); });
+              if (r.status === 409 || r.status === 422) {
+                return getSha().then(function (o) {
+                  var sha = o && (o.sha || null);
+                  if (!sha) throw new Error("Could not get file SHA. Ensure the shared URL is correct and try Load/Refresh first.");
+                  return doPut(sha);
+                });
               }
               return r;
             })
@@ -9227,7 +9247,8 @@
         });
       })();
       await handleRoute();
-      if (typeof window.__fetchSharedUpdates === "function") window.__fetchSharedUpdates();
+      if (typeof window.__doLoadFromStoredUrl === "function") window.__doLoadFromStoredUrl();
+      else if (typeof window.__fetchSharedUpdates === "function") window.__fetchSharedUpdates();
     }
     if (document.readyState === "loading") {
       document.addEventListener("DOMContentLoaded", bootstrap);
