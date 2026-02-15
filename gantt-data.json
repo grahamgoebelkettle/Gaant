@@ -9,6 +9,11 @@
       "id": "p-1771142046060",
       "name": "Wanda",
       "createdAt": 1771142046060
+    },
+    {
+      "id": "p-1771142164069",
+      "name": "Untitled project",
+      "createdAt": 1771142164069
     }
   ],
   "boards": {
@@ -213,6 +218,12 @@
           ]
         }
       ]
+    },
+    "p-1771142164069": {
+      "tasks": [],
+      "settings": {},
+      "view": "default",
+      "custom_palettes": []
     }
   }
 }
