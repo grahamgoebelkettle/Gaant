@@ -14,6 +14,11 @@
       "id": "p-1771131853990",
       "name": "May fourth",
       "createdAt": 1771131853990
+    },
+    {
+      "id": "p-1771133455408",
+      "name": "Untitled project",
+      "createdAt": 1771133455408
     }
   ],
   "boards": {
@@ -179,6 +184,15 @@
       "settings": {
         "title": "May fourth",
         "description": "Drag bars to reschedule • Drag edges to change dates • Drag rows to reorder • Click a row to expand details • Click cells to edit"
+      },
+      "view": "default",
+      "custom_palettes": []
+    },
+    "p-1771133455408": {
+      "tasks": [],
+      "settings": {
+        "title": "Untitled project",
+        "description": ""
       },
       "view": "default",
       "custom_palettes": []
