@@ -6599,11 +6599,11 @@
           const clamped = clampTaskDatesToProjectRange(rawStart, candidateEnd);
           task.startDate = clamped.startDate;
           task.endDate = clamped.endDate;
-          const startOffset = dateToOffset(task.startDate);
-          const endOffset = dateToOffset(task.endDate);
-          currentLeft = (startOffset / WEEKS) * 100;
+          const snappedStartOffset = dateToOffset(task.startDate);
+          const snappedEndOffset = dateToOffset(task.endDate);
+          currentLeft = (snappedStartOffset / WEEKS) * 100;
           bar.style.left = currentLeft + "%";
-          bar.style.width = ((endOffset - startOffset) / WEEKS) * 100 + "%";
+          bar.style.width = ((snappedEndOffset - snappedStartOffset) / WEEKS) * 100 + "%";
           task.start = formatDate(task.startDate);
           task.end = formatDate(task.endDate);
           const phaseAtPos = getPhaseForWeekOffset(dateToOffset(task.startDate), index);
@@ -6627,9 +6627,11 @@
           document.removeEventListener("mouseup", onUp);
           if (wouldSnapToSprint(task.startDate)) {
             const snapped = snapDateToSprint(task.startDate);
-            task.startDate = snapped;
+            const candidateEnd = offsetToDate(dateToOffset(snapped) + (currentWidth / 100) * WEEKS);
+            const clamped = clampTaskDatesToProjectRange(snapped, candidateEnd);
+            task.startDate = clamped.startDate;
+            task.endDate = clamped.endDate;
             task.start = formatDate(task.startDate);
-            task.endDate = offsetToDate(dateToOffset(task.startDate) + (currentWidth / 100) * WEEKS);
             task.end = formatDate(task.endDate);
             const startOffset = dateToOffset(task.startDate);
             const endOffset = dateToOffset(task.endDate);
@@ -6704,7 +6706,8 @@
           } else {
             lastShownBoundary = null;
           }
-          task.endDate = rawEndDate;
+          const clamped = clampTaskDatesToProjectRange(task.startDate, rawEndDate);
+          task.endDate = clamped.endDate;
           const snappedEndOffset = dateToOffset(task.endDate);
           const snappedStartOffset = dateToOffset(task.startDate);
           currentWidth = ((snappedEndOffset - snappedStartOffset) / WEEKS) * 100;
@@ -6728,7 +6731,8 @@
           document.removeEventListener("mouseup", onUp);
           if (wouldSnapToSprint(task.endDate)) {
             const snapped = snapDateToSprint(task.endDate);
-            task.endDate = snapped;
+            const clamped = clampTaskDatesToProjectRange(task.startDate, snapped);
+            task.endDate = clamped.endDate;
             task.end = formatDate(task.endDate);
             const startOffset = dateToOffset(task.startDate);
             const endOffset = dateToOffset(task.endDate);
@@ -8506,20 +8510,22 @@
             location.hash = getProjectUrl(p);
           });
         }
+        const previewWrap = document.createElement("div");
+        previewWrap.className = "home-project-timeline-preview" + (isEditMode ? " home-timeline-empty" : "");
         if (!isEditMode) {
           let showPreviews = true;
           try { showPreviews = localStorage.getItem(HOME_TIMELINE_PREVIEWS_KEY) !== "false"; } catch (e) {}
           if (showPreviews) {
-            const previewWrap = document.createElement("div");
-            previewWrap.className = "home-project-timeline-preview";
             if (window.ganttStorage?.isCloudEnabled()) {
               window.ganttStorage.ensureBoardDataLoaded(p.id).then(() => renderHomeTimelinePreview(p.id, previewWrap));
             } else {
               renderHomeTimelinePreview(p.id, previewWrap);
             }
-            card.appendChild(previewWrap);
+          } else {
+            previewWrap.classList.add("home-timeline-empty");
           }
         }
+        card.appendChild(previewWrap);
         const body = document.createElement("div");
         body.className = "home-project-card-body";
         const info = document.createElement("div");
@@ -8569,10 +8575,12 @@
         card.appendChild(body);
         const footer = document.createElement("div");
         footer.className = "home-project-card-footer";
+        const storageMode = typeof getStorageMode === "function" ? getStorageMode() : null;
+        const isLocalMode = storageMode === "local_storage" || storageMode === "local_cache";
         const isLocal = !window.ganttStorage?.isCloudEnabled();
         let hasSharedUrl = false;
         try { var u = localStorage.getItem(SHARED_FILE_URL_KEY); hasSharedUrl = !!(u && u.trim()); } catch (e) {}
-        if (isLocal && !hasSharedUrl && !isEditMode) {
+        if ((isLocalMode || (isLocal && !hasSharedUrl)) && !isEditMode) {
           const localTag = document.createElement("span");
           localTag.className = "home-project-local-tag";
           localTag.textContent = "Local";
@@ -8792,6 +8800,14 @@
         t.start = formatDate(t.startDate);
         t.end = formatDate(t.endDate);
       });
+      const previousTasks = tasks.map(t => ({
+        ...t,
+        startDate: t.startDate ? new Date(t.startDate.getTime()) : null,
+        endDate: t.endDate ? new Date(t.endDate.getTime()) : null,
+        subTasks: Array.isArray(t.subTasks) ? t.subTasks.slice() : [],
+        blockers: Array.isArray(t.blockers) ? t.blockers.slice() : [],
+        links: Array.isArray(t.links) ? t.links.slice() : []
+      }));
       tasks = sampleTasks;
       tasks.forEach((_, i) => { if (tasks.some(t => t.dependsOn === i)) propagateDependencyChanges(i); });
       saveTasks();
@@ -8800,6 +8816,20 @@
       renderTasks();
       if (typeof updateWeekWidth === "function") updateWeekWidth();
       if (typeof renderPhaseHeaders === "function") renderPhaseHeaders();
+      const performUndo = () => {
+        tasks = previousTasks.map(t => ({
+          ...t,
+          startDate: t.startDate ? new Date(t.startDate.getTime()) : null,
+          endDate: t.endDate ? new Date(t.endDate.getTime()) : null
+        }));
+        saveTasks();
+        if (typeof updateChartRange === "function") updateChartRange();
+        if (typeof updateEmptyState === "function") updateEmptyState();
+        if (typeof renderTasks === "function") renderTasks();
+        if (typeof updateWeekWidth === "function") updateWeekWidth();
+        if (typeof renderPhaseHeaders === "function") renderPhaseHeaders();
+      };
+      if (typeof showToast === "function") showToast("Sample tasks added", { onUndo: performUndo });
     }
     function initGantt() {
       grid = document.getElementById("ganttGrid");
@@ -8946,11 +8976,33 @@
           t.start = formatDate(t.startDate);
           t.end = formatDate(t.endDate);
         });
+        const previousTasks = tasks.map(t => ({
+          ...t,
+          startDate: t.startDate ? new Date(t.startDate.getTime()) : null,
+          endDate: t.endDate ? new Date(t.endDate.getTime()) : null,
+          subTasks: Array.isArray(t.subTasks) ? t.subTasks.slice() : [],
+          blockers: Array.isArray(t.blockers) ? t.blockers.slice() : [],
+          links: Array.isArray(t.links) ? t.links.slice() : []
+        }));
         tasks = sampleTasks;
         tasks.forEach((_, i) => { if (tasks.some(t => t.dependsOn === i)) propagateDependencyChanges(i); });
         saveTasks();
         updateChartRange();
         closeSettingsModal();
+        const performUndo = () => {
+          tasks = previousTasks.map(t => ({
+            ...t,
+            startDate: t.startDate ? new Date(t.startDate.getTime()) : null,
+            endDate: t.endDate ? new Date(t.endDate.getTime()) : null
+          }));
+          saveTasks();
+          if (typeof updateChartRange === "function") updateChartRange();
+          if (typeof updateEmptyState === "function") updateEmptyState();
+          if (typeof renderTasks === "function") renderTasks();
+          if (typeof updateWeekWidth === "function") updateWeekWidth();
+          if (typeof renderPhaseHeaders === "function") renderPhaseHeaders();
+        };
+        if (typeof showToast === "function") showToast("Sample tasks added", { onUndo: performUndo });
       });
       setupPhaseListDrag(document.getElementById("settingsPhaseList"));
       document.addEventListener("click", (e) => {
@@ -10160,24 +10212,11 @@
         });
         document.getElementById("landingOptionLocalStorage")?.addEventListener("click", function () {
           setStorageMode("local_storage");
-          window.hasWriteAccess = function () { return true; };
-          if (landingView) landingView.classList.remove("active");
-          var sec = document.getElementById("sharedFileSection");
-          if (sec) sec.style.display = "none";
-          var backupSec = document.getElementById("localBackupSection");
-          if (backupSec) backupSec.style.display = "flex";
-          handleRoute();
-          if (typeof updateWriteAccessUI === "function") updateWriteAccessUI();
-          initLocalBackupHandlers();
+          location.reload();
         });
         document.getElementById("landingOptionLocalCache")?.addEventListener("click", function () {
           setStorageMode("local_cache");
-          window.hasWriteAccess = function () { return true; };
-          if (landingView) landingView.classList.remove("active");
-          var sec = document.getElementById("sharedFileSection");
-          if (sec) sec.style.display = "none";
-          handleRoute();
-          if (typeof updateWriteAccessUI === "function") updateWriteAccessUI();
+          location.reload();
         });
         return;
       }
@@ -10678,7 +10717,7 @@
       async function createNewProject() {
         if (typeof window.hasWriteAccess === "function" && !window.hasWriteAccess()) return;
         if (window.ganttStorage?.isCloudEnabled()) {
-          const name = getUniqueProjectName("Untitled project");
+          const name = getUniqueProjectName("My Board");
           let newId;
           try {
             newId = await window.ganttStorage.createBoard(name);
@@ -10700,10 +10739,107 @@
           return;
         }
         const newId = "p-" + Date.now();
-        ensureProjectInList(newId, getUniqueProjectName("Untitled project"));
+        ensureProjectInList(newId, getUniqueProjectName("My Board"));
         homeEditProjectId = newId;
         renderHomeView();
         requestAnimationFrame(() => {
+          const newCard = document.querySelector(".home-project-card.edit-mode");
+          if (newCard) newCard.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        });
+      }
+      function buildSampleTasksForNewBoard(phases, baseDate) {
+        const WEEK_MS_LOCAL = 7 * 24 * 60 * 60 * 1000;
+        const DAY_MS_LOCAL = 24 * 60 * 60 * 1000;
+        const sampleTaskNames = ["Research", "Design", "Review", "Build", "Launch"];
+        const n = Math.min(sampleTaskNames.length, Math.max(1, phases.length));
+        const sampleTasks = [];
+        let startWeekOffset = 0;
+        for (let i = 0; i < n; i++) {
+          const phaseIdx = Math.min(i, phases.length - 1);
+          const p = phases[phaseIdx];
+          const sprints = Math.max(1, parseInt(p.sprints, 10) || 2);
+          const spanWeeks = sprints * 2;
+          const startDate = new Date(baseDate.getTime() + startWeekOffset * WEEK_MS_LOCAL);
+          const endDate = new Date(baseDate.getTime() + (startWeekOffset + spanWeeks) * WEEK_MS_LOCAL - DAY_MS_LOCAL);
+          sampleTasks.push({
+            task: sampleTaskNames[i],
+            phase: p.id,
+            party: "Unassigned",
+            star: false,
+            overview: "",
+            subTasks: [],
+            blockers: [],
+            links: [],
+            dependsOn: i === 0 ? null : i - 1,
+            startDate,
+            endDate
+          });
+          startWeekOffset += spanWeeks;
+        }
+        sampleTasks.forEach(function (t) {
+          t.start = (t.startDate.getMonth() + 1) + "/" + t.startDate.getDate();
+          t.end = (t.endDate.getMonth() + 1) + "/" + t.endDate.getDate();
+        });
+        return sampleTasks;
+      }
+      async function createNewLinkedBoard() {
+        if (typeof window.hasWriteAccess === "function" && !window.hasWriteAccess()) return;
+        const defaultPhases = DEFAULT_PHASES.map(function (p) { return { id: p.id, name: p.name, color: p.color || "#737373", sprints: 2 }; });
+        const baseDate = new Date();
+        baseDate.setHours(0, 0, 0, 0);
+        const sampleTasks = buildSampleTasksForNewBoard(defaultPhases, baseDate);
+        const toSave = sampleTasks.map(function (t) {
+          return {
+            task: t.task,
+            phase: t.phase,
+            phaseSecondary: null,
+            party: t.party,
+            start: t.start,
+            end: t.end,
+            startDate: t.startDate ? t.startDate.toISOString() : null,
+            endDate: t.endDate ? t.endDate.toISOString() : null,
+            star: t.star,
+            overview: t.overview || "",
+            subTasks: t.subTasks || [],
+            blockers: t.blockers || [],
+            links: t.links || [],
+            dependsOn: typeof t.dependsOn === "number" ? t.dependsOn : null
+          };
+        });
+        if (window.ganttStorage?.isCloudEnabled()) {
+          const name = getUniqueProjectName("My Linked Board");
+          let newId;
+          try {
+            newId = await window.ganttStorage.createBoard(name);
+          } catch (err) {
+            if (typeof showToast === "function") showToast("Could not create project. Try again or log out and back in.", { type: "error" });
+            return;
+          }
+          if (newId) {
+            try {
+              await window.ganttStorage.saveTasks(newId, toSave);
+            } catch (e) { console.warn("Could not save sample tasks:", e); }
+            ensureProjectInList(newId, name);
+            homeEditProjectId = newId;
+            renderHomeView();
+            requestAnimationFrame(function () {
+              const newCard = document.querySelector(".home-project-card.edit-mode");
+              if (newCard) newCard.scrollIntoView({ behavior: "smooth", block: "nearest" });
+            });
+          } else {
+            if (typeof showToast === "function") showToast("Could not create project. Check connection or try logging out and back in.", { type: "error" });
+          }
+          return;
+        }
+        const newId = "p-" + Date.now();
+        try {
+          localStorage.setItem("gantt-tasks-" + newId, JSON.stringify(toSave));
+          if (window.notifySharedDataChanged) window.notifySharedDataChanged();
+        } catch (e) { console.warn("Could not save sample tasks:", e); }
+        ensureProjectInList(newId, getUniqueProjectName("My Linked Board"));
+        homeEditProjectId = newId;
+        renderHomeView();
+        requestAnimationFrame(function () {
           const newCard = document.querySelector(".home-project-card.edit-mode");
           if (newCard) newCard.scrollIntoView({ behavior: "smooth", block: "nearest" });
         });
@@ -10756,7 +10892,11 @@
             if (typeof showToast === "function") showToast("Could not create project.", { type: "error" });
           }
         } else if (action === "linked") {
-          if (typeof showToast === "function") showToast("Linked boards coming soon.", { type: "info" });
+          try {
+            await createNewLinkedBoard();
+          } catch (err) {
+            if (typeof showToast === "function") showToast("Could not create linked board.", { type: "error" });
+          }
         }
       });
       (function initViewCycling() {
