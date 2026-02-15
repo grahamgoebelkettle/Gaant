@@ -57,13 +57,13 @@
         },
         {
           "task": "First",
-          "phase": "development",
+          "phase": "discovery",
           "phaseSecondary": null,
           "party": "Unassigned",
-          "start": "4/7",
-          "end": "4/30",
-          "startDate": "2026-04-07T08:30:10.368Z",
-          "endDate": "2026-04-30T13:30:12.672Z",
+          "start": "5/4",
+          "end": "5/28",
+          "startDate": "2026-05-05T05:00:10.195Z",
+          "endDate": "2026-05-28T10:00:12.499Z",
           "star": false,
           "overview": "",
           "subTasks": [],
@@ -201,7 +201,7 @@
         "responsibleParties": [],
         "scrollPosition": {
           "scrollTop": 0,
-          "scrollLeft": 0
+          "scrollLeft": 155
         }
       },
       "view": "default",
