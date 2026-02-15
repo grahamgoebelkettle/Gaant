@@ -272,6 +272,22 @@
           "blockers": [],
           "links": [],
           "dependsOn": null
+        },
+        {
+          "task": "my first task",
+          "phase": "review",
+          "phaseSecondary": "delivery",
+          "party": "Unassigned",
+          "start": "5/9",
+          "end": "6/10",
+          "startDate": "2026-05-09T15:06:32.640Z",
+          "endDate": "2026-06-10T19:09:48.672Z",
+          "star": false,
+          "overview": "",
+          "subTasks": [],
+          "blockers": [],
+          "links": [],
+          "dependsOn": null
         }
       ],
       "settings": {
@@ -279,7 +295,7 @@
         "description": "another one",
         "scrollPosition": {
           "scrollTop": 0,
-          "scrollLeft": 495
+          "scrollLeft": 683
         }
       },
       "view": "default",
