@@ -12,7 +12,7 @@
     },
     {
       "id": "p-1771142164069",
-      "name": "Untitled project",
+      "name": "Blue blaze",
       "createdAt": 1771142164069
     }
   ],
@@ -220,8 +220,32 @@
       ]
     },
     "p-1771142164069": {
-      "tasks": [],
-      "settings": {},
+      "tasks": [
+        {
+          "task": "my first task",
+          "phase": "development",
+          "phaseSecondary": null,
+          "party": "Unassigned",
+          "start": "4/10",
+          "end": "4/16",
+          "startDate": "2026-04-10T09:29:59.481Z",
+          "endDate": "2026-04-16T09:29:59.481Z",
+          "star": false,
+          "overview": "",
+          "subTasks": [],
+          "blockers": [],
+          "links": [],
+          "dependsOn": null
+        }
+      ],
+      "settings": {
+        "title": "Blue blaze",
+        "description": "",
+        "scrollPosition": {
+          "scrollTop": 0,
+          "scrollLeft": 0
+        }
+      },
       "view": "default",
       "custom_palettes": []
     }
