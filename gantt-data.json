@@ -366,7 +366,24 @@
       "custom_palettes": []
     },
     "p-1771140518298": {
-      "tasks": [],
+      "tasks": [
+        {
+          "task": "my first task",
+          "phase": "discovery",
+          "phaseSecondary": null,
+          "party": "Unassigned",
+          "start": "2/15",
+          "end": "2/21",
+          "startDate": "2026-02-15T07:00:00.000Z",
+          "endDate": "2026-02-21T07:00:00.000Z",
+          "star": false,
+          "overview": "",
+          "subTasks": [],
+          "blockers": [],
+          "links": [],
+          "dependsOn": null
+        }
+      ],
       "settings": {
         "title": "999999",
         "description": ""
