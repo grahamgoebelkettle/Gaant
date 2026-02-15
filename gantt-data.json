@@ -27,7 +27,7 @@
     },
     {
       "id": "p-1771139546918",
-      "name": "Untitled project",
+      "name": "666 6666",
       "createdAt": 1771139546919
     }
   ],
@@ -255,8 +255,28 @@
       "custom_palettes": []
     },
     "p-1771139546918": {
-      "tasks": [],
-      "settings": {},
+      "tasks": [
+        {
+          "task": "my first task",
+          "phase": "discovery",
+          "phaseSecondary": null,
+          "party": "Unassigned",
+          "start": "2/15",
+          "end": "2/21",
+          "startDate": "2026-02-15T07:00:00.000Z",
+          "endDate": "2026-02-21T07:00:00.000Z",
+          "star": false,
+          "overview": "",
+          "subTasks": [],
+          "blockers": [],
+          "links": [],
+          "dependsOn": null
+        }
+      ],
+      "settings": {
+        "title": "666 6666",
+        "description": ""
+      },
       "view": "default",
       "custom_palettes": []
     }
