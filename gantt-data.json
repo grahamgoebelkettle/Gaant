@@ -275,7 +275,51 @@
       ],
       "settings": {
         "title": "Untitled project",
-        "description": ""
+        "description": "Drag bars to reschedule • Drag edges to change dates • Drag rows to reorder • Click a row to expand details • Click cells to edit",
+        "phases": [
+          {
+            "id": "discovery",
+            "name": "Discovery",
+            "color": "#64748b",
+            "sprints": 2
+          },
+          {
+            "id": "ideation",
+            "name": "Ideation",
+            "color": "#475569",
+            "sprints": 2
+          },
+          {
+            "id": "development",
+            "name": "Development",
+            "color": "#334155",
+            "sprints": 2
+          },
+          {
+            "id": "review",
+            "name": "Review",
+            "color": "#1e293b",
+            "sprints": 2
+          },
+          {
+            "id": "delivery",
+            "name": "Delivery",
+            "color": "#0f172a",
+            "sprints": 2
+          }
+        ],
+        "paletteIndex": 5,
+        "dependencyGapDays": 0,
+        "rowAppearance": "default",
+        "strokeMode": false,
+        "showDurationOnBar": false,
+        "projectStartDate": null,
+        "projectEndDate": null,
+        "phaseDurationMode": "fixed",
+        "snapToSprint": false,
+        "moveTasksWhenSprintExtended": false,
+        "allowIndependentDependencies": false,
+        "responsibleParties": []
       },
       "view": "default",
       "custom_palettes": []
