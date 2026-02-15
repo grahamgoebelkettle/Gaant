@@ -2282,7 +2282,7 @@
     .gantt-auth-user-trigger svg { width: 18px; height: 18px; }
     .gantt-auth-user-dropdown {
       position: absolute;
-      top: calc(100% + 6px);
+      top: 100%;
       right: 0;
       min-width: 220px;
       padding: 8px 0;
@@ -2348,6 +2348,7 @@
       box-shadow: var(--shadow-md); border: 1px solid var(--border-default);
     }
     .gantt-auth-modal h3 { margin: 0 0 16px 0; font-size: 18px; font-weight: 600; }
+    .gantt-auth-modal form { margin: 0; padding: 0; }
     .gantt-auth-modal input[type="email"],
     .gantt-auth-modal input[type="password"],
     .gantt-auth-modal input[type="url"],
@@ -2503,6 +2504,17 @@
       align-self: flex-start;
     }
     .home-project-card-footer .home-project-phase-tag { margin-top: 0; }
+    .home-project-local-tag {
+      display: inline-block;
+      padding: 3px 8px;
+      font-size: 11px;
+      font-weight: 500;
+      border-radius: 4px;
+      background: var(--bg-subtle, #f0f0f0);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-default, #e5e5e5);
+      align-self: flex-start;
+    }
     .home-project-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
     .home-project-action-btn {
       display: inline-flex;
@@ -2955,16 +2967,18 @@
       </div>
       <div class="auth-login-section hidden" id="ganttAuthLoginSection">
         <h3 id="ganttAuthModalTitle">Log in</h3>
-        <input type="email" id="ganttAuthEmail" placeholder="Email" autocomplete="email" />
-        <input type="password" id="ganttAuthPassword" placeholder="Password" autocomplete="current-password" />
-        <label class="auth-remember">
-          <input type="checkbox" id="ganttAuthRemember" checked />
-          <span>Remember me</span>
-        </label>
-        <div class="auth-actions">
-          <button type="button" class="gantt-auth-btn gantt-auth-btn-primary" id="ganttAuthSubmit">Log in</button>
-          <button type="button" class="gantt-auth-btn gantt-auth-btn-secondary" id="ganttAuthSignupSubmit">Sign up</button>
-        </div>
+        <form id="ganttAuthLoginForm" name="login" method="post" action="#" autocomplete="on" onsubmit="return false;" aria-label="Log in or sign up">
+          <input type="email" id="ganttAuthEmail" name="email" placeholder="Email" autocomplete="email" />
+          <input type="password" id="ganttAuthPassword" name="password" placeholder="Password" autocomplete="current-password" />
+          <label class="auth-remember">
+            <input type="checkbox" id="ganttAuthRemember" checked />
+            <span>Remember me</span>
+          </label>
+          <div class="auth-actions">
+            <button type="button" class="gantt-auth-btn gantt-auth-btn-primary" id="ganttAuthSubmit">Log in</button>
+            <button type="button" class="gantt-auth-btn gantt-auth-btn-secondary" id="ganttAuthSignupSubmit">Sign up</button>
+          </div>
+        </form>
         <div class="auth-use-different"><button type="button" id="ganttAuthShowConfig">Use different Supabase project</button></div>
       </div>
       <div class="auth-error" id="ganttAuthError" role="alert"></div>
@@ -3134,9 +3148,15 @@
 
     function getProjectTasksForPreview(projectId) {
       try {
-        const tasksRaw = localStorage.getItem("gantt-tasks-" + projectId);
-        const list = tasksRaw ? JSON.parse(tasksRaw) : [];
-        const tasks = Array.isArray(list) ? list : [];
+        let tasks = [];
+        if (window.ganttStorage?.isCloudEnabled()) {
+          const list = window.ganttStorage.loadTasks(projectId);
+          tasks = Array.isArray(list) ? list : [];
+        } else {
+          const tasksRaw = localStorage.getItem("gantt-tasks-" + projectId);
+          const list = tasksRaw ? JSON.parse(tasksRaw) : [];
+          tasks = Array.isArray(list) ? list : [];
+        }
         const phases = getProjectPhases(projectId);
         const phaseMap = new Map(phases.map(p => [p.id, p.color || "#737373"]));
         const today = new Date();
@@ -7014,9 +7034,9 @@
       if (titleEl) titleEl.textContent = title;
       if (descEl) descEl.textContent = desc;
       tasks.forEach((_, i) => { if (tasks.some(t => t.dependsOn === i)) propagateDependencyChanges(i); });
+      if (typeof renderPhaseHeaders === "function") renderPhaseHeaders();
       if (typeof updateChartRange === "function") updateChartRange();
       closeSettingsModal();
-      window.location.reload();
     }
 
     function getProjectDescription(projectId) {
@@ -7226,7 +7246,11 @@
         if (!isEditMode) {
           const previewWrap = document.createElement("div");
           previewWrap.className = "home-project-timeline-preview";
-          renderHomeTimelinePreview(p.id, previewWrap);
+          if (window.ganttStorage?.isCloudEnabled()) {
+            window.ganttStorage.ensureBoardDataLoaded(p.id).then(() => renderHomeTimelinePreview(p.id, previewWrap));
+          } else {
+            renderHomeTimelinePreview(p.id, previewWrap);
+          }
           card.appendChild(previewWrap);
         }
         const body = document.createElement("div");
@@ -7278,6 +7302,13 @@
         card.appendChild(body);
         const footer = document.createElement("div");
         footer.className = "home-project-card-footer";
+        const isLocal = !window.ganttStorage?.isCloudEnabled();
+        if (isLocal && !isEditMode) {
+          const localTag = document.createElement("span");
+          localTag.className = "home-project-local-tag";
+          localTag.textContent = "Local";
+          footer.appendChild(localTag);
+        }
         const phaseInfo = !isEditMode ? getProjectCurrentPhase(p.id) : null;
         if (phaseInfo) {
           const tag = document.createElement("span");
@@ -8432,8 +8463,13 @@
         }
       }
 
+      var hadSession = false;
       function updateAuthUI(session) {
         const show = !!session;
+        if (hadSession && !show && typeof showToast === "function") {
+          showToast("You have been logged out.", { type: "error" });
+        }
+        hadSession = !!session;
         if (wrap) wrap.style.display = show ? "" : "none";
         if (loginBtn) loginBtn.style.display = show ? "none" : "";
         if (userEmailEl) userEmailEl.textContent = show ? (session.user?.email || "Signed in") : "";
@@ -8456,7 +8492,9 @@
           userTrigger.setAttribute("aria-expanded", wrap.classList.contains("open"));
         });
       }
-      document.addEventListener("click", () => wrap?.classList.remove("open"));
+      document.addEventListener("click", (e) => {
+        if (wrap && wrap.classList.contains("open") && !wrap.contains(e.target)) wrap.classList.remove("open");
+      });
       if (userDropdown) userDropdown.addEventListener("click", (e) => e.stopPropagation());
       if (supabaseLink) supabaseLink.addEventListener("click", () => wrap?.classList.remove("open"));
       if (logoutBtn) logoutBtn.addEventListener("click", () => { wrap?.classList.remove("open"); window.ganttStorage.signOut(); });
@@ -8554,6 +8592,10 @@
       if (window.ganttStorage?.isCloudEnabled()) {
         const session = await window.ganttStorage.getSession();
         if (session) await window.ganttStorage.ensureBoardsListLoaded();
+        if (window.ganttStorage?.refreshAuthUI) window.ganttStorage.refreshAuthUI();
+        setTimeout(function () {
+          if (window.ganttStorage?.refreshAuthUI) window.ganttStorage.refreshAuthUI();
+        }, 400);
       }
       window.addEventListener("hashchange", () => handleRoute());
       async function createNewProject() {
