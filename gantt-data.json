@@ -79,35 +79,35 @@
           {
             "id": "discovery",
             "name": "Discovery",
-            "color": "#ff1ab6",
+            "color": "#f01997",
             "sprints": 2
           },
           {
             "id": "ideation",
             "name": "Ideation",
-            "color": "#c931a1",
+            "color": "#16a34a",
             "sprints": 2
           },
           {
             "id": "development",
             "name": "Development",
-            "color": "#b83da7",
+            "color": "#15803d",
             "sprints": 2
           },
           {
             "id": "review",
             "name": "Review",
-            "color": "#ae6195",
+            "color": "#166534",
             "sprints": 2
           },
           {
             "id": "delivery",
             "name": "Delivery",
-            "color": "#785475",
+            "color": "#14532d",
             "sprints": 2
           }
         ],
-        "paletteIndex": 4,
+        "paletteIndex": 6,
         "dependencyGapDays": 0,
         "rowAppearance": "compact",
         "strokeMode": true,
