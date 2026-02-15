@@ -16,16 +16,16 @@
       "createdAt": 1771142164069
     },
     {
-      "id": "p-1771176809291",
-      "name": "Untitled project",
-      "createdAt": 1771176809291
+      "id": "p-1771172367708",
+      "name": "This is a project!",
+      "createdAt": 1771172367708
     }
   ],
   "boards": {
     "p-1771131136904": {
       "tasks": [
         {
-          "task": "This is the first task!",
+          "task": "second",
           "phase": "discovery",
           "phaseSecondary": null,
           "party": "Unassigned",
@@ -141,7 +141,7 @@
           "dependsOn": null
         },
         {
-          "task": "First",
+          "task": "Last",
           "phase": "development",
           "phaseSecondary": null,
           "party": "Unassigned",
@@ -240,7 +240,7 @@
           "dependsOn": null
         },
         {
-          "task": "my first task",
+          "task": "second",
           "phase": "development",
           "phaseSecondary": null,
           "party": "Unassigned",
@@ -324,13 +324,13 @@
       "tasks": [
         {
           "task": "my first task",
-          "phase": "development",
+          "phase": "discovery",
           "phaseSecondary": null,
           "party": "Unassigned",
-          "start": "4/17",
-          "end": "5/5",
-          "startDate": "2026-04-18T02:59:55.968Z",
-          "endDate": "2026-05-06T05:29:55.449Z",
+          "start": "2/21",
+          "end": "3/11",
+          "startDate": "2026-02-22T00:48:57.421Z",
+          "endDate": "2026-03-12T03:18:56.902Z",
           "star": false,
           "overview": "",
           "subTasks": [],
@@ -392,17 +392,17 @@
       },
       "custom_palettes": []
     },
-    "p-1771176809291": {
+    "p-1771172367708": {
       "tasks": [
         {
-          "task": "New Research",
+          "task": "my first task",
           "phase": "discovery",
           "phaseSecondary": null,
           "party": "Unassigned",
-          "start": "2/15",
-          "end": "3/14",
-          "startDate": "2026-02-15T07:00:00.000Z",
-          "endDate": "2026-03-14T07:00:00.000Z",
+          "start": "2/5",
+          "end": "2/23",
+          "startDate": "2026-02-05T08:59:54.240Z",
+          "endDate": "2026-02-24T04:59:53.721Z",
           "star": false,
           "overview": "",
           "subTasks": [],
@@ -411,77 +411,68 @@
           "dependsOn": null
         },
         {
-          "task": "Design",
-          "phase": "ideation",
+          "task": "my first task",
+          "phase": "discovery",
           "phaseSecondary": null,
           "party": "Unassigned",
-          "start": "3/14",
-          "end": "4/10",
-          "startDate": "2026-03-14T07:00:00.000Z",
-          "endDate": "2026-04-10T07:00:00.000Z",
+          "start": "2/5",
+          "end": "2/23",
+          "startDate": "2026-02-05T08:59:54.240Z",
+          "endDate": "2026-02-24T04:59:53.721Z",
           "star": false,
           "overview": "",
           "subTasks": [],
           "blockers": [],
           "links": [],
-          "dependsOn": 0
-        },
-        {
-          "task": "Review",
-          "phase": "development",
-          "phaseSecondary": null,
-          "party": "Unassigned",
-          "start": "4/10",
-          "end": "5/7",
-          "startDate": "2026-04-10T07:00:00.000Z",
-          "endDate": "2026-05-07T07:00:00.000Z",
-          "star": false,
-          "overview": "",
-          "subTasks": [],
-          "blockers": [],
-          "links": [],
-          "dependsOn": 1
-        },
-        {
-          "task": "Build",
-          "phase": "review",
-          "phaseSecondary": null,
-          "party": "Unassigned",
-          "start": "5/7",
-          "end": "6/3",
-          "startDate": "2026-05-07T07:00:00.000Z",
-          "endDate": "2026-06-03T07:00:00.000Z",
-          "star": false,
-          "overview": "",
-          "subTasks": [],
-          "blockers": [],
-          "links": [],
-          "dependsOn": 2
-        },
-        {
-          "task": "Launch",
-          "phase": "delivery",
-          "phaseSecondary": null,
-          "party": "Unassigned",
-          "start": "6/3",
-          "end": "6/30",
-          "startDate": "2026-06-03T07:00:00.000Z",
-          "endDate": "2026-06-30T07:00:00.000Z",
-          "star": false,
-          "overview": "",
-          "subTasks": [],
-          "blockers": [],
-          "links": [],
-          "dependsOn": 3
+          "dependsOn": null
         }
       ],
       "settings": {
-        "title": "Untitled project",
-        "description": "",
-        "scrollPosition": {
-          "scrollTop": 114,
-          "scrollLeft": 0
-        }
+        "title": "This is a project!",
+        "description": "Drag bars to reschedule • Drag edges to change dates • Drag rows to reorder • Click a row to expand details • Click cells to edit",
+        "phases": [
+          {
+            "id": "discovery",
+            "name": "Discovery",
+            "color": "#eab308",
+            "sprints": 2
+          },
+          {
+            "id": "ideation",
+            "name": "Ideation",
+            "color": "#0d9488",
+            "sprints": 2
+          },
+          {
+            "id": "development",
+            "name": "Development",
+            "color": "#0284c7",
+            "sprints": 2
+          },
+          {
+            "id": "review",
+            "name": "Review",
+            "color": "#14b8a6",
+            "sprints": 2
+          },
+          {
+            "id": "delivery",
+            "name": "Delivery",
+            "color": "#6366f1",
+            "sprints": 2
+          }
+        ],
+        "paletteIndex": 0,
+        "dependencyGapDays": 0,
+        "strokeMode": false,
+        "showDurationOnBar": false,
+        "projectStartDate": "2026-02-02",
+        "projectEndDate": null,
+        "phaseDurationMode": "fixed",
+        "snapToSprint": false,
+        "moveTasksWhenSprintExtended": false,
+        "allowIndependentDependencies": false,
+        "responsibleParties": []
       },
       "custom_palettes": []
     }
