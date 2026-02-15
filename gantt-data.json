@@ -21,13 +21,13 @@
       "tasks": [
         {
           "task": "second",
-          "phase": "ideation",
+          "phase": "discovery",
           "phaseSecondary": null,
           "party": "Unassigned",
-          "start": "4/30",
-          "end": "5/18",
-          "startDate": "2026-04-30T13:30:12.672Z",
-          "endDate": "2026-05-18T12:30:12.153Z",
+          "start": "5/6",
+          "end": "5/24",
+          "startDate": "2026-05-06T13:00:16.128Z",
+          "endDate": "2026-05-24T12:00:15.609Z",
           "star": false,
           "overview": "second green task",
           "subTasks": [
@@ -37,7 +37,7 @@
           ],
           "blockers": [],
           "links": [],
-          "dependsOn": 1
+          "dependsOn": null
         },
         {
           "task": "First",
@@ -105,7 +105,7 @@
         "responsibleParties": [],
         "scrollPosition": {
           "scrollTop": 0,
-          "scrollLeft": 0
+          "scrollLeft": 160
         }
       },
       "view": "default",
