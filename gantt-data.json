@@ -271,6 +271,22 @@
           "blockers": [],
           "links": [],
           "dependsOn": null
+        },
+        {
+          "task": "New task",
+          "phase": "ideation",
+          "phaseSecondary": null,
+          "party": "Unassigned",
+          "start": "3/2",
+          "end": "3/8",
+          "startDate": "2026-03-02T07:00:00.000Z",
+          "endDate": "2026-03-08T07:00:00.000Z",
+          "star": false,
+          "overview": "",
+          "subTasks": [],
+          "blockers": [],
+          "links": [],
+          "dependsOn": null
         }
       ],
       "settings": {
