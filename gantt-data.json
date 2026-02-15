@@ -78,7 +78,7 @@
         ],
         "paletteIndex": 4,
         "dependencyGapDays": 0,
-        "rowAppearance": "compact",
+        "rowAppearance": "default",
         "strokeMode": true,
         "showDurationOnBar": false,
         "projectStartDate": null,
