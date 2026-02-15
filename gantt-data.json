@@ -22,7 +22,7 @@
     },
     {
       "id": "p-1771138208478",
-      "name": "Untitled project",
+      "name": "555 5555",
       "createdAt": 1771138208478
     }
   ],
@@ -225,7 +225,10 @@
     },
     "p-1771138208478": {
       "tasks": [],
-      "settings": {},
+      "settings": {
+        "title": "555 5555",
+        "description": "ok ya"
+      },
       "view": "default",
       "custom_palettes": []
     }
