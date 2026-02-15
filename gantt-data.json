@@ -6,34 +6,9 @@
       "createdAt": 1771131136904
     },
     {
-      "id": "p-1771131140680",
-      "name": "deux",
-      "createdAt": 1771131140680
-    },
-    {
-      "id": "p-1771131853990",
-      "name": "Please work!",
-      "createdAt": 1771131853990
-    },
-    {
-      "id": "p-1771133455408",
-      "name": "444 4444",
-      "createdAt": 1771133455408
-    },
-    {
-      "id": "p-1771138208478",
-      "name": "maybe plz",
-      "createdAt": 1771138208478
-    },
-    {
-      "id": "p-1771139546918",
-      "name": "777 7777",
-      "createdAt": 1771139546919
-    },
-    {
-      "id": "p-1771140518298",
-      "name": "for billy",
-      "createdAt": 1771140518298
+      "id": "p-1771142046060",
+      "name": "ladies first! copy",
+      "createdAt": 1771142046060
     }
   ],
   "boards": {
@@ -138,17 +113,17 @@
         }
       ]
     },
-    "p-1771131140680": {
+    "p-1771142046060": {
       "tasks": [
         {
           "task": "my first task",
-          "phase": "development",
+          "phase": "discovery",
           "phaseSecondary": null,
-          "party": "kevin c",
-          "start": "1/1",
-          "end": "1/22",
-          "startDate": "2026-01-02T05:12:02.048Z",
-          "endDate": "2026-01-22T17:30:16.761Z",
+          "party": "Unassigned",
+          "start": "2/14",
+          "end": "3/3",
+          "startDate": "2026-02-14T07:00:00.000Z",
+          "endDate": "2026-03-04T05:59:59.481Z",
           "star": false,
           "overview": "",
           "subTasks": [],
@@ -158,13 +133,13 @@
         },
         {
           "task": "my first task",
-          "phase": "delivery",
+          "phase": "development",
           "phaseSecondary": null,
-          "party": "George",
-          "start": "3/12",
-          "end": "3/18",
-          "startDate": "2026-03-12T13:06:33.296Z",
-          "endDate": "2026-03-18T13:06:33.296Z",
+          "party": "Unassigned",
+          "start": "4/7",
+          "end": "4/30",
+          "startDate": "2026-04-07T08:30:10.368Z",
+          "endDate": "2026-04-30T13:30:12.672Z",
           "star": false,
           "overview": "",
           "subTasks": [],
@@ -174,46 +149,46 @@
         }
       ],
       "settings": {
-        "title": "deux",
-        "description": "Drag bars to reschedule • Drag edges to change dates • Drag rows to reorder • Click a row to expand details • Click cells to edit",
+        "title": "ladies first! copy",
+        "description": "new description",
         "phases": [
           {
             "id": "discovery",
             "name": "Discovery",
-            "color": "#eab308",
+            "color": "#f01997",
             "sprints": 2
           },
           {
             "id": "ideation",
             "name": "Ideation",
-            "color": "#0d9488",
+            "color": "#16a34a",
             "sprints": 2
           },
           {
             "id": "development",
             "name": "Development",
-            "color": "#0284c7",
+            "color": "#15803d",
             "sprints": 2
           },
           {
             "id": "review",
             "name": "Review",
-            "color": "#14b8a6",
+            "color": "#166534",
             "sprints": 2
           },
           {
             "id": "delivery",
             "name": "Delivery",
-            "color": "#6366f1",
+            "color": "#14532d",
             "sprints": 2
           }
         ],
-        "paletteIndex": 0,
+        "paletteIndex": 6,
         "dependencyGapDays": 0,
-        "rowAppearance": "default",
-        "strokeMode": false,
+        "rowAppearance": "compact",
+        "strokeMode": true,
         "showDurationOnBar": false,
-        "projectStartDate": "2025-11-04",
+        "projectStartDate": null,
         "projectEndDate": null,
         "phaseDurationMode": "fixed",
         "snapToSprint": false,
@@ -226,229 +201,18 @@
         }
       },
       "view": "default",
-      "custom_palettes": []
-    },
-    "p-1771131853990": {
-      "tasks": [
+      "custom_palettes": [
         {
-          "task": "my first task",
-          "phase": "discovery",
-          "phaseSecondary": null,
-          "party": "Unassigned",
-          "start": "2/14",
-          "end": "2/20",
-          "startDate": "2026-02-14T07:00:00.000Z",
-          "endDate": "2026-02-20T07:00:00.000Z",
-          "star": false,
-          "overview": "",
-          "subTasks": [],
-          "blockers": [],
-          "links": [],
-          "dependsOn": null
+          "name": "My palette",
+          "colors": [
+            "#f01997",
+            "#16a34a",
+            "#15803d",
+            "#166534",
+            "#14532d"
+          ]
         }
-      ],
-      "settings": {
-        "title": "Please work!",
-        "description": "Drag bars to reschedule • Drag edges to change dates • Drag rows to reorder • Click a row to expand details • Click cells to edit"
-      },
-      "view": "default",
-      "custom_palettes": []
-    },
-    "p-1771133455408": {
-      "tasks": [
-        {
-          "task": "my first task",
-          "phase": "discovery",
-          "phaseSecondary": null,
-          "party": "Unassigned",
-          "start": "2/14",
-          "end": "2/20",
-          "startDate": "2026-02-14T07:00:00.000Z",
-          "endDate": "2026-02-20T07:00:00.000Z",
-          "star": false,
-          "overview": "",
-          "subTasks": [],
-          "blockers": [],
-          "links": [],
-          "dependsOn": null
-        }
-      ],
-      "settings": {
-        "title": "444 4444",
-        "description": "Drag bars to reschedule • Drag edges to change dates • Drag rows to reorder • Click a row to expand details • Click cells to edit",
-        "scrollPosition": {
-          "scrollTop": 0,
-          "scrollLeft": 0
-        }
-      },
-      "view": "default",
-      "custom_palettes": []
-    },
-    "p-1771138208478": {
-      "tasks": [
-        {
-          "task": "my first task",
-          "phase": "discovery",
-          "phaseSecondary": null,
-          "party": "Unassigned",
-          "start": "2/14",
-          "end": "3/5",
-          "startDate": "2026-02-14T07:00:00.000Z",
-          "endDate": "2026-03-06T03:30:02.304Z",
-          "star": false,
-          "overview": "",
-          "subTasks": [],
-          "blockers": [],
-          "links": [],
-          "dependsOn": null
-        }
-      ],
-      "settings": {
-        "title": "maybe plz",
-        "description": "ok ya",
-        "scrollPosition": {
-          "scrollTop": 0,
-          "scrollLeft": 238
-        }
-      },
-      "view": "default",
-      "custom_palettes": []
-    },
-    "p-1771139546918": {
-      "tasks": [
-        {
-          "task": "my first task",
-          "phase": "discovery",
-          "phaseSecondary": null,
-          "party": "Unassigned",
-          "start": "3/16",
-          "end": "4/7",
-          "startDate": "2026-03-16T07:30:00.172Z",
-          "endDate": "2026-04-07T18:59:54.412Z",
-          "star": false,
-          "overview": "",
-          "subTasks": [],
-          "blockers": [],
-          "links": [],
-          "dependsOn": null
-        },
-        {
-          "task": "my first task",
-          "phase": "ideation",
-          "phaseSecondary": null,
-          "party": "Unassigned",
-          "start": "4/13",
-          "end": "5/6",
-          "startDate": "2026-04-13T21:30:00.206Z",
-          "endDate": "2026-05-06T08:59:54.446Z",
-          "star": false,
-          "overview": "",
-          "subTasks": [],
-          "blockers": [],
-          "links": [],
-          "dependsOn": null
-        },
-        {
-          "task": "New task",
-          "phase": "development",
-          "phaseSecondary": null,
-          "party": "Unassigned",
-          "start": "5/20",
-          "end": "5/26",
-          "startDate": "2026-05-20T07:59:54.240Z",
-          "endDate": "2026-05-26T07:59:54.240Z",
-          "star": false,
-          "overview": "",
-          "subTasks": [],
-          "blockers": [],
-          "links": [],
-          "dependsOn": null
-        }
-      ],
-      "settings": {
-        "title": "777 7777",
-        "description": "Drag bars to reschedule • Drag edges to change dates • Drag rows to reorder • Click a row to expand details • Click cells to edit",
-        "scrollPosition": {
-          "scrollTop": 0,
-          "scrollLeft": 268
-        }
-      },
-      "view": "default",
-      "custom_palettes": []
-    },
-    "p-1771140518298": {
-      "tasks": [
-        {
-          "task": "my first task",
-          "phase": "discovery",
-          "phaseSecondary": "ideation",
-          "party": "Unassigned",
-          "start": "3/2",
-          "end": "4/4",
-          "startDate": "2026-03-03T01:35:21.340Z",
-          "endDate": "2026-04-04T23:05:15.781Z",
-          "star": false,
-          "overview": "",
-          "subTasks": [],
-          "blockers": [],
-          "links": [],
-          "dependsOn": null
-        }
-      ],
-      "settings": {
-        "title": "for billy",
-        "description": "Drag bars to reschedule • Drag edges to change dates • Drag rows to reorder • Click a row to expand details • Click cells to edit",
-        "phases": [
-          {
-            "id": "discovery",
-            "name": "Discovery",
-            "color": "#eab308",
-            "sprints": 2
-          },
-          {
-            "id": "ideation",
-            "name": "Ideation",
-            "color": "#0d9488",
-            "sprints": 2
-          },
-          {
-            "id": "development",
-            "name": "Development",
-            "color": "#0284c7",
-            "sprints": 2
-          },
-          {
-            "id": "review",
-            "name": "Review",
-            "color": "#14b8a6",
-            "sprints": 2
-          },
-          {
-            "id": "delivery",
-            "name": "Delivery",
-            "color": "#6366f1",
-            "sprints": 2
-          }
-        ],
-        "paletteIndex": 0,
-        "dependencyGapDays": 0,
-        "rowAppearance": "default",
-        "strokeMode": false,
-        "showDurationOnBar": false,
-        "projectStartDate": "2026-02-15",
-        "projectEndDate": null,
-        "phaseDurationMode": "fixed",
-        "snapToSprint": false,
-        "moveTasksWhenSprintExtended": false,
-        "allowIndependentDependencies": false,
-        "responsibleParties": [],
-        "scrollPosition": {
-          "scrollTop": 0,
-          "scrollLeft": 72
-        }
-      },
-      "view": "default",
-      "custom_palettes": []
+      ]
     }
   }
 }
