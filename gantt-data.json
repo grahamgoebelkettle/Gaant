@@ -27,7 +27,7 @@
     },
     {
       "id": "p-1771139546918",
-      "name": "666 6666",
+      "name": "777 7777",
       "createdAt": 1771139546919
     }
   ],
@@ -261,10 +261,26 @@
           "phase": "discovery",
           "phaseSecondary": null,
           "party": "Unassigned",
-          "start": "2/15",
-          "end": "2/21",
-          "startDate": "2026-02-15T07:00:00.000Z",
-          "endDate": "2026-02-21T07:00:00.000Z",
+          "start": "3/16",
+          "end": "4/7",
+          "startDate": "2026-03-16T07:30:00.172Z",
+          "endDate": "2026-04-07T18:59:54.412Z",
+          "star": false,
+          "overview": "",
+          "subTasks": [],
+          "blockers": [],
+          "links": [],
+          "dependsOn": null
+        },
+        {
+          "task": "my first task",
+          "phase": "ideation",
+          "phaseSecondary": null,
+          "party": "Unassigned",
+          "start": "4/13",
+          "end": "5/6",
+          "startDate": "2026-04-13T21:30:00.206Z",
+          "endDate": "2026-05-06T08:59:54.446Z",
           "star": false,
           "overview": "",
           "subTasks": [],
@@ -274,13 +290,13 @@
         },
         {
           "task": "New task",
-          "phase": "ideation",
+          "phase": "development",
           "phaseSecondary": null,
           "party": "Unassigned",
-          "start": "3/2",
-          "end": "3/8",
-          "startDate": "2026-03-02T07:00:00.000Z",
-          "endDate": "2026-03-08T07:00:00.000Z",
+          "start": "5/20",
+          "end": "5/26",
+          "startDate": "2026-05-20T07:59:54.240Z",
+          "endDate": "2026-05-26T07:59:54.240Z",
           "star": false,
           "overview": "",
           "subTasks": [],
@@ -290,8 +306,12 @@
         }
       ],
       "settings": {
-        "title": "666 6666",
-        "description": ""
+        "title": "777 7777",
+        "description": "Drag bars to reschedule • Drag edges to change dates • Drag rows to reorder • Click a row to expand details • Click cells to edit",
+        "scrollPosition": {
+          "scrollTop": 0,
+          "scrollLeft": 268
+        }
       },
       "view": "default",
       "custom_palettes": []
