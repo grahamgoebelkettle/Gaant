@@ -24,6 +24,11 @@
       "id": "p-1771132173996",
       "name": "Five",
       "createdAt": 1771132185399
+    },
+    {
+      "id": "p-1771134178737",
+      "name": "Untitled project",
+      "createdAt": 1771134178737
     }
   ],
   "boards": {
@@ -245,6 +250,15 @@
           "scrollTop": 0,
           "scrollLeft": 0
         }
+      },
+      "view": "default",
+      "custom_palettes": []
+    },
+    "p-1771134178737": {
+      "tasks": [],
+      "settings": {
+        "title": "Untitled project",
+        "description": ""
       },
       "view": "default",
       "custom_palettes": []
