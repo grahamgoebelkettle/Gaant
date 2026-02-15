@@ -344,7 +344,7 @@
         "description": "I like blue!",
         "scrollPosition": {
           "scrollTop": 0,
-          "scrollLeft": 497
+          "scrollLeft": 0
         },
         "phases": [
           {
@@ -477,7 +477,11 @@
       ],
       "settings": {
         "title": "Untitled project",
-        "description": ""
+        "description": "",
+        "scrollPosition": {
+          "scrollTop": 114,
+          "scrollLeft": 0
+        }
       },
       "custom_palettes": []
     }
