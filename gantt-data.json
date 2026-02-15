@@ -194,7 +194,6 @@
         ],
         "paletteIndex": 6,
         "dependencyGapDays": 0,
-        "rowAppearance": "compact",
         "strokeMode": true,
         "showDurationOnBar": false,
         "projectStartDate": null,
@@ -206,10 +205,9 @@
         "responsibleParties": [],
         "scrollPosition": {
           "scrollTop": 0,
-          "scrollLeft": 155
+          "scrollLeft": 0
         }
       },
-      "view": "default",
       "custom_palettes": [
         {
           "name": "My palette",
@@ -295,7 +293,6 @@
         ],
         "paletteIndex": 6,
         "dependencyGapDays": 0,
-        "rowAppearance": "compact",
         "strokeMode": true,
         "showDurationOnBar": false,
         "projectStartDate": null,
@@ -310,7 +307,6 @@
           "scrollLeft": 0
         }
       },
-      "view": "default",
       "custom_palettes": [
         {
           "name": "My palette",
@@ -384,7 +380,6 @@
         ],
         "paletteIndex": 0,
         "dependencyGapDays": 0,
-        "rowAppearance": "default",
         "strokeMode": false,
         "showDurationOnBar": false,
         "projectStartDate": "2026-02-15",
@@ -395,7 +390,6 @@
         "allowIndependentDependencies": false,
         "responsibleParties": []
       },
-      "view": "default",
       "custom_palettes": []
     },
     "p-1771176809291": {
@@ -485,7 +479,6 @@
         "title": "Untitled project",
         "description": ""
       },
-      "view": "default",
       "custom_palettes": []
     }
   }
