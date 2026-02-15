@@ -810,6 +810,11 @@
     .gantt-bar .resize-handle-left:hover { background: rgba(0,0,0,0.15); }
     .gantt-bar.resizing .resize-handle,
     .gantt-bar.resizing .resize-handle-left { background: rgba(0,0,0,0.25); }
+    .gantt-read-only .gantt-bar { cursor: pointer; }
+    .gantt-read-only .gantt-bar .resize-handle,
+    .gantt-read-only .gantt-bar .resize-handle-left,
+    .gantt-read-only .gantt-row:not(.gantt-header) .gantt-cell:not(.gantt-timeline-cell) { pointer-events: none; }
+    .gantt-read-only .gantt-row:not(.gantt-header) { cursor: default; }
     .gantt-bar-duration-hint {
       position: absolute;
       left: 50%;
@@ -837,6 +842,18 @@
     body.shift-mode .gantt-bar,
     body.shift-mode .gantt-bar .resize-handle,
     body.shift-mode .gantt-bar .resize-handle-left { cursor: default; pointer-events: none; }
+    .gantt-read-only .gantt-bar .resize-handle,
+    .gantt-read-only .gantt-bar .resize-handle-left,
+    .gantt-read-only .gantt-row:not(.gantt-header) .gantt-cell[contenteditable],
+    .gantt-read-only .task-detail-content input,
+    .gantt-read-only .task-detail-content select,
+    .gantt-read-only .task-detail-content textarea,
+    .gantt-read-only .task-detail-list-remove,
+    .gantt-read-only .task-detail-add-btn { cursor: default; pointer-events: none; }
+    .gantt-read-only .task-detail-edit-btn,
+    .gantt-read-only .task-detail-done-btn { display: none !important; }
+    .gantt-read-only .gantt-phase-dropdown { pointer-events: none; cursor: default; }
+    .gantt-read-only .gantt-phase-dropdown-trigger .phase-chevron { opacity: 0; }
     body.shift-mode .gantt-bar-duration-hint-hover {
       opacity: 1 !important;
     }
@@ -2277,7 +2294,9 @@
     .shared-file-modal .shared-file-modal-status-dot.none { background: var(--stroke-default); }
     .shared-file-modal .shared-file-modal-status-dot.local { background: var(--stroke-default); }
     .shared-file-modal label { display: block; font-size: 12px; font-weight: 500; color: var(--text-secondary); margin-bottom: 4px; }
-    .shared-file-modal input[type="url"], .shared-file-modal input[type="password"] { width: 100%; padding: 10px 12px; margin-bottom: 12px; border-radius: 6px; border: 1px solid var(--border-strong); font-size: 14px; box-sizing: border-box; }
+    .shared-file-modal input[type="url"] { width: 100%; padding: 10px 12px; margin-bottom: 12px; border-radius: 6px; border: 1px solid var(--border-strong); font-size: 14px; box-sizing: border-box; }
+    .shared-file-modal-token-row { display: flex; gap: 8px; margin-bottom: 12px; align-items: center; }
+    .shared-file-modal-token-row input { flex: 1; padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border-strong); font-size: 14px; box-sizing: border-box; }
     .shared-file-modal .shared-file-modal-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
     .shared-file-modal .shared-file-modal-section { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-default); }
     .home-header-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
@@ -3063,7 +3082,10 @@
       </div>
       <div class="shared-file-modal-section">
         <label for="sharedFileGitHubToken">Push to GitHub (owner): Personal Access Token with <code>repo</code> scope</label>
-        <input type="password" id="sharedFileGitHubToken" placeholder="ghp_..." autocomplete="off" />
+        <div class="shared-file-modal-token-row">
+          <input type="password" id="sharedFileGitHubToken" placeholder="ghp_..." autocomplete="off" />
+          <button type="button" class="home-shared-file-btn" id="sharedFileClearToken" title="Clear token">Clear</button>
+        </div>
         <div class="shared-file-modal-actions">
           <button type="button" class="home-shared-file-btn" id="sharedFilePush">Push to GitHub</button>
         </div>
@@ -3105,7 +3127,7 @@
     const PROJECTS_LIST_KEY = "gantt-projects";
     const SHARED_FILE_URL_KEY = "gantt-shared-file-url";
     const GITHUB_TOKEN_KEY = "gantt-github-token";
-    const SHARED_FILE_POLL_MS = 15000;
+    const SHARED_FILE_POLL_MS = 3000;
     const EXAMPLE_SHARED_FILE_URL = "https://raw.githubusercontent.com/grahamgoebelkettle/Gaant/main/gantt-data.json";
     function getCustomPalettesKey() {
       return "gantt-custom-palettes-" + (currentProjectId || "default");
@@ -3231,6 +3253,7 @@
       saveProjectsList(list);
     }
     function duplicateProject(sourceId) {
+      if (typeof window.hasWriteAccess === "function" && !window.hasWriteAccess()) return;
       pushProjectsListUndo();
       const list = loadProjectsList();
       const source = list.find(proj => proj.id === sourceId);
@@ -3262,6 +3285,7 @@
         if (palettesRaw) localStorage.setItem("gantt-custom-palettes-" + newId, palettesRaw);
       } catch (e) { console.warn("Could not copy project data:", e); }
       ensureProjectInList(newId, copyName);
+      if (typeof renderHomeView === "function") renderHomeView();
     }
 
     function getProjectPhases(projectId) {
@@ -3517,6 +3541,7 @@
     }
 
     function saveTasks() {
+      if (typeof window.hasWriteAccess === "function" && !window.hasWriteAccess()) return;
       const toSave = tasks.map(t => ({
         task: t.task,
         phase: t.phase,
@@ -4588,7 +4613,7 @@
       }
       const childContainer = document.getElementById("ganttChildConnectorsContainer");
       if (childContainer) childContainer.innerHTML = "";
-      grid?.querySelectorAll(".gantt-row:not(.gantt-header)").forEach(r => { r.draggable = true; });
+      grid?.querySelectorAll(".gantt-row:not(.gantt-header)").forEach(r => { r.draggable = typeof window.hasWriteAccess !== "function" || window.hasWriteAccess(); });
     }
 
     function populateTooltipForBar(tooltipEl, task, index) {
@@ -5437,6 +5462,7 @@
       const DRAG_THRESHOLD_PX = 5;
       bar.addEventListener("mousedown", (e) => {
         if (e.target.closest(".resize-handle")) return;
+        if (typeof window.hasWriteAccess === "function" && !window.hasWriteAccess()) return;
         e.preventDefault();
         const startX = e.clientX;
         const startY = e.clientY;
@@ -5970,7 +5996,7 @@
       const row = document.createElement("div");
       row.className = "gantt-row";
       row.dataset.index = i;
-      row.draggable = true;
+      row.draggable = typeof window.hasWriteAccess !== "function" || window.hasWriteAccess();
       const taskCell = document.createElement("div");
       taskCell.className = "gantt-cell gantt-task-cell";
       const nameWrap = document.createElement("span");
@@ -6249,7 +6275,9 @@
       row.appendChild(timelineCell);
 
       row.addEventListener("click", (e) => {
-        if (e.target.closest(".gantt-delete-btn") || e.target.closest(".gantt-duplicate-btn") || e.target.closest(".gantt-bar") || e.target.closest(".resize-handle") || e.target.closest(".gantt-phase-cell") || e.target.closest(".gantt-party-cell") || e.target.closest(".gantt-date-cell")) return;
+        const isReadOnly = typeof window.hasWriteAccess === "function" && !window.hasWriteAccess();
+        const onBar = e.target.closest(".gantt-bar");
+        if (e.target.closest(".gantt-delete-btn") || e.target.closest(".gantt-duplicate-btn") || (onBar && !isReadOnly) || e.target.closest(".resize-handle") || e.target.closest(".gantt-phase-cell") || e.target.closest(".gantt-party-cell") || e.target.closest(".gantt-date-cell")) return;
         document.querySelectorAll(".gantt-row.selected").forEach(r => r.classList.remove("selected"));
         row.classList.add("selected");
         const idx = parseInt(row.dataset.index, 10);
@@ -6262,6 +6290,10 @@
     let draggedIndex = null;
     function setupRowDrag(row, index) {
       row.addEventListener("dragstart", (e) => {
+        if (typeof window.hasWriteAccess === "function" && !window.hasWriteAccess()) {
+          e.preventDefault();
+          return;
+        }
         if (e.target.closest(".gantt-bar") || e.target.closest(".gantt-timeline-cell") || e.target.closest(".gantt-party-cell")) {
           e.preventDefault();
           return;
@@ -6316,6 +6348,7 @@
       document.removeEventListener("keydown", fabPhaseMenu._escapeKey);
     }
     function addTaskInPhase(phaseId) {
+      if (typeof window.hasWriteAccess === "function" && !window.hasWriteAccess()) return;
       closeFabPhaseMenu();
       pushTasksUndo();
       const resolvedPhaseId = phaseId || PHASES[0]?.id || "";
@@ -7074,12 +7107,10 @@
     function closeSettingsModal() {
       applyRowAppearance();
       document.getElementById("settingsOverlay").classList.remove("open");
-      if (currentProjectId) {
-        const addFab = document.getElementById("addTaskFab");
-        if (addFab) addFab.style.display = "";
-      }
+      if (currentProjectId && typeof window.updateWriteAccessUI === "function") window.updateWriteAccessUI();
     }
     function saveSettingsFromModal() {
+      if (typeof window.hasWriteAccess === "function" && !window.hasWriteAccess()) return;
       const title = document.getElementById("settingsTitle").value.trim() || DEFAULT_PAGE_TITLE;
       const desc = document.getElementById("settingsDescription").value.trim() || DEFAULT_PAGE_DESCRIPTION;
       const phases = [];
@@ -7364,6 +7395,7 @@
     function renderHomeView() {
       const listEl = document.getElementById("homeProjectList");
       if (!listEl) return;
+      if (typeof window.hasWriteAccess === "function" && !window.hasWriteAccess()) homeEditProjectId = null;
       initHomePageHeader();
       const projects = loadProjectsList();
       const badgeEl = document.getElementById("homeProjectCountBadge");
@@ -7461,7 +7493,8 @@
         }
         const footerActions = document.createElement("div");
         footerActions.className = "home-project-footer-actions";
-        if (isEditMode) {
+        var canWrite = typeof window.hasWriteAccess === "function" && window.hasWriteAccess();
+        if (isEditMode && canWrite) {
           const doneBtn = document.createElement("button");
           doneBtn.type = "button";
           doneBtn.className = "home-project-done-btn";
@@ -7481,7 +7514,7 @@
             renderHomeView();
           });
           footerActions.appendChild(doneBtn);
-        } else {
+        } else if (canWrite) {
           const duplicateBtn = document.createElement("button");
           duplicateBtn.type = "button";
           duplicateBtn.className = "home-project-action-btn home-project-duplicate-btn";
@@ -7490,10 +7523,12 @@
           duplicateBtn.addEventListener("click", async (e) => {
             e.preventDefault();
             e.stopPropagation();
+            if (typeof window.hasWriteAccess === "function" && !window.hasWriteAccess()) return;
             await duplicateProject(p.id);
           });
           footerActions.appendChild(duplicateBtn);
         }
+        if (canWrite) {
         const deleteBtn = document.createElement("button");
         deleteBtn.type = "button";
         deleteBtn.className = "home-project-delete-btn";
@@ -7502,6 +7537,7 @@
         deleteBtn.addEventListener("click", async (e) => {
           e.preventDefault();
           e.stopPropagation();
+          if (typeof window.hasWriteAccess === "function" && !window.hasWriteAccess()) return;
           if (!confirm("Delete this project? Tasks and settings will be removed. This cannot be undone.")) return;
           pushProjectsListUndo();
           if (p.id === homeEditProjectId) homeEditProjectId = null;
@@ -7522,6 +7558,7 @@
           renderHomeView();
         });
         footerActions.appendChild(deleteBtn);
+        }
         footer.appendChild(footerActions);
         card.appendChild(footer);
         listEl.appendChild(card);
@@ -7542,10 +7579,11 @@
     function updateEmptyState() {
       const emptyEl = document.getElementById("ganttEmptyState");
       if (!emptyEl) return;
-      if (isPlaceholderOnlyProject()) {
-        emptyEl.classList.remove("hidden");
-      } else {
+      var readOnly = typeof window.hasWriteAccess === "function" && !window.hasWriteAccess();
+      if (readOnly || !isPlaceholderOnlyProject()) {
         emptyEl.classList.add("hidden");
+      } else {
+        emptyEl.classList.remove("hidden");
       }
     }
     async function handleRoute() {
@@ -7576,6 +7614,7 @@
         if (allLines) allLines.classList.remove("visible");
         const ganttGrid = document.getElementById("ganttGrid");
         ganttGrid?.querySelectorAll(".gantt-row:not(.gantt-header)").forEach(r => { r.draggable = true; });
+        if (typeof window.updateWriteAccessUI === "function") window.updateWriteAccessUI();
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
             if (homeView) homeView.classList.add("active");
@@ -7589,8 +7628,7 @@
       currentProjectId = id;
       ensureProjectInList(id);
       if (!sameProject) initGantt();
-      const addFab = document.getElementById("addTaskFab");
-      if (addFab) addFab.style.display = "";
+      if (typeof window.updateWriteAccessUI === "function") window.updateWriteAccessUI();
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           if (homeView) homeView.classList.remove("active");
@@ -8448,7 +8486,7 @@
         if (!shiftHeld) return;
         shiftHeld = false;
         document.body.classList.remove("shift-mode");
-        grid?.querySelectorAll(".gantt-row:not(.gantt-header)").forEach(r => { r.draggable = true; });
+        grid?.querySelectorAll(".gantt-row:not(.gantt-header)").forEach(r => { r.draggable = typeof window.hasWriteAccess !== "function" || window.hasWriteAccess(); });
         if (singleLineEl) singleLineEl.style.visibility = "";
         shiftModeUnlinkButtons.forEach(btn => btn.remove());
         shiftModeUnlinkButtons.length = 0;
@@ -8828,15 +8866,43 @@
         function isSynced() {
           try { var u = localStorage.getItem(SHARED_FILE_URL_KEY); return !!(u && u.trim()); } catch (e) { return false; }
         }
+        function hasWriteAccess() {
+          if (window.ganttStorage && window.ganttStorage.isCloudEnabled && window.ganttStorage.isCloudEnabled()) return true;
+          if (!isSynced()) return true;
+          try { var t = localStorage.getItem(GITHUB_TOKEN_KEY); return !!(t && t.trim()); } catch (e) { return false; }
+        }
+        window.hasWriteAccess = hasWriteAccess;
+        function updateWriteAccessUI() {
+          var canWrite = hasWriteAccess();
+          var fab = document.getElementById("homeFab");
+          if (fab) fab.style.display = canWrite ? "" : "none";
+          var addFab = document.getElementById("addTaskFab");
+          if (addFab) addFab.style.display = canWrite ? "" : "none";
+          var settingsBtn = document.getElementById("settingsBtn");
+          if (settingsBtn) settingsBtn.style.display = canWrite ? "" : "none";
+          var ganttView = document.getElementById("ganttView");
+          if (ganttView) ganttView.classList.toggle("gantt-read-only", !canWrite);
+          var homeDesc = document.getElementById("homePageDescription");
+          if (homeDesc) homeDesc.contentEditable = String(canWrite);
+          var homeTitle = document.getElementById("homePageTitle");
+          if (homeTitle) homeTitle.contentEditable = String(canWrite);
+          var pageTitle = document.getElementById("pageTitle");
+          if (pageTitle) pageTitle.contentEditable = String(canWrite);
+          var pageDesc = document.getElementById("pageDescription");
+          if (pageDesc) pageDesc.contentEditable = String(canWrite);
+          document.querySelectorAll("#ganttGrid .gantt-row:not(.gantt-header)").forEach(function (r) { r.draggable = canWrite; });
+        }
+        window.updateWriteAccessUI = updateWriteAccessUI;
         function updateHomeStatus() {
           var synced = isSynced();
           if (statusDot) { statusDot.className = "home-shared-file-status-dot " + (synced ? "synced" : "local"); }
           if (statusText) {
-            statusText.textContent = synced ? "Synced with GitHub" : "";
+            statusText.textContent = synced ? (hasWriteAccess() ? "Synced with GitHub" : "Synced (Read only)") : "";
             statusText.style.display = synced ? "" : "none";
           }
           var openBtn = document.getElementById("sharedFileOpenModal");
           if (openBtn) openBtn.style.display = synced ? "none" : "";
+          if (typeof updateWriteAccessUI === "function") updateWriteAccessUI();
         }
         function updateModalStatus() {
           var url = (urlInput && urlInput.value) ? urlInput.value : "";
@@ -8857,10 +8923,19 @@
           try { if (tokenInput && tokenInput.value.trim()) localStorage.setItem(GITHUB_TOKEN_KEY, tokenInput.value.trim()); } catch (e) {}
           if (modalOverlay) modalOverlay.classList.remove("visible");
           updateHomeStatus();
+          if (typeof updateWriteAccessUI === "function") updateWriteAccessUI();
         }
         if (openModalBtn) openModalBtn.addEventListener("click", openSharedFileModal);
         if (statusText) statusText.addEventListener("click", openSharedFileModal);
         if (closeModalBtn) closeModalBtn.addEventListener("click", closeSharedFileModal);
+        var clearTokenBtn = document.getElementById("sharedFileClearToken");
+        if (clearTokenBtn) clearTokenBtn.addEventListener("click", function () {
+          try { localStorage.removeItem(GITHUB_TOKEN_KEY); } catch (e) {}
+          if (tokenInput) tokenInput.value = "";
+          updateHomeStatus();
+          if (typeof updateWriteAccessUI === "function") updateWriteAccessUI();
+          if (typeof showToast === "function") showToast("Token cleared.", { type: "success" });
+        });
         if (modalOverlay) modalOverlay.addEventListener("click", function (e) { if (e.target === modalOverlay) closeSharedFileModal(); });
         if (urlInput) urlInput.addEventListener("input", updateModalStatus);
         updateHomeStatus();
@@ -9176,6 +9251,7 @@
       })();
       window.addEventListener("hashchange", () => handleRoute());
       async function createNewProject() {
+        if (typeof window.hasWriteAccess === "function" && !window.hasWriteAccess()) return;
         if (window.ganttStorage?.isCloudEnabled()) {
           const name = getUniqueProjectName("Untitled project");
           let newId;
@@ -9247,8 +9323,10 @@
         });
       })();
       await handleRoute();
+      if (typeof window.updateWriteAccessUI === "function") window.updateWriteAccessUI();
       if (typeof window.__doLoadFromStoredUrl === "function") window.__doLoadFromStoredUrl();
       else if (typeof window.__fetchSharedUpdates === "function") window.__fetchSharedUpdates();
+      if (typeof window.updateWriteAccessUI === "function") window.updateWriteAccessUI();
     }
     if (document.readyState === "loading") {
       document.addEventListener("DOMContentLoaded", bootstrap);
