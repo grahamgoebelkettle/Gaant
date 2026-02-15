@@ -31,9 +31,9 @@
       "createdAt": 1771139546919
     },
     {
-      "id": "p-1771140080187",
-      "name": "777 7777 copy",
-      "createdAt": 1771140080187
+      "id": "p-1771140111963",
+      "name": "Untitled project",
+      "createdAt": 1771140111963
     }
   ],
   "boards": {
@@ -321,65 +321,9 @@
       "view": "default",
       "custom_palettes": []
     },
-    "p-1771140080187": {
-      "tasks": [
-        {
-          "task": "my first task",
-          "phase": "discovery",
-          "phaseSecondary": null,
-          "party": "Unassigned",
-          "start": "3/16",
-          "end": "4/7",
-          "startDate": "2026-03-16T07:30:00.172Z",
-          "endDate": "2026-04-07T18:59:54.412Z",
-          "star": false,
-          "overview": "",
-          "subTasks": [],
-          "blockers": [],
-          "links": [],
-          "dependsOn": null
-        },
-        {
-          "task": "my first task",
-          "phase": "ideation",
-          "phaseSecondary": null,
-          "party": "Unassigned",
-          "start": "4/13",
-          "end": "5/6",
-          "startDate": "2026-04-13T21:30:00.206Z",
-          "endDate": "2026-05-06T08:59:54.446Z",
-          "star": false,
-          "overview": "",
-          "subTasks": [],
-          "blockers": [],
-          "links": [],
-          "dependsOn": null
-        },
-        {
-          "task": "New task",
-          "phase": "development",
-          "phaseSecondary": null,
-          "party": "Unassigned",
-          "start": "5/20",
-          "end": "5/26",
-          "startDate": "2026-05-20T07:59:54.240Z",
-          "endDate": "2026-05-26T07:59:54.240Z",
-          "star": false,
-          "overview": "",
-          "subTasks": [],
-          "blockers": [],
-          "links": [],
-          "dependsOn": null
-        }
-      ],
-      "settings": {
-        "title": "777 7777 copy",
-        "description": "Drag bars to reschedule • Drag edges to change dates • Drag rows to reorder • Click a row to expand details • Click cells to edit",
-        "scrollPosition": {
-          "scrollTop": 0,
-          "scrollLeft": 268
-        }
-      },
+    "p-1771140111963": {
+      "tasks": [],
+      "settings": {},
       "view": "default",
       "custom_palettes": []
     }
