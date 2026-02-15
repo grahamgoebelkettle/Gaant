@@ -379,7 +379,51 @@
         "scrollPosition": {
           "scrollTop": 0,
           "scrollLeft": 683
-        }
+        },
+        "phases": [
+          {
+            "id": "discovery",
+            "name": "Discovery",
+            "color": "#22c55e",
+            "sprints": 2
+          },
+          {
+            "id": "ideation",
+            "name": "Ideation",
+            "color": "#16a34a",
+            "sprints": 2
+          },
+          {
+            "id": "development",
+            "name": "Development",
+            "color": "#15803d",
+            "sprints": 2
+          },
+          {
+            "id": "review",
+            "name": "Review",
+            "color": "#166534",
+            "sprints": 2
+          },
+          {
+            "id": "delivery",
+            "name": "Delivery",
+            "color": "#14532d",
+            "sprints": 2
+          }
+        ],
+        "paletteIndex": 4,
+        "dependencyGapDays": 0,
+        "rowAppearance": "default",
+        "strokeMode": false,
+        "showDurationOnBar": false,
+        "projectStartDate": null,
+        "projectEndDate": null,
+        "phaseDurationMode": "fixed",
+        "snapToSprint": false,
+        "moveTasksWhenSprintExtended": false,
+        "allowIndependentDependencies": false,
+        "responsibleParties": []
       },
       "view": "default",
       "custom_palettes": []
