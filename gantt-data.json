@@ -258,7 +258,7 @@
       "tasks": [
         {
           "task": "my first task",
-          "phase": "discovery",
+          "phase": "ideation",
           "phaseSecondary": null,
           "party": "Unassigned",
           "start": "2/14",
