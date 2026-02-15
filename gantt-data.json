@@ -1,11 +1,6 @@
 {
   "projects": [
     {
-      "id": "p-sample",
-      "name": "Sample project",
-      "createdAt": 1739548800000
-    },
-    {
       "id": "p-1771131136904",
       "name": "Sample project copy",
       "createdAt": 1771131136904
@@ -27,32 +22,6 @@
     }
   ],
   "boards": {
-    "p-sample": {
-      "tasks": [
-        {
-          "task": "my first task",
-          "phase": "discovery",
-          "phaseSecondary": null,
-          "party": "Unassigned",
-          "start": "2/14",
-          "end": "2/20",
-          "startDate": "2026-02-14T07:00:00.000Z",
-          "endDate": "2026-02-20T07:00:00.000Z",
-          "star": false,
-          "overview": "",
-          "subTasks": [],
-          "blockers": [],
-          "links": [],
-          "dependsOn": null
-        }
-      ],
-      "settings": {
-        "title": "Sample project",
-        "description": ""
-      },
-      "view": "default",
-      "custom_palettes": []
-    },
     "p-1771131136904": {
       "tasks": [
         {
