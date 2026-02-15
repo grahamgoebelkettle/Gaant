@@ -256,11 +256,31 @@
           "blockers": [],
           "links": [],
           "dependsOn": null
+        },
+        {
+          "task": "my first task",
+          "phase": "development",
+          "phaseSecondary": null,
+          "party": "Unassigned",
+          "start": "4/10",
+          "end": "4/16",
+          "startDate": "2026-04-11T04:00:52.992Z",
+          "endDate": "2026-04-17T04:00:52.992Z",
+          "star": false,
+          "overview": "",
+          "subTasks": [],
+          "blockers": [],
+          "links": [],
+          "dependsOn": null
         }
       ],
       "settings": {
         "title": "this is brand new!",
-        "description": "another one"
+        "description": "another one",
+        "scrollPosition": {
+          "scrollTop": 0,
+          "scrollLeft": 495
+        }
       },
       "view": "default",
       "custom_palettes": []
