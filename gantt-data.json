@@ -32,7 +32,7 @@
     },
     {
       "id": "p-1771140518298",
-      "name": "one million!!!",
+      "name": "two million!!!",
       "createdAt": 1771140518298
     }
   ],
@@ -369,13 +369,13 @@
       "tasks": [
         {
           "task": "my first task",
-          "phase": "development",
+          "phase": "discovery",
           "phaseSecondary": null,
           "party": "Unassigned",
-          "start": "4/21",
-          "end": "4/27",
-          "startDate": "2026-04-21T08:41:28.410Z",
-          "endDate": "2026-04-27T08:41:28.410Z",
+          "start": "2/20",
+          "end": "2/26",
+          "startDate": "2026-02-20T17:36:54.221Z",
+          "endDate": "2026-02-26T17:36:54.221Z",
           "star": false,
           "overview": "",
           "subTasks": [],
@@ -385,7 +385,7 @@
         }
       ],
       "settings": {
-        "title": "one million!!!",
+        "title": "two million!!!",
         "description": "Drag bars to reschedule • Drag edges to change dates • Drag rows to reorder • Click a row to expand details • Click cells to edit",
         "phases": [
           {
@@ -433,7 +433,7 @@
         "responsibleParties": [],
         "scrollPosition": {
           "scrollTop": 0,
-          "scrollLeft": 0
+          "scrollLeft": 46
         }
       },
       "view": "default",
