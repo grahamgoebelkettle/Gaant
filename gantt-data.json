@@ -1,6 +1,11 @@
 {
   "projects": [
     {
+      "id": "p-sample",
+      "name": "Sample project",
+      "createdAt": 1739548800000
+    },
+    {
       "id": "p-1771131136904",
       "name": "Sample project copy",
       "createdAt": 1771131136904
@@ -16,12 +21,38 @@
       "createdAt": 1771131853990
     },
     {
-      "id": "p-1771133455408",
-      "name": "Untitled project",
-      "createdAt": 1771133455408
+      "id": "p-1771132173996",
+      "name": "from cursor back",
+      "createdAt": 1771132185399
     }
   ],
   "boards": {
+    "p-sample": {
+      "tasks": [
+        {
+          "task": "my first task",
+          "phase": "discovery",
+          "phaseSecondary": null,
+          "party": "Unassigned",
+          "start": "2/14",
+          "end": "2/20",
+          "startDate": "2026-02-14T07:00:00.000Z",
+          "endDate": "2026-02-20T07:00:00.000Z",
+          "star": false,
+          "overview": "",
+          "subTasks": [],
+          "blockers": [],
+          "links": [],
+          "dependsOn": null
+        }
+      ],
+      "settings": {
+        "title": "Sample project",
+        "description": ""
+      },
+      "view": "default",
+      "custom_palettes": []
+    },
     "p-1771131136904": {
       "tasks": [
         {
@@ -43,7 +74,7 @@
       ],
       "settings": {
         "title": "Sample project copy",
-        "description": "new description",
+        "description": "Drag bars to reschedule • Drag edges to change dates • Drag rows to reorder • Click a row to expand details • Click cells to edit",
         "phases": [
           {
             "id": "discovery",
@@ -78,7 +109,7 @@
         ],
         "paletteIndex": 4,
         "dependencyGapDays": 0,
-        "rowAppearance": "compact",
+        "rowAppearance": "fill",
         "strokeMode": true,
         "showDurationOnBar": false,
         "projectStartDate": null,
@@ -188,11 +219,28 @@
       "view": "default",
       "custom_palettes": []
     },
-    "p-1771133455408": {
-      "tasks": [],
+    "p-1771132173996": {
+      "tasks": [
+        {
+          "task": "my first task",
+          "phase": "discovery",
+          "phaseSecondary": null,
+          "party": "Unassigned",
+          "start": "2/14",
+          "end": "2/20",
+          "startDate": "2026-02-14T07:00:00.000Z",
+          "endDate": "2026-02-20T07:00:00.000Z",
+          "star": false,
+          "overview": "",
+          "subTasks": [],
+          "blockers": [],
+          "links": [],
+          "dependsOn": null
+        }
+      ],
       "settings": {
-        "title": "Untitled project",
-        "description": ""
+        "title": "from cursor back",
+        "description": "Drag bars to reschedule • Drag edges to change dates • Drag rows to reorder • Click a row to expand details • Click cells to edit"
       },
       "view": "default",
       "custom_palettes": []
