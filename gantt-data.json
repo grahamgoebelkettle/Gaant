@@ -24,6 +24,11 @@
       "id": "p-1771138208478",
       "name": "555 5555",
       "createdAt": 1771138208478
+    },
+    {
+      "id": "p-1771139546918",
+      "name": "Untitled project",
+      "createdAt": 1771139546919
     }
   ],
   "boards": {
@@ -246,6 +251,12 @@
         "title": "555 5555",
         "description": "ok ya"
       },
+      "view": "default",
+      "custom_palettes": []
+    },
+    "p-1771139546918": {
+      "tasks": [],
+      "settings": {},
       "view": "default",
       "custom_palettes": []
     }
