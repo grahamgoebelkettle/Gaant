@@ -79,31 +79,31 @@
           {
             "id": "discovery",
             "name": "Discovery",
-            "color": "#22c55e",
+            "color": "#ff1ab6",
             "sprints": 2
           },
           {
             "id": "ideation",
             "name": "Ideation",
-            "color": "#16a34a",
+            "color": "#c931a1",
             "sprints": 2
           },
           {
             "id": "development",
             "name": "Development",
-            "color": "#15803d",
+            "color": "#b83da7",
             "sprints": 2
           },
           {
             "id": "review",
             "name": "Review",
-            "color": "#166534",
+            "color": "#ae6195",
             "sprints": 2
           },
           {
             "id": "delivery",
             "name": "Delivery",
-            "color": "#14532d",
+            "color": "#785475",
             "sprints": 2
           }
         ],
@@ -121,7 +121,7 @@
         "responsibleParties": [],
         "scrollPosition": {
           "scrollTop": 0,
-          "scrollLeft": 43
+          "scrollLeft": 0
         }
       },
       "view": "default",
