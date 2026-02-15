@@ -14,6 +14,11 @@
       "id": "p-1771142164069",
       "name": "Blue blaze",
       "createdAt": 1771142164069
+    },
+    {
+      "id": "p-1771176809291",
+      "name": "Untitled project",
+      "createdAt": 1771176809291
     }
   ],
   "boards": {
@@ -389,6 +394,32 @@
         "moveTasksWhenSprintExtended": false,
         "allowIndependentDependencies": false,
         "responsibleParties": []
+      },
+      "view": "default",
+      "custom_palettes": []
+    },
+    "p-1771176809291": {
+      "tasks": [
+        {
+          "task": "my first task",
+          "phase": "discovery",
+          "phaseSecondary": null,
+          "party": "Unassigned",
+          "start": "2/15",
+          "end": "2/21",
+          "startDate": "2026-02-15T07:00:00.000Z",
+          "endDate": "2026-02-21T07:00:00.000Z",
+          "star": false,
+          "overview": "",
+          "subTasks": [],
+          "blockers": [],
+          "links": [],
+          "dependsOn": null
+        }
+      ],
+      "settings": {
+        "title": "Untitled project",
+        "description": ""
       },
       "view": "default",
       "custom_palettes": []
