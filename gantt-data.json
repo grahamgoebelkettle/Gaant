@@ -19,6 +19,11 @@
       "id": "p-1771131853990",
       "name": "May fourth",
       "createdAt": 1771131853990
+    },
+    {
+      "id": "p-1771132035842",
+      "name": "May fifth",
+      "createdAt": 1771132053151
     }
   ],
   "boards": {
@@ -209,6 +214,32 @@
       ],
       "settings": {
         "title": "May fourth",
+        "description": "Drag bars to reschedule • Drag edges to change dates • Drag rows to reorder • Click a row to expand details • Click cells to edit"
+      },
+      "view": "default",
+      "custom_palettes": []
+    },
+    "p-1771132035842": {
+      "tasks": [
+        {
+          "task": "my first task",
+          "phase": "discovery",
+          "phaseSecondary": null,
+          "party": "Unassigned",
+          "start": "2/14",
+          "end": "2/20",
+          "startDate": "2026-02-14T07:00:00.000Z",
+          "endDate": "2026-02-20T07:00:00.000Z",
+          "star": false,
+          "overview": "",
+          "subTasks": [],
+          "blockers": [],
+          "links": [],
+          "dependsOn": null
+        }
+      ],
+      "settings": {
+        "title": "May fifth",
         "description": "Drag bars to reschedule • Drag edges to change dates • Drag rows to reorder • Click a row to expand details • Click cells to edit"
       },
       "view": "default",
