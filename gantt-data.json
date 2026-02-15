@@ -12,7 +12,7 @@
     },
     {
       "id": "p-1771131853990",
-      "name": "its working still?",
+      "name": "Please work!",
       "createdAt": 1771131853990
     },
     {
@@ -187,7 +187,7 @@
         }
       ],
       "settings": {
-        "title": "its working still?",
+        "title": "Please work!",
         "description": "Drag bars to reschedule • Drag edges to change dates • Drag rows to reorder • Click a row to expand details • Click cells to edit"
       },
       "view": "default",
