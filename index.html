@@ -62,6 +62,9 @@
       height: 100vh;
       overflow: hidden;
     }
+    @media (max-width: 480px) {
+      body { padding-left: 8px; padding-right: 8px; overflow-x: hidden; }
+    }
     h1 {
       font-size: 24px;
       font-weight: 700;
@@ -881,6 +884,14 @@
       transition: opacity 0.15s;
     }
     .gantt-bar-tooltip.visible { opacity: 1; visibility: visible; }
+    .gantt-bar-tooltip.gantt-bar-tooltip-static {
+      position: static !important;
+      width: 100%;
+      min-width: 0;
+      max-width: none;
+      opacity: 1;
+      visibility: visible;
+    }
     .gantt-bar-tooltip.has-actions { pointer-events: auto; }
     .gantt-bar-tooltip-actions { margin-top: 8px; padding-top: 8px; border-top: 1px solid #404040; display: flex; flex-direction: column; gap: 6px; }
     .gantt-bar-tooltip-move-label { font-size: 11px; font-weight: 600; color: #a3a3a3; text-transform: uppercase; letter-spacing: 0.04em; }
@@ -1026,11 +1037,43 @@
     .home-new-project-btn:hover {
       opacity: 0.9;
     }
+    .home-readonly-badge {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      z-index: 1000;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      border-radius: 8px;
+      pointer-events: none;
+      font-family: inherit;
+    }
+    .home-readonly-badge svg {
+      width: 14px;
+      height: 14px;
+      opacity: 0.85;
+      flex-shrink: 0;
+    }
     @media (prefers-color-scheme: dark) {
       .home-new-project-btn {
         background: #ffffff;
         color: #171717;
       }
+      .home-readonly-badge {
+        background: rgba(23, 23, 23, 0.5);
+        border-color: rgba(255, 255, 255, 0.08);
+        color: var(--text-tertiary);
+      }
+      .home-readonly-badge svg { opacity: 0.7; }
     }
     .week-label { 
       font-weight: 500;
@@ -1063,7 +1106,7 @@
     .gantt-phase-dropdown-trigger {
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
       gap: 6px;
       width: 100%;
       padding: 2px 0;
@@ -1073,7 +1116,7 @@
       font-family: inherit;
       cursor: pointer;
       color: inherit;
-      text-align: center;
+      text-align: left;
     }
     .gantt-phase-dropdown-trigger:focus { outline: none; }
     .gantt-phase-dropdown-trigger .phase-dot {
@@ -1775,9 +1818,11 @@
       flex-shrink: 0;
     }
     @media (max-width: 480px) {
-      .settings-drawer { width: 100%; }
+      .settings-drawer { width: 100%; height: 100vh; max-height: 100vh; }
+      .settings-drawer-header { padding: 16px 16px 16px 20px; }
+      .settings-drawer-header h2 { font-size: 17px; }
+      .settings-drawer-close { width: 44px; height: 44px; font-size: 24px; flex-shrink: 0; }
       .settings-drawer-body { padding: 16px; }
-      .settings-drawer-header,
       .settings-drawer-footer { padding-left: 16px; padding-right: 16px; }
       .settings-tabs { padding: 0 16px; }
       .settings-tab { padding: 12px 14px; font-size: 13px; }
@@ -2197,7 +2242,86 @@
       border-color: var(--border-default);
       background: var(--bg-surface);
     }
-    .app-views-wrap { flex: 1; min-height: 0; position: relative; }
+    .task-detail-mobile-summary {
+      display: none;
+    }
+    @media (max-width: 480px) {
+      #ganttView { min-width: 0; max-width: 100vw; overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+      #ganttView .page-header { padding-top: 16px; min-width: 0; }
+      .gantt-wrapper { max-width: 100%; min-width: 0; box-sizing: border-box; overflow: visible; flex: 0 1 auto; min-height: 0; }
+      .gantt-wrapper .gantt-grid { max-width: 100%; min-width: 0; }
+      .gantt-header-sticky { min-width: 0; max-width: 100%; }
+      .gantt-header-sticky .phase-header-row {
+        display: none !important;
+      }
+      .gantt-row {
+        grid-template-columns: 1fr;
+        min-width: 0;
+        max-width: 100%;
+      }
+      .gantt-row .gantt-cell:nth-child(n+2) {
+        display: none;
+      }
+      .gantt-row .gantt-cell:first-child {
+        grid-column: 1;
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        box-sizing: border-box;
+        overflow: hidden;
+      }
+      .gantt-row .gantt-task-cell .task-name-wrap,
+      .gantt-row .gantt-task-cell .task-text {
+        min-width: 0;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        word-break: break-word;
+      }
+      .gantt-row .gantt-task-cell {
+        overflow: hidden;
+      }
+      .gantt-detail-row {
+        padding: 20px 10px 24px;
+      }
+      .gantt-detail-row-inner {
+        max-height: none;
+      }
+      .task-detail-mobile-summary {
+        display: none !important;
+      }
+      .gantt-detail-row .task-detail-content {
+        grid-template-columns: 1fr;
+        gap: 20px 0;
+        padding-top: 0;
+      }
+      .gantt-detail-row .task-detail-content .task-detail-field {
+        grid-column: 1 / -1;
+        width: 100%;
+      }
+      .gantt-detail-row .task-detail-toolbar {
+        right: 10px;
+      }
+      .task-detail-mobile-tooltip {
+        display: block !important;
+        min-width: 0;
+        width: 100%;
+        margin-bottom: 20px;
+        visibility: visible;
+        opacity: 1;
+      }
+      .task-detail-mobile-tooltip .gantt-bar-tooltip-static {
+        display: block !important;
+      }
+      .task-detail-mobile-tooltip .gantt-bar-tooltip-title,
+      .task-detail-mobile-tooltip .gantt-bar-tooltip-desc {
+        display: none !important;
+      }
+    }
+    @media (min-width: 481px) {
+      .task-detail-mobile-tooltip { display: none; }
+    }
+    .app-views-wrap { flex: 1; min-height: 0; position: relative; min-width: 0; }
     .app-view {
       position: absolute;
       inset: 0;
@@ -2208,11 +2332,73 @@
       transition-property: opacity;
       transition-duration: 0.25s;
       transition-timing-function: ease;
+      min-width: 0;
     }
     .app-view.active {
       opacity: 1;
       pointer-events: auto;
       z-index: 1;
+    }
+    #landingView {
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      overflow-y: auto;
+    }
+    .landing-inner {
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+    }
+    .landing-title {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--color-general-primary);
+      margin: 0 0 8px 0;
+    }
+    .landing-subtitle {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin: 0 0 32px 0;
+      line-height: 1.45;
+    }
+    .landing-options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .landing-option {
+      display: block;
+      width: 100%;
+      padding: 20px 24px;
+      text-align: left;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--color-general-primary);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+    }
+    .landing-option:hover {
+      border-color: var(--border-strong);
+      background: var(--bg-hover);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .landing-option-desc {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text-secondary);
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+    .landing-option-badge {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-tertiary);
+      margin-top: 6px;
     }
     #homeView.active ~ #ganttView #ganttDependencyLine,
     #homeView.active ~ #ganttView #ganttChildConnectorsContainer,
@@ -2223,6 +2409,9 @@
       padding: 24px;
       overflow-y: auto;
       overflow-x: hidden;
+    }
+    @media (max-width: 480px) {
+      #homeView.active { padding: 16px 10px 24px; }
     }
     .home-sticky-header {
       flex-shrink: 0;
@@ -2278,29 +2467,66 @@
     .home-shared-file-status-dot.custom { background: var(--text-tertiary); }
     .home-shared-file-status-dot.none { background: var(--stroke-default); }
     .home-shared-file-status-dot.local { background: var(--stroke-default); }
+    .home-shared-file-status-dot.syncing { animation: home-sync-dot-pulse 1.2s ease-in-out infinite; }
+    @keyframes home-sync-dot-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     .home-shared-file-status-text { font-size: 13px; color: var(--text-secondary); }
     .home-shared-file-status-text strong { color: var(--text-primary); font-weight: 600; }
     .home-shared-file-open-btn { padding: 8px 16px; font-size: 14px; font-weight: 600; border-radius: 8px; border: 1px solid var(--border-strong); background: var(--bg-surface); color: var(--text-primary); cursor: pointer; font-family: inherit; }
     .home-shared-file-open-btn:hover { background: var(--bg-hover); }
     .shared-file-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 24px; }
     .shared-file-modal-overlay.visible { display: flex; }
-    .shared-file-modal { background: var(--bg-surface); border-radius: 12px; padding: 24px; width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-md); border: 1px solid var(--border-default); }
+    .shared-file-modal { background: var(--bg-surface); border-radius: 12px; padding: 24px; width: 480px; height: 420px; max-height: 85vh; overflow-y: auto; box-shadow: var(--shadow-md); border: 1px solid var(--border-default); box-sizing: border-box; }
+    .shared-file-modal-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: -24px -24px 16px -24px; padding: 16px 24px; border-bottom: 1px solid var(--border-default); background: var(--bg-surface); flex-shrink: 0; }
+    .shared-file-modal-header h3 { margin: 0; font-size: 18px; font-weight: 600; flex: 1; min-width: 0; }
+    .shared-file-modal-close {
+      width: 36px; height: 36px; min-width: 36px; min-height: 36px; padding: 0; border: none; background: transparent; border-radius: 8px; color: var(--text-tertiary); cursor: pointer; font-size: 22px; line-height: 1; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .shared-file-modal-close:hover { background: var(--bg-subtle); color: var(--text-primary); }
     .shared-file-modal h3 { margin: 0 0 16px 0; font-size: 18px; font-weight: 600; }
-    .shared-file-modal .shared-file-modal-status { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; padding: 10px 12px; background: var(--bg-subtle); border-radius: 8px; font-size: 13px; }
-    .shared-file-modal .shared-file-modal-status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .shared-file-modal .shared-file-modal-status { display: flex; align-items: center; gap: 6px; margin-top: 6px; margin-bottom: 0; padding: 0; background: none; border-radius: 0; font-size: 12px; color: var(--text-tertiary); min-height: 18px; }
+    .shared-file-modal .shared-file-modal-status-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
     .shared-file-modal .shared-file-modal-status-dot.github { background: #238636; }
     .shared-file-modal .shared-file-modal-status-dot.synced { background: #238636; }
     .shared-file-modal .shared-file-modal-status-dot.custom { background: var(--text-tertiary); }
     .shared-file-modal .shared-file-modal-status-dot.none { background: var(--stroke-default); }
     .shared-file-modal .shared-file-modal-status-dot.local { background: var(--stroke-default); }
     .shared-file-modal label { display: block; font-size: 12px; font-weight: 500; color: var(--text-secondary); margin-bottom: 4px; }
-    .shared-file-modal input[type="url"] { width: 100%; padding: 10px 12px; margin-bottom: 12px; border-radius: 6px; border: 1px solid var(--border-strong); font-size: 14px; box-sizing: border-box; }
-    .shared-file-modal-token-row { display: flex; gap: 8px; margin-bottom: 12px; align-items: center; }
-    .shared-file-modal-token-row input { flex: 1; padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border-strong); font-size: 14px; box-sizing: border-box; }
+    .shared-file-input-wrap { display: flex; align-items: stretch; margin-bottom: 12px; border: 1px solid var(--border-strong); border-radius: 6px; background: var(--bg-surface); transition: box-shadow 0.15s ease; }
+    .shared-file-input-wrap:focus-within { box-shadow: 0 0 0 2px var(--color-general-primary); outline: none; }
+    .shared-file-input-wrap input { flex: 1; min-width: 0; padding: 10px 12px; border: none; border-radius: 6px 0 0 6px; font-size: 14px; box-sizing: border-box; background: transparent; color: var(--text-primary); font-family: inherit; }
+    .shared-file-input-wrap input::placeholder { color: var(--text-tertiary); opacity: 1; }
+    .shared-file-input-wrap input:focus { outline: none; }
+    .shared-file-input-icons { display: flex; align-items: center; justify-content: center; gap: 2px; padding: 0 6px 0 8px; flex-shrink: 0; background: transparent; border-radius: 0 6px 6px 0; border-left: 1px solid var(--border-subtle); }
+    .shared-file-input-icons .shared-file-input-icon { width: 28px; height: 28px; min-height: 28px; padding: 0; border: none; border-radius: 4px; background: transparent; color: var(--text-secondary); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .shared-file-input-icons .shared-file-input-icon:hover { background: var(--bg-hover); color: var(--text-primary); }
+    .shared-file-input-icons .shared-file-input-icon svg { width: 16px; height: 16px; }
+    .shared-file-modal-token-row { display: block; margin-bottom: 12px; }
+    .shared-file-modal-token-row .shared-file-input-wrap { margin-bottom: 0; }
     .shared-file-modal .shared-file-modal-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
     .shared-file-modal .shared-file-modal-section { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-default); }
+    .storage-modal-tabs { display: flex; gap: 0; margin: 0 0 20px 0; border-bottom: 1px solid var(--border-default); }
+    .storage-modal-tab { padding: 10px 16px; font-size: 13px; font-weight: 500; color: var(--text-secondary); background: none; border: none; border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer; font-family: inherit; }
+    .storage-modal-tab:hover { color: var(--text-primary); }
+    .storage-modal-tab.active { color: var(--color-general-primary); border-bottom-color: var(--color-general-primary); }
+    .storage-modal-tab .storage-tab-check { margin-left: 4px; }
+    .storage-modal-tab .storage-tab-check::before { content: "\2713"; font-weight: 700; }
+    .storage-modal-tab:not(.storage-tab-selected) .storage-tab-check { visibility: hidden; }
+    .storage-modal-tab.storage-tab-selected .storage-tab-check { visibility: visible; color: var(--color-general-primary); }
+    .storage-modal-panel { display: none; }
+    .storage-modal-panel.active { display: block; }
+    .storage-modal-panel-desc { font-size: 13px; color: var(--text-secondary); margin: 0 0 16px 0; line-height: 1.45; }
+    .storage-modal-use-btn { margin-top: 16px; }
+    @media (max-width: 480px) {
+      .shared-file-modal-overlay { padding: 0; align-items: stretch; justify-content: stretch; }
+      .shared-file-modal { width: 100%; height: 100vh; max-height: 100vh; border-radius: 0; border-left: none; border-right: none; border-top: none; padding: 0; }
+      .shared-file-modal-header { margin: 0; padding: 16px 16px 16px 20px; border-radius: 0; }
+      .shared-file-modal-close { width: 44px; height: 44px; min-width: 44px; min-height: 44px; font-size: 24px; }
+      .shared-file-modal .storage-modal-tabs { padding-left: 16px; padding-right: 16px; }
+      .shared-file-modal .storage-modal-panel { padding-left: 16px; padding-right: 16px; }
+    }
     .home-header-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-    .home-header-actions { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+    .home-header-actions { display: flex; align-items: center; gap: 10px; margin-left: auto; flex-wrap: wrap; }
+    .home-local-backup-inline { display: flex; align-items: center; gap: 8px; }
     .gantt-auth-btn {
       padding: 8px 14px;
       font-size: 13px;
@@ -2652,6 +2878,10 @@
       flex: 1 0 auto;
       min-height: 0;
     }
+    @media (max-width: 480px) {
+      .gantt-wrapper { overflow: visible; flex: 0 1 auto; }
+      .gantt-wrapper .gantt-grid { flex: 0 1 auto; }
+    }
     .gantt-empty-state {
       display: flex;
       flex-direction: column;
@@ -2709,6 +2939,27 @@
 </head>
 <body>
   <div class="app-views-wrap">
+  <div id="landingView" class="app-view">
+    <div class="landing-inner">
+      <h1 class="landing-title">Choose how to store your data</h1>
+      <p class="landing-subtitle">Pick one option to get started. You can continue with full editing in all modes.</p>
+      <div class="landing-options">
+        <button type="button" class="landing-option" id="landingOptionGitHub">
+          Sync with GitHub
+          <div class="landing-option-desc">Load and push a gantt-data.json file to a GitHub repo. Share with others and keep a remote backup.</div>
+        </button>
+        <button type="button" class="landing-option" id="landingOptionLocalStorage">
+          Use local storage
+          <div class="landing-option-desc">Store data in the browser and optionally backup or restore from a gantt-data.json file on your device.</div>
+        </button>
+        <button type="button" class="landing-option" id="landingOptionLocalCache">
+          Use local cache (not recommended)
+          <div class="landing-option-desc">Rely only on browser cache. No file backup; data can be lost if cache is cleared.</div>
+          <div class="landing-option-badge">Not recommended</div>
+        </button>
+      </div>
+    </div>
+  </div>
   <div id="homeView" class="app-view">
     <div class="home-sticky-header">
       <div class="home-header-row">
@@ -2735,6 +2986,12 @@
               <button type="button" class="home-shared-file-open-btn" id="sharedFileOpenModal">Sync Settings</button>
             </div>
           </div>
+          <div class="home-local-backup-inline" id="localBackupSection" style="display: none;">
+            <button type="button" class="home-shared-file-btn" id="localBackupToFile">Backup to file</button>
+            <input type="file" id="localRestoreFileInput" accept=".json,application/json" style="display: none;">
+            <button type="button" class="home-shared-file-btn" id="localRestoreFromFile">Restore from file</button>
+          </div>
+          <button type="button" class="home-shared-file-btn" id="storageSettingsBtn" style="display: none;">Settings</button>
           <button type="button" class="home-new-project-btn" id="homeFab" aria-label="New project">+ New project</button>
         </div>
       </div>
@@ -2932,8 +3189,8 @@
       <button type="button" class="delete-confirm-delete">Delete</button>
     </div>
   </div>
-  <div class="phase-select-menu" id="phaseSelectMenu" role="menu" aria-label="Move to phase">
-    <div class="phase-select-menu-title">Move to phase</div>
+  <div class="phase-select-menu" id="phaseSelectMenu" role="menu" aria-label="Phase">
+    <div class="phase-select-menu-title">Phase</div>
     <div class="phase-select-menu-list" id="phaseSelectMenuList"></div>
   </div>
   <div class="fab-phase-menu" id="fabPhaseMenu" role="menu" aria-label="Start in phase">
@@ -2987,7 +3244,7 @@
       <span class="gantt-bar-tooltip-text"></span>
     </div>
     <div class="gantt-bar-tooltip-actions" id="ganttBarTooltipActions" style="display:none">
-      <label class="gantt-bar-tooltip-move-label">Move to phase</label>
+      <label class="gantt-bar-tooltip-move-label">Phase</label>
       <div class="gantt-phase-dropdown gantt-bar-tooltip-phase-dropdown" id="ganttBarTooltipPhaseDropdown"></div>
     </div>
   </div>
@@ -3022,6 +3279,11 @@
   </div>
   </div><!-- /#ganttView -->
   </div><!-- /.app-views-wrap -->
+
+  <span class="home-readonly-badge" id="homeReadonlyBadge" aria-hidden="true" style="display: none;">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <span>Read-only mode</span>
+  </span>
 
   <div class="gantt-auth-modal-overlay" id="ganttAuthModalOverlay">
     <div class="gantt-auth-modal">
@@ -3068,30 +3330,61 @@
 
   <div class="shared-file-modal-overlay" id="sharedFileModalOverlay">
     <div class="shared-file-modal">
-      <h3>Shared file &amp; GitHub sync</h3>
-      <div class="shared-file-modal-status" id="sharedFileModalStatus">
-        <span class="shared-file-modal-status-dot none" id="sharedFileModalStatusDot"></span>
-        <span class="shared-file-modal-status-text" id="sharedFileModalStatusText">Not set</span>
+      <div class="shared-file-modal-header">
+        <h3>Storage &amp; sync</h3>
+        <button type="button" class="shared-file-modal-close" id="sharedFileModalClose" title="Close" aria-label="Close">&times;</button>
       </div>
-      <label for="sharedFileUrl">JSON URL (GitHub raw or any CORS-accessible URL)</label>
-      <input type="url" id="sharedFileUrl" placeholder="https://raw.githubusercontent.com/.../gantt-data.json" class="home-shared-file-input" />
-      <div class="shared-file-modal-actions">
-        <button type="button" class="home-shared-file-btn" id="sharedFileLoad">Load</button>
-        <button type="button" class="home-shared-file-btn" id="sharedFileRefresh">Refresh</button>
-        <button type="button" class="home-shared-file-btn" id="sharedFileDownload">Download JSON</button>
+      <div class="storage-modal-tabs" role="tablist">
+        <button type="button" class="storage-modal-tab active" role="tab" id="storageTabGitHub" data-tab="github" aria-selected="true"><span class="storage-tab-label">Sync with GitHub</span><span class="storage-tab-check" aria-hidden="true"></span></button>
+        <button type="button" class="storage-modal-tab" role="tab" id="storageTabLocalStorage" data-tab="local_storage" aria-selected="false"><span class="storage-tab-label">Local storage</span><span class="storage-tab-check" aria-hidden="true"></span></button>
+        <button type="button" class="storage-modal-tab" role="tab" id="storageTabLocalCache" data-tab="local_cache" aria-selected="false"><span class="storage-tab-label">Local cache</span><span class="storage-tab-check" aria-hidden="true"></span></button>
       </div>
-      <div class="shared-file-modal-section">
-        <label for="sharedFileGitHubToken">Push to GitHub (owner): Personal Access Token with <code>repo</code> scope</label>
-        <div class="shared-file-modal-token-row">
-          <input type="password" id="sharedFileGitHubToken" placeholder="ghp_..." autocomplete="off" />
-          <button type="button" class="home-shared-file-btn" id="sharedFileClearToken" title="Clear token">Clear</button>
+      <div id="storagePanelGitHub" class="storage-modal-panel active" role="tabpanel">
+        <label for="sharedFileUrl">JSON URL (GitHub raw or any CORS-accessible URL)</label>
+        <div class="shared-file-input-wrap">
+          <input type="url" id="sharedFileUrl" placeholder="https://raw.githubusercontent.com/.../gantt-data.json" />
+          <div class="shared-file-input-icons">
+            <button type="button" class="shared-file-input-icon" id="sharedFileLoad" title="Load from URL" aria-label="Load from URL"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+            <button type="button" class="shared-file-input-icon" id="sharedFileRefresh" title="Refresh" aria-label="Refresh"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></button>
+            <button type="button" class="shared-file-input-icon" id="sharedFileDownload" title="Download JSON" aria-label="Download JSON"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
         </div>
+        <div class="shared-file-modal-status" id="sharedFileModalStatus">
+          <span class="shared-file-modal-status-dot none" id="sharedFileModalStatusDot"></span>
+          <span class="shared-file-modal-status-text" id="sharedFileModalStatusText">Not set</span>
+        </div>
+        <div class="shared-file-modal-section">
+          <label for="sharedFileGitHubToken">Push to GitHub (owner): Personal Access Token with <code>repo</code> scope</label>
+          <div class="shared-file-modal-token-row">
+            <div class="shared-file-input-wrap shared-file-input-wrap-token">
+              <input type="password" id="sharedFileGitHubToken" placeholder="ghp_..." autocomplete="off" />
+              <div class="shared-file-input-icons">
+                <button type="button" class="shared-file-input-icon" id="sharedFileClearToken" title="Clear token" aria-label="Clear token"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+                <button type="button" class="shared-file-input-icon" id="sharedFilePush" title="Push to GitHub" aria-label="Push to GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="shared-file-modal-actions storage-modal-use-btn">
+          <button type="button" class="home-new-project-btn" id="storageModalUseGitHub">Use GitHub sync</button>
+        </div>
+      </div>
+      <div id="storagePanelLocalStorage" class="storage-modal-panel" role="tabpanel">
+        <p class="storage-modal-panel-desc">Store data in the browser and optionally backup or restore from a gantt-data.json file on your device. Full editing; no GitHub required.</p>
         <div class="shared-file-modal-actions">
-          <button type="button" class="home-shared-file-btn" id="sharedFilePush">Push to GitHub</button>
+          <button type="button" class="home-shared-file-btn" id="storageModalBackupToFile">Backup to file</button>
+          <input type="file" id="storageModalRestoreFileInput" accept=".json,application/json" style="display: none;">
+          <button type="button" class="home-shared-file-btn" id="storageModalRestoreFromFile">Restore from file</button>
+        </div>
+        <div class="shared-file-modal-actions storage-modal-use-btn">
+          <button type="button" class="home-new-project-btn" id="storageModalUseLocalStorage">Use local storage</button>
         </div>
       </div>
-      <div class="shared-file-modal-actions" style="margin-top: 20px;">
-        <button type="button" class="gantt-auth-btn gantt-auth-btn-secondary" id="sharedFileModalClose">Close</button>
+      <div id="storagePanelLocalCache" class="storage-modal-panel" role="tabpanel">
+        <p class="storage-modal-panel-desc">Rely only on browser cache. No file backup; data can be lost if cache is cleared. Full editing; not recommended for important data.</p>
+        <div class="shared-file-modal-actions storage-modal-use-btn">
+          <button type="button" class="home-shared-file-btn" id="storageModalUseLocalCache">Use local cache (not recommended)</button>
+        </div>
       </div>
     </div>
   </div>
@@ -3125,9 +3418,26 @@
     let PHASES = [...DEFAULT_PHASES.map(p => ({ ...p }))];
 
     const PROJECTS_LIST_KEY = "gantt-projects";
+    const STORAGE_MODE_KEY = "gantt-storage-mode";
     const SHARED_FILE_URL_KEY = "gantt-shared-file-url";
     const GITHUB_TOKEN_KEY = "gantt-github-token";
-    const SHARED_FILE_POLL_MS = 3000;
+    function getStorageMode() {
+      try { return localStorage.getItem(STORAGE_MODE_KEY) || null; } catch (e) { return null; }
+    }
+    function setStorageMode(mode) {
+      try { if (mode) localStorage.setItem(STORAGE_MODE_KEY, mode); else localStorage.removeItem(STORAGE_MODE_KEY); } catch (e) {}
+    }
+    function clearLocalProjectData() {
+      try {
+        var keys = [];
+        for (var i = 0; i < localStorage.length; i++) {
+          var k = localStorage.key(i);
+          if (k === PROJECTS_LIST_KEY || k.indexOf("gantt-tasks-") === 0 || k.indexOf("gantt-settings-") === 0 || k.indexOf("gantt-view-") === 0 || k.indexOf("gantt-custom-palettes-") === 0) keys.push(k);
+        }
+        keys.forEach(function (k) { localStorage.removeItem(k); });
+      } catch (e) {}
+    }
+    const SHARED_FILE_POLL_MS = 30000;
     const EXAMPLE_SHARED_FILE_URL = "https://raw.githubusercontent.com/grahamgoebelkettle/Gaant/main/gantt-data.json";
     function getCustomPalettesKey() {
       return "gantt-custom-palettes-" + (currentProjectId || "default");
@@ -3147,12 +3457,14 @@
       if (id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) return "#/project/" + id;
       return "#/project/" + slugify(project?.name || "project");
     }
+    const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     function getProjectIdFromHash() {
       const hash = typeof location !== "undefined" ? (location.hash || "").replace(/^#\/?/, "") : "";
       const m = /^project\/(.+)$/.exec(hash);
       if (!m) return null;
       const segment = m[1];
-      const projects = loadProjectsList();
+      if (UUID_REGEX.test(segment)) return segment;
+      const projects = loadProjectsList() || [];
       if (projects.some(p => p.id === segment)) return segment;
       if (/^(p-\d+|default)$/.test(segment)) return segment;
       const bySlug = projects.find(p => slugify(p.name) === segment);
@@ -4233,6 +4545,110 @@
         if (!container) return;
       }
       container.innerHTML = "";
+      const mobileSummary = document.createElement("div");
+      mobileSummary.className = "task-detail-mobile-summary";
+      const mobileName = document.createElement("span");
+      mobileName.className = "task-detail-mobile-summary-name";
+      mobileName.textContent = task.task || "Task";
+      const mobileHint = document.createElement("span");
+      mobileHint.className = "task-detail-mobile-summary-hint";
+      mobileHint.textContent = "Tap for details";
+      mobileSummary.appendChild(mobileName);
+      mobileSummary.appendChild(mobileHint);
+      const mobileTooltipEl = document.createElement("div");
+      mobileTooltipEl.className = "task-detail-mobile-tooltip";
+      function populateMobileTooltip() {
+        mobileTooltipEl.innerHTML = "";
+        var inner = document.createElement("div");
+        inner.className = "gantt-bar-tooltip gantt-bar-tooltip-static";
+        inner.setAttribute("role", "tooltip");
+        var titleEl = document.createElement("div");
+        titleEl.className = "gantt-bar-tooltip-title";
+        titleEl.textContent = (task.star ? "\u2605 " : "") + (task.task || "Task");
+        inner.appendChild(titleEl);
+        var descRow = document.createElement("div");
+        descRow.className = "gantt-bar-tooltip-row gantt-bar-tooltip-desc";
+        descRow.innerHTML = "<span class=\"gantt-bar-tooltip-icon\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"/><path d=\"M14 2v6h6\"/><path d=\"M16 13H8\"/><path d=\"M16 17H8\"/><path d=\"M10 9H8\"/></svg></span><span class=\"gantt-bar-tooltip-text\"></span>";
+        descRow.querySelector(".gantt-bar-tooltip-text").textContent = (task.overview || "").trim() || "\u2014";
+        inner.appendChild(descRow);
+        var partyRow = document.createElement("div");
+        partyRow.className = "gantt-bar-tooltip-row gantt-bar-tooltip-party";
+        partyRow.innerHTML = "<span class=\"gantt-bar-tooltip-icon\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2\"/><circle cx=\"12\" cy=\"7\" r=\"4\"/></svg></span><span class=\"gantt-bar-tooltip-text\"></span>";
+        partyRow.querySelector(".gantt-bar-tooltip-text").textContent = task.party || "";
+        if (!task.party) partyRow.style.display = "none";
+        inner.appendChild(partyRow);
+        var depRow = document.createElement("div");
+        depRow.className = "gantt-bar-tooltip-row gantt-bar-tooltip-depends";
+        depRow.innerHTML = "<span class=\"gantt-bar-tooltip-icon\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M5 12h14\"/><path d=\"M12 5l7 7-7 7\"/></svg></span><span class=\"gantt-bar-tooltip-text\"></span>";
+        if (typeof task.dependsOn === "number" && tasks[task.dependsOn]) {
+          var primary = tasks[task.dependsOn];
+          depRow.querySelector(".gantt-bar-tooltip-text").textContent = "Depends on: " + ((primary.star ? "\u2605 " : "") + (primary.task || "Task"));
+          depRow.style.color = typeof getPhaseColor === "function" ? getPhaseColor(primary.phase || (typeof PHASES !== "undefined" && PHASES[0] ? PHASES[0].id : "")) : "";
+        } else {
+          depRow.style.display = "none";
+        }
+        inner.appendChild(depRow);
+        var datesRow = document.createElement("div");
+        datesRow.className = "gantt-bar-tooltip-row gantt-bar-tooltip-dates";
+        datesRow.innerHTML = "<span class=\"gantt-bar-tooltip-icon\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\" ry=\"2\"/><path d=\"M16 2v4\"/><path d=\"M8 2v4\"/><path d=\"M3 10h18\"/></svg></span><span class=\"gantt-bar-tooltip-text\"></span>";
+        var datesStr = "";
+        if (task.start && task.end) {
+          datesStr = task.start === task.end ? task.start : task.start + " \u2013 " + task.end;
+          if (task.startDate && task.endDate) {
+            var days = Math.ceil((task.endDate - task.startDate) / (24 * 60 * 60 * 1000)) + 1;
+            var sprints = Math.ceil(days / 14);
+            datesStr += " \u00b7 " + sprints + " sprint" + (sprints !== 1 ? "s" : "");
+          }
+        }
+        datesRow.querySelector(".gantt-bar-tooltip-text").textContent = datesStr;
+        if (!datesStr) datesRow.style.display = "none";
+        inner.appendChild(datesRow);
+        var actionsEl = document.createElement("div");
+        actionsEl.className = "gantt-bar-tooltip-actions";
+        var moveLabel = document.createElement("label");
+        moveLabel.className = "gantt-bar-tooltip-move-label";
+        moveLabel.textContent = "Phase";
+        actionsEl.appendChild(moveLabel);
+        var phaseWrap = document.createElement("div");
+        phaseWrap.className = "gantt-bar-tooltip-phase-dropdown";
+        var phaseTrigger = document.createElement("div");
+        phaseTrigger.className = "gantt-phase-dropdown-trigger";
+        phaseTrigger.style.cursor = "default";
+        var phaseDot = document.createElement("span");
+        phaseDot.className = "phase-dot";
+        var primaryId = typeof PHASES !== "undefined" && PHASES.length ? (task.phase || PHASES[0].id) : "";
+        var secondaryId = task.phaseSecondary && task.phaseSecondary !== primaryId ? task.phaseSecondary : null;
+        phaseDot.style.background = typeof getPhaseColor === "function" ? getPhaseColor(primaryId) : "#737373";
+        var phaseLabelSpan = document.createElement("span");
+        if (typeof PHASES !== "undefined" && PHASES.length) {
+          var pName = PHASES.find(function (p) { return p.id === primaryId; });
+          var sName = secondaryId ? (PHASES.find(function (p) { return p.id === secondaryId; })?.name || secondaryId) : null;
+          phaseLabelSpan.textContent = sName ? (pName ? pName.name : primaryId) + " \u2192 " + sName : (pName ? pName.name : primaryId);
+        } else {
+          phaseLabelSpan.textContent = primaryId || "—";
+        }
+        phaseTrigger.appendChild(phaseDot);
+        phaseTrigger.appendChild(phaseLabelSpan);
+        phaseWrap.appendChild(phaseTrigger);
+        actionsEl.appendChild(phaseWrap);
+        inner.appendChild(actionsEl);
+        if (typeof getPhaseColor === "function" && primaryId) {
+          var hex = getPhaseColor(primaryId);
+          if (hex && hex.indexOf("#") === 0) {
+            var r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
+            inner.style.borderColor = "rgba(" + r + "," + g + "," + b + ",0.24)";
+          }
+        }
+        mobileTooltipEl.appendChild(inner);
+      }
+      mobileSummary.addEventListener("click", function () {
+        detailRow.classList.toggle("detail-expanded");
+        mobileHint.textContent = detailRow.classList.contains("detail-expanded") ? "Tap to collapse" : "Tap for details";
+        if (detailRow.classList.contains("detail-expanded")) populateMobileTooltip();
+      });
+      container.appendChild(mobileSummary);
+      container.appendChild(mobileTooltipEl);
+      populateMobileTooltip();
       const toolbar = document.createElement("div");
       toolbar.className = "task-detail-toolbar";
       const editBtn = document.createElement("button");
@@ -4515,7 +4931,7 @@
         }
         if (typeof updateChartRange === "function") updateChartRange();
         saveTasks();
-        if (onRerender) onRerender();
+        if (rerender) rerender();
       });
       dependsOnField.appendChild(dependsOnSelect);
       container.appendChild(dependsOnField);
@@ -7370,14 +7786,23 @@
     const DEFAULT_HOME_TITLE = "Gantt projects";
     const DEFAULT_HOME_DESC = "Create and open project schedules. Each project has its own tasks and settings.";
     let homePageHeaderInited = false;
+    function saveHomePageHeader() {
+      const titleEl = document.getElementById("homePageTitle");
+      const descEl = document.getElementById("homePageDescription");
+      if (!titleEl || !descEl) return;
+      const title = (titleEl.textContent || "").trim() || DEFAULT_HOME_TITLE;
+      const desc = (descEl.textContent || "").trim() || DEFAULT_HOME_DESC;
+      localStorage.setItem(HOME_TITLE_KEY, title);
+      localStorage.setItem(HOME_DESC_KEY, desc);
+    }
     function initHomePageHeader() {
       const titleEl = document.getElementById("homePageTitle");
       const descEl = document.getElementById("homePageDescription");
       if (!titleEl || !descEl) return;
       const savedTitle = localStorage.getItem(HOME_TITLE_KEY);
       const savedDesc = localStorage.getItem(HOME_DESC_KEY);
-      if (savedTitle != null) titleEl.textContent = savedTitle;
-      if (savedDesc != null) descEl.textContent = savedDesc;
+      titleEl.textContent = (savedTitle != null && savedTitle !== "") ? savedTitle : DEFAULT_HOME_TITLE;
+      descEl.textContent = (savedDesc != null && savedDesc !== "") ? savedDesc : DEFAULT_HOME_DESC;
       if (!homePageHeaderInited) {
         homePageHeaderInited = true;
         const saveTitle = () => {
@@ -7386,7 +7811,9 @@
           localStorage.setItem(HOME_TITLE_KEY, (titleEl.textContent || "").trim() || DEFAULT_HOME_TITLE);
         };
         const saveDesc = () => {
-          localStorage.setItem(HOME_DESC_KEY, (descEl.textContent || "").trim());
+          const v = (descEl.textContent || "").trim() || DEFAULT_HOME_DESC;
+          if (!v) descEl.textContent = DEFAULT_HOME_DESC;
+          localStorage.setItem(HOME_DESC_KEY, (descEl.textContent || "").trim() || DEFAULT_HOME_DESC);
         };
         titleEl.addEventListener("blur", saveTitle);
         descEl.addEventListener("blur", saveDesc);
@@ -7623,6 +8050,7 @@
         });
         return;
       }
+      if (homeView && homeView.classList.contains("active") && typeof saveHomePageHeader === "function") saveHomePageHeader();
       if (window.ganttStorage?.isCloudEnabled()) await window.ganttStorage.ensureBoardDataLoaded(id);
       const sameProject = currentProjectId === id;
       currentProjectId = id;
@@ -8823,9 +9251,190 @@
       });
     }
 
+    function applyStorageModeUI(mode) {
+      var sec = document.getElementById("sharedFileSection");
+      var backupSec = document.getElementById("localBackupSection");
+      var storageBtn = document.getElementById("storageSettingsBtn");
+      if (mode === "github") {
+        if (sec) sec.style.display = "";
+        if (backupSec) backupSec.style.display = "none";
+        if (storageBtn) storageBtn.style.display = "none";
+        if (typeof initSharedFile === "function") initSharedFile();
+      } else {
+        window.hasWriteAccess = function () { return true; };
+        if (sec) sec.style.display = "none";
+        if (storageBtn) storageBtn.style.display = "";
+        if (mode === "local_storage") {
+          if (backupSec) backupSec.style.display = "flex";
+          initLocalBackupHandlers();
+        } else {
+          if (backupSec) backupSec.style.display = "none";
+        }
+      }
+      if (typeof updateWriteAccessUI === "function") updateWriteAccessUI();
+    }
     async function bootstrap() {
       migrateLegacySingleProject();
       initAuthUI();
+      (function setupStorageModalTabs() {
+        var overlay = document.getElementById("sharedFileModalOverlay");
+        var tabs = document.querySelectorAll(".storage-modal-tab");
+        var panels = document.querySelectorAll(".storage-modal-panel");
+        function updateStorageTabChecks() {
+          var mode = getStorageMode() || "github";
+          tabs.forEach(function (t) {
+            t.classList.toggle("storage-tab-selected", t.dataset.tab === mode);
+          });
+        }
+        function switchStorageTab(mode) {
+          var tabId = "storageTab" + (mode === "github" ? "GitHub" : mode === "local_storage" ? "LocalStorage" : "LocalCache");
+          var panelId = "storagePanel" + (mode === "github" ? "GitHub" : mode === "local_storage" ? "LocalStorage" : "LocalCache");
+          tabs.forEach(function (t) {
+            var isActive = t.id === tabId;
+            t.classList.toggle("active", isActive);
+            t.setAttribute("aria-selected", isActive);
+          });
+          panels.forEach(function (p) {
+            p.classList.toggle("active", p.id === panelId);
+          });
+          updateStorageTabChecks();
+        }
+        window.switchStorageTab = switchStorageTab;
+        window.openStorageModal = function () {
+          if (typeof initSharedFile === "function") initSharedFile();
+          switchStorageTab(getStorageMode() || "github");
+          if (overlay) overlay.classList.add("visible");
+          if (typeof updateModalStatus === "function") updateModalStatus();
+        };
+        tabs.forEach(function (t) {
+          t.addEventListener("click", function () { switchStorageTab(t.dataset.tab); });
+        });
+        function closeStorageModal() {
+          if (overlay) overlay.classList.remove("visible");
+        }
+        function refreshHomeAfterStorageChange() {
+          currentProjectId = null;
+          if (typeof location !== "undefined") location.hash = "#/";
+          if (typeof handleRoute === "function") handleRoute();
+        }
+        document.getElementById("storageModalUseGitHub")?.addEventListener("click", function () {
+          setStorageMode("github");
+          applyStorageModeUI("github");
+          refreshHomeAfterStorageChange();
+          if (typeof window.__doLoadFromStoredUrl === "function") window.__doLoadFromStoredUrl();
+          else if (typeof window.__fetchSharedUpdates === "function") window.__fetchSharedUpdates();
+          if (typeof updateWriteAccessUI === "function") updateWriteAccessUI();
+          closeStorageModal();
+          if (typeof showToast === "function") showToast("Using GitHub sync.", { type: "success" });
+        });
+        document.getElementById("storageModalUseLocalStorage")?.addEventListener("click", function () {
+          setStorageMode("local_storage");
+          applyStorageModeUI("local_storage");
+          refreshHomeAfterStorageChange();
+          closeStorageModal();
+          if (typeof showToast === "function") showToast("Using local storage with file backup.", { type: "success" });
+        });
+        document.getElementById("storageModalUseLocalCache")?.addEventListener("click", function () {
+          setStorageMode("local_cache");
+          try {
+            localStorage.removeItem(SHARED_FILE_URL_KEY);
+            localStorage.removeItem(GITHUB_TOKEN_KEY);
+          } catch (e) {}
+          clearLocalProjectData();
+          applyStorageModeUI("local_cache");
+          refreshHomeAfterStorageChange();
+          closeStorageModal();
+          if (typeof showToast === "function") showToast("Using local cache only. Cache cleared.", { type: "success" });
+        });
+        document.getElementById("storageModalBackupToFile")?.addEventListener("click", function () {
+          var snap = exportSharedSnapshot();
+          var blob = new Blob([JSON.stringify(snap, null, 2)], { type: "application/json" });
+          var a = document.createElement("a");
+          a.href = URL.createObjectURL(blob);
+          a.download = "gantt-data.json";
+          a.click();
+          URL.revokeObjectURL(a.href);
+          if (typeof showToast === "function") showToast("Backed up to gantt-data.json", { type: "success" });
+        });
+        var storageRestoreInput = document.getElementById("storageModalRestoreFileInput");
+        document.getElementById("storageModalRestoreFromFile")?.addEventListener("click", function () { if (storageRestoreInput) storageRestoreInput.click(); });
+        if (storageRestoreInput) storageRestoreInput.addEventListener("change", function () {
+          var f = storageRestoreInput.files && storageRestoreInput.files[0];
+          if (!f) return;
+          var r = new FileReader();
+          r.onload = function () {
+            try {
+              var data = JSON.parse(r.result);
+              importSharedSnapshot(data);
+              if (typeof handleRoute === "function") { location.hash = "#/"; handleRoute(); }
+              if (typeof renderHomeView === "function") renderHomeView();
+              closeStorageModal();
+              if (typeof showToast === "function") showToast("Restored from file.", { type: "success" });
+            } catch (e) { if (typeof showToast === "function") showToast("Restore failed: " + (e && e.message ? e.message : String(e)), { type: "error" }); }
+            storageRestoreInput.value = "";
+          };
+          r.readAsText(f);
+        });
+        if (overlay) overlay.addEventListener("click", function (e) { if (e.target === overlay) closeStorageModal(); });
+        document.getElementById("storageSettingsBtn")?.addEventListener("click", function () { window.openStorageModal(); });
+      })();
+      var landingView = document.getElementById("landingView");
+      var homeViewEl = document.getElementById("homeView");
+      var ganttViewEl = document.getElementById("ganttView");
+      try {
+        if (!getStorageMode() && (localStorage.getItem(SHARED_FILE_URL_KEY) || "").trim()) setStorageMode("github");
+      } catch (e) {}
+      if (!getStorageMode()) {
+        if (landingView) landingView.classList.add("active");
+        if (homeViewEl) homeViewEl.classList.remove("active");
+        if (ganttViewEl) ganttViewEl.classList.remove("active");
+        document.getElementById("landingOptionGitHub")?.addEventListener("click", function () {
+          setStorageMode("github");
+          if (landingView) landingView.classList.remove("active");
+          handleRoute();
+          initSharedFile();
+          if (typeof updateWriteAccessUI === "function") updateWriteAccessUI();
+          if (typeof window.__doLoadFromStoredUrl === "function") window.__doLoadFromStoredUrl();
+          else if (typeof window.__fetchSharedUpdates === "function") window.__fetchSharedUpdates();
+          if (typeof updateWriteAccessUI === "function") updateWriteAccessUI();
+          var openBtn = document.getElementById("sharedFileOpenModal");
+          if (openBtn) openBtn.click();
+        });
+        document.getElementById("landingOptionLocalStorage")?.addEventListener("click", function () {
+          setStorageMode("local_storage");
+          window.hasWriteAccess = function () { return true; };
+          if (landingView) landingView.classList.remove("active");
+          var sec = document.getElementById("sharedFileSection");
+          if (sec) sec.style.display = "none";
+          var backupSec = document.getElementById("localBackupSection");
+          if (backupSec) backupSec.style.display = "flex";
+          handleRoute();
+          if (typeof updateWriteAccessUI === "function") updateWriteAccessUI();
+          initLocalBackupHandlers();
+        });
+        document.getElementById("landingOptionLocalCache")?.addEventListener("click", function () {
+          setStorageMode("local_cache");
+          window.hasWriteAccess = function () { return true; };
+          if (landingView) landingView.classList.remove("active");
+          var sec = document.getElementById("sharedFileSection");
+          if (sec) sec.style.display = "none";
+          handleRoute();
+          if (typeof updateWriteAccessUI === "function") updateWriteAccessUI();
+        });
+        return;
+      }
+      if (getStorageMode() !== "github") {
+        window.hasWriteAccess = function () { return true; };
+        var sec = document.getElementById("sharedFileSection");
+        if (sec) sec.style.display = "none";
+        var storageBtn = document.getElementById("storageSettingsBtn");
+        if (storageBtn) storageBtn.style.display = "";
+        if (getStorageMode() === "local_storage") {
+          var backupSec = document.getElementById("localBackupSection");
+          if (backupSec) backupSec.style.display = "flex";
+          initLocalBackupHandlers();
+        }
+      }
       if (window.ganttStorage?.isCloudEnabled()) {
         var session = await window.ganttStorage.getSession();
         if (session) await window.ganttStorage.ensureBoardsListLoaded();
@@ -8840,7 +9449,9 @@
           }, delay);
         });
       }
-      (function initSharedFile() {
+      function initSharedFile() {
+        if (window.__sharedFileInited) return;
+        window.__sharedFileInited = true;
         var urlInput = document.getElementById("sharedFileUrl");
         var loadBtn = document.getElementById("sharedFileLoad");
         var refreshBtn = document.getElementById("sharedFileRefresh");
@@ -8876,6 +9487,8 @@
           var canWrite = hasWriteAccess();
           var fab = document.getElementById("homeFab");
           if (fab) fab.style.display = canWrite ? "" : "none";
+          var readonlyBadge = document.getElementById("homeReadonlyBadge");
+          if (readonlyBadge) readonlyBadge.style.display = canWrite ? "none" : "inline-flex";
           var addFab = document.getElementById("addTaskFab");
           if (addFab) addFab.style.display = canWrite ? "" : "none";
           var settingsBtn = document.getElementById("settingsBtn");
@@ -8893,7 +9506,15 @@
           document.querySelectorAll("#ganttGrid .gantt-row:not(.gantt-header)").forEach(function (r) { r.draggable = canWrite; });
         }
         window.updateWriteAccessUI = updateWriteAccessUI;
+        var syncInProgress = null;
         function updateHomeStatus() {
+          if (syncInProgress) {
+            if (statusDot) { statusDot.className = "home-shared-file-status-dot synced syncing"; }
+            if (statusText) { statusText.textContent = "Syncing…"; statusText.style.display = ""; }
+            var openBtn = document.getElementById("sharedFileOpenModal");
+            if (openBtn) openBtn.style.display = "none";
+            return;
+          }
           var synced = isSynced();
           if (statusDot) { statusDot.className = "home-shared-file-status-dot " + (synced ? "synced" : "local"); }
           if (statusText) {
@@ -8912,6 +9533,7 @@
           if (modalStatusText) modalStatusText.textContent = synced ? "Synced" + (st.type !== "none" ? " \u2022 " + (st.type === "github" ? "GitHub: " + st.label : st.label) : "") : "Local";
         }
         function openSharedFileModal() {
+          if (window.switchStorageTab) window.switchStorageTab("github");
           try {
             if (urlInput) urlInput.value = localStorage.getItem(SHARED_FILE_URL_KEY) || EXAMPLE_SHARED_FILE_URL;
             if (tokenInput) tokenInput.value = localStorage.getItem(GITHUB_TOKEN_KEY) || "";
@@ -8962,6 +9584,7 @@
           return m ? { owner: m[1], repo: m[2], branch: m[3], path: m[4] } : null;
         }
         var sharedFetchFailCount = 0;
+        var sharedFetchPausedUntil = 0;
         function fetchViaGitHubRestApi(gh, token) {
           var pathEnc = gh.path.split("/").map(function (p) { return encodeURIComponent(p); }).join("/");
           var apiUrl = "https://api.github.com/repos/" + encodeURIComponent(gh.owner) + "/" + encodeURIComponent(gh.repo) + "/contents/" + pathEnc + "?ref=" + encodeURIComponent(gh.branch);
@@ -9007,9 +9630,12 @@
         function fetchSharedUpdates() {
           if (document.visibilityState !== "visible" || !isSynced()) return;
           if (window.ganttStorage && window.ganttStorage.isCloudEnabled && window.ganttStorage.isCloudEnabled()) return;
+          if (Date.now() < sharedFetchPausedUntil) return;
           var url;
           try { url = localStorage.getItem(SHARED_FILE_URL_KEY); } catch (e) { return; }
           if (!url || !url.trim()) return;
+          syncInProgress = "pull";
+          updateHomeStatus();
           var gh = parseGitHubRawUrl(url);
           var token;
           try { token = localStorage.getItem(GITHUB_TOKEN_KEY); } catch (e) {}
@@ -9028,15 +9654,29 @@
                 return data;
               });
           }
+          function canonicalJson(obj) {
+            if (obj === null || typeof obj !== "object") return obj;
+            if (Array.isArray(obj)) return obj.map(canonicalJson);
+            var keys = Object.keys(obj).sort();
+            var out = {};
+            for (var i = 0; i < keys.length; i++) out[keys[i]] = canonicalJson(obj[keys[i]]);
+            return out;
+          }
+          function snapshotForCompare(snap) {
+            if (!snap || !Array.isArray(snap.projects)) return snap;
+            var projects = snap.projects.slice().sort(function (a, b) { return String(a.id || "").localeCompare(String(b.id || "")); });
+            return canonicalJson({ projects: projects, boards: snap.boards || {} });
+          }
           fetchPromise
             .then(function (data) {
               sharedFetchFailCount = 0;
               if (!data || data.skip) return;
               if (!data.projects || !Array.isArray(data.projects)) return;
               var current = exportSharedSnapshot();
-              var currentStr = JSON.stringify(current);
-              var newStr = JSON.stringify(data);
+              var currentStr = JSON.stringify(snapshotForCompare(current));
+              var newStr = JSON.stringify(snapshotForCompare(data));
               if (currentStr === newStr) return;
+              if (typeof window.hasWriteAccess === "function" && window.hasWriteAccess()) return;
               importSharedSnapshot(data);
               updateHomeStatus();
               updateModalStatus();
@@ -9050,9 +9690,12 @@
             .catch(function (err) {
               sharedFetchFailCount++;
               var msg = err && (err.message || String(err));
-              if (typeof console !== "undefined" && console.warn) console.warn("[GitHub sync]", msg);
-              if (sharedFetchFailCount >= 2 && typeof showToast === "function") showToast("Sync failed: " + (msg || "Unknown error") + ". Check URL, token, and network.", { type: "error" });
-            });
+              var is403 = /403/.test(String(msg));
+              if (is403) sharedFetchPausedUntil = Date.now() + 60000;
+              if (typeof console !== "undefined" && console.warn && !is403) console.warn("[GitHub sync]", msg);
+              if (sharedFetchFailCount >= 2 && typeof showToast === "function") showToast("Sync failed: " + (msg || "Unknown error") + ". Add a GitHub token in Sync Settings to avoid rate limits.", { type: "error" });
+            })
+            .finally(function () { syncInProgress = null; updateHomeStatus(); });
         }
         window.__fetchSharedUpdates = fetchSharedUpdates;
         window.__doLoadFromStoredUrl = function () {
@@ -9067,6 +9710,8 @@
         function doLoad(url) {
           var u = (url && url.trim()) || "";
           if (!u) { if (typeof showToast === "function") showToast("Enter a URL first.", { type: "error" }); return; }
+          syncInProgress = "pull";
+          updateHomeStatus();
           var gh = parseGitHubRawUrl(u);
           var token;
           try { token = localStorage.getItem(GITHUB_TOKEN_KEY); } catch (e) {}
@@ -9095,7 +9740,8 @@
               }
               if (typeof showToast === "function") showToast("Loaded shared file.", { type: "success" });
             })
-            .catch(function (e) { if (typeof showToast === "function") showToast("Load failed: " + (e && e.message ? e.message : String(e)), { type: "error" }); });
+            .catch(function (e) { if (typeof showToast === "function") showToast("Load failed: " + (e && e.message ? e.message : String(e)), { type: "error" }); })
+            .finally(function () { syncInProgress = null; updateHomeStatus(); });
         }
         if (loadBtn && urlInput) loadBtn.addEventListener("click", function () { doLoad(urlInput.value); });
         if (refreshBtn && urlInput) refreshBtn.addEventListener("click", function () {
@@ -9113,6 +9759,8 @@
           if (typeof showToast === "function") showToast("Downloaded gantt-data.json. Commit to your repo so others can Load/Refresh.", { type: "success" });
         });
         function pushToGitHub(token, gh, pushBtn) {
+          syncInProgress = "push";
+          updateHomeStatus();
           function showPushError(msg) { safeToast("Push failed: " + msg, { type: "error" }); }
           function statusToMessage(status) {
             if (status === 401) return "Invalid or expired token. Check your Personal Access Token and try again.";
@@ -9207,7 +9855,11 @@
               var msg = e && e.message ? e.message : String(e);
               if (msg.indexOf("Failed to fetch") !== -1 || msg.indexOf("NetworkError") !== -1) showPushError("Network error. Check connection or run the app from a local server (not file://)."); else showPushError(msg);
             })
-            .finally(function () { if (pushBtn) pushBtn.disabled = false; });
+            .finally(function () {
+              syncInProgress = null;
+              updateHomeStatus();
+              if (pushBtn) pushBtn.disabled = false;
+            });
         }
         var pushBtn = document.getElementById("sharedFilePush");
         function safeToast(msg, type) {
@@ -9248,7 +9900,7 @@
           autoPushTimer = setTimeout(doAutoPush, AUTO_PUSH_DEBOUNCE_MS);
         }
         window.notifySharedDataChanged = scheduleAutoPush;
-      })();
+      }
       window.addEventListener("hashchange", () => handleRoute());
       async function createNewProject() {
         if (typeof window.hasWriteAccess === "function" && !window.hasWriteAccess()) return;
@@ -9284,7 +9936,7 @@
         });
       }
       document.addEventListener("click", async (e) => {
-        if (!e.target.closest("#homeFab") && !e.target.closest(".home-new-project-btn")) return;
+        if (!e.target.closest("#homeFab")) return;
         const homeView = document.getElementById("homeView");
         if (!homeView?.classList.contains("active")) return;
         e.preventDefault();
@@ -9323,10 +9975,45 @@
         });
       })();
       await handleRoute();
+      if (getStorageMode() === "github") initSharedFile();
       if (typeof window.updateWriteAccessUI === "function") window.updateWriteAccessUI();
       if (typeof window.__doLoadFromStoredUrl === "function") window.__doLoadFromStoredUrl();
       else if (typeof window.__fetchSharedUpdates === "function") window.__fetchSharedUpdates();
       if (typeof window.updateWriteAccessUI === "function") window.updateWriteAccessUI();
+    }
+    function initLocalBackupHandlers() {
+      if (window.__localBackupHandlersInited) return;
+      window.__localBackupHandlersInited = true;
+      var backupBtn = document.getElementById("localBackupToFile");
+      var restoreBtn = document.getElementById("localRestoreFromFile");
+      var fileInput = document.getElementById("localRestoreFileInput");
+      if (backupBtn) backupBtn.addEventListener("click", function () {
+        var snap = exportSharedSnapshot();
+        var blob = new Blob([JSON.stringify(snap, null, 2)], { type: "application/json" });
+        var a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "gantt-data.json";
+        a.click();
+        URL.revokeObjectURL(a.href);
+        if (typeof showToast === "function") showToast("Backed up to gantt-data.json", { type: "success" });
+      });
+      if (restoreBtn && fileInput) restoreBtn.addEventListener("click", function () { fileInput.click(); });
+      if (fileInput) fileInput.addEventListener("change", function () {
+        var f = fileInput.files && fileInput.files[0];
+        if (!f) return;
+        var r = new FileReader();
+        r.onload = function () {
+          try {
+            var data = JSON.parse(r.result);
+            importSharedSnapshot(data);
+            if (typeof handleRoute === "function") { location.hash = "#/"; handleRoute(); }
+            if (typeof renderHomeView === "function") renderHomeView();
+            if (typeof showToast === "function") showToast("Restored from file.", { type: "success" });
+          } catch (e) { if (typeof showToast === "function") showToast("Restore failed: " + (e && e.message ? e.message : String(e)), { type: "error" }); }
+          fileInput.value = "";
+        };
+        r.readAsText(f);
+      });
     }
     if (document.readyState === "loading") {
       document.addEventListener("DOMContentLoaded", bootstrap);
