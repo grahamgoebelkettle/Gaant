@@ -153,6 +153,7 @@
     .gantt-wrapper[data-row-appearance="compact"] .gantt-task-cell .task-text {
       display: -webkit-box;
       -webkit-line-clamp: 2;
+      line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -1561,10 +1562,12 @@
       font-family: inherit;
       text-align: right;
       -moz-appearance: textfield;
+      appearance: textfield;
     }
     .settings-phase-sprints input::-webkit-outer-spin-button,
     .settings-phase-sprints input::-webkit-inner-spin-button {
       -webkit-appearance: none;
+      appearance: none;
       margin: 0;
     }
     .settings-phase-sprints .sprints-suffix {
@@ -2367,6 +2370,11 @@
     .gantt-auth-modal .auth-use-different { font-size: 12px; color: var(--text-tertiary); margin-top: 16px; }
     .gantt-auth-modal .auth-use-different button { background: none; border: none; color: var(--text-secondary); cursor: pointer; text-decoration: underline; font-size: 12px; padding: 0; font-family: inherit; }
     .gantt-auth-modal .auth-use-different button:hover { color: var(--text-primary); }
+    .gantt-auth-modal .auth-project-hint { font-size: 11px; color: var(--text-tertiary); margin: 10px 0 0 0; word-break: break-all; }
+    .gantt-auth-modal .auth-test-wrap { margin-top: 14px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .gantt-auth-modal .auth-test-result { font-size: 12px; color: var(--text-secondary); }
+    .gantt-auth-modal .auth-test-result.ok { color: #059669; }
+    .gantt-auth-modal .auth-test-result.fail { color: #b91c1c; }
     .home-project-list {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -2955,11 +2963,11 @@
     <div class="gantt-auth-modal">
       <div class="auth-config-section" id="ganttAuthConfigSection">
         <h3 id="ganttAuthConfigTitle">Connect to Supabase</h3>
-        <p style="font-size: 13px; color: var(--text-secondary); margin: 0 0 12px 0;">Enter your project URL and anon key from Supabase Dashboard → Settings → API.</p>
+        <p style="font-size: 13px; color: var(--text-secondary); margin: 0 0 12px 0;">Enter your project URL and API key from Supabase Dashboard → Settings → API. Use the <strong>Publishable</strong> key, or if login times out use the <strong>anon</strong> key from the <strong>Legacy API Keys</strong> tab.</p>
         <label for="ganttAuthConfigUrl">Project URL</label>
         <input type="url" id="ganttAuthConfigUrl" placeholder="https://xxxxx.supabase.co" autocomplete="off" />
-        <label for="ganttAuthConfigAnonKey">Anon key</label>
-        <input type="text" id="ganttAuthConfigAnonKey" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6..." autocomplete="off" />
+        <label for="ganttAuthConfigAnonKey">Publishable key or anon key</label>
+        <input type="text" id="ganttAuthConfigAnonKey" placeholder="sb_publishable_... or eyJhbGciOiJIUzI1NiIs..." autocomplete="off" />
         <div class="auth-actions">
           <button type="button" class="gantt-auth-btn" id="ganttAuthConfigSave">Save & continue</button>
           <button type="button" class="gantt-auth-btn" id="ganttAuthCancelConfig">Cancel</button>
@@ -2980,6 +2988,11 @@
           </div>
         </form>
         <div class="auth-use-different"><button type="button" id="ganttAuthShowConfig">Use different Supabase project</button></div>
+        <p class="auth-project-hint" id="ganttAuthProjectHint" aria-live="polite"></p>
+        <div class="auth-test-wrap">
+          <button type="button" class="gantt-auth-btn gantt-auth-btn-secondary" id="ganttAuthTestConnection">Test connection</button>
+          <span class="auth-test-result" id="ganttAuthTestResult"></span>
+        </div>
       </div>
       <div class="auth-error" id="ganttAuthError" role="alert"></div>
     </div>
@@ -8399,7 +8412,10 @@
       function authErrorMessage(err) {
         if (!err) return "Something went wrong.";
         const msg = typeof err === "string" ? err : (err && err.message ? err.message : String(err));
-        if (/aborted|cancelled|canceled|timeout/i.test(msg)) return "Request was cancelled or took too long. Please try again.";
+        if (/aborted|cancelled|canceled|timeout/i.test(msg)) return "Request was cancelled or took too long. Clear this site's data (browser settings → Site settings → Clear data) and try again.";
+        if (/failed to fetch|network error|connection refused|connection failed|load failed|ERR_CONNECTION|NS_ERROR/i.test(msg)) {
+          return "Connection failed. If you see 'refused to connect', start the server: in a terminal run 'python3 -m http.server 8000' in this folder, then open http://localhost:8000/template.html in Chrome or Safari.";
+        }
         return msg;
       }
 
@@ -8452,6 +8468,11 @@
         overlay?.classList.add("visible");
         if (window.ganttStorage.isCloudEnabled()) {
           showModalView("login");
+          var hintEl = document.getElementById("ganttAuthProjectHint");
+          if (hintEl) {
+            var cfg = window.ganttStorage.getSavedConfig();
+            hintEl.textContent = cfg && cfg.url ? "Project: " + cfg.url : "";
+          }
           fillRememberedEmail();
           emailInput?.focus();
         } else {
@@ -8467,7 +8488,7 @@
       function updateAuthUI(session) {
         const show = !!session;
         if (hadSession && !show && typeof showToast === "function") {
-          showToast("You have been logged out.", { type: "error" });
+          showToast("You've logged out.", { type: "error" });
         }
         hadSession = !!session;
         if (wrap) wrap.style.display = show ? "" : "none";
@@ -8497,7 +8518,11 @@
       });
       if (userDropdown) userDropdown.addEventListener("click", (e) => e.stopPropagation());
       if (supabaseLink) supabaseLink.addEventListener("click", () => wrap?.classList.remove("open"));
-      if (logoutBtn) logoutBtn.addEventListener("click", () => { wrap?.classList.remove("open"); window.ganttStorage.signOut(); });
+      if (logoutBtn) logoutBtn.addEventListener("click", async () => {
+        wrap?.classList.remove("open");
+        await window.ganttStorage.signOut();
+        setTimeout(function () { location.reload(); }, 1200);
+      });
       if (overlay) overlay.addEventListener("click", (e) => { if (e.target === overlay) overlay.classList.remove("visible"); });
       if (cancelConfigBtn) cancelConfigBtn.addEventListener("click", () => overlay?.classList.remove("visible"));
 
@@ -8533,17 +8558,53 @@
         configUrlInput?.focus();
       });
 
+      var testResultEl = document.getElementById("ganttAuthTestResult");
+      var testConnBtn = document.getElementById("ganttAuthTestConnection");
+      if (testConnBtn && testResultEl) testConnBtn.addEventListener("click", async function () {
+        testResultEl.textContent = "Testing…";
+        testResultEl.className = "auth-test-result";
+        var cfg = window.ganttStorage && window.ganttStorage.getSavedConfig();
+        if (!cfg || !cfg.url || !cfg.anonKey) {
+          testResultEl.textContent = "Save project URL and key first.";
+          testResultEl.className = "auth-test-result fail";
+          return;
+        }
+        var url = (cfg.url || "").replace(/\/$/, "") + "/auth/v1/health";
+        var controller = new AbortController();
+        var timeoutId = setTimeout(function () { controller.abort(); }, 8000);
+        try {
+          var r = await fetch(url, { method: "GET", headers: { apikey: cfg.anonKey }, signal: controller.signal });
+          clearTimeout(timeoutId);
+          if (r.ok) {
+            testResultEl.textContent = "Connection OK — project is reachable.";
+            testResultEl.className = "auth-test-result ok";
+          } else {
+            testResultEl.textContent = "Connection failed: " + r.status + " " + r.statusText;
+            testResultEl.className = "auth-test-result fail";
+          }
+        } catch (e) {
+          clearTimeout(timeoutId);
+          var msg = e && e.name === "AbortError" ? "Timed out (8s) — project may be paused or unreachable." : (e && e.message ? e.message : String(e));
+          testResultEl.textContent = "Connection failed: " + msg;
+          testResultEl.className = "auth-test-result fail";
+        }
+      });
+
       if (submitBtn) submitBtn.addEventListener("click", async () => {
         const email = emailInput?.value?.trim();
         const password = passwordInput?.value;
         clearAuthError();
         if (!email || !password) { showAuthError("Enter email and password."); return; }
+        if (window.location.protocol === "file:") {
+          showAuthError("Login doesn't work when the app is opened as a local file. Run a local web server (e.g. python -m http.server 8000), then open http://localhost:8000 in an external browser (Chrome, Safari)—Cursor's built-in browser may not connect to localhost.");
+          return;
+        }
         setAuthLoading("login");
         try {
           const result = await withTimeout(
             window.ganttStorage.signIn(email, password),
-            45000,
-            "Request took too long. Check your connection and Supabase project URL (Dashboard → Settings → API), then try again."
+            30000,
+            "Login timed out. Try: (1) Restore the project in the Supabase dashboard if it's paused. (2) Use the anon key from Settings → API → Legacy API Keys instead of the Publishable key. (3) Check the project URL above is correct."
           );
           if (result && result.error) { showAuthError(result.error); return; }
           try {
@@ -8567,12 +8628,16 @@
         const password = passwordInput?.value;
         clearAuthError();
         if (!email || !password) { showAuthError("Enter email and password."); return; }
+        if (window.location.protocol === "file:") {
+          showAuthError("Sign up doesn't work when the app is opened as a local file. Run a local web server (e.g. python -m http.server 8000), then open http://localhost:8000 in an external browser (Chrome, Safari)—Cursor's built-in browser may not connect to localhost.");
+          return;
+        }
         setAuthLoading("signup");
         try {
           const result = await withTimeout(
             window.ganttStorage.signUp(email, password),
-            45000,
-            "Request took too long. Check your connection and Supabase project URL (Dashboard → Settings → API), then try again."
+            20000,
+            "Request took too long. Try again or clear this site's data and try again."
           );
           if (result && result.error) { showAuthError(result.error); return; }
           overlay.classList.remove("visible");
@@ -8590,12 +8655,18 @@
       migrateLegacySingleProject();
       initAuthUI();
       if (window.ganttStorage?.isCloudEnabled()) {
-        const session = await window.ganttStorage.getSession();
+        var session = await window.ganttStorage.getSession();
         if (session) await window.ganttStorage.ensureBoardsListLoaded();
         if (window.ganttStorage?.refreshAuthUI) window.ganttStorage.refreshAuthUI();
-        setTimeout(function () {
-          if (window.ganttStorage?.refreshAuthUI) window.ganttStorage.refreshAuthUI();
-        }, 400);
+        [100, 350, 800].forEach(function (delay) {
+          setTimeout(async function () {
+            var s = await window.ganttStorage.getSession();
+            if (s) {
+              await window.ganttStorage.ensureBoardsListLoaded();
+              if (window.ganttStorage?.refreshAuthUI) window.ganttStorage.refreshAuthUI();
+            }
+          }, delay);
+        });
       }
       window.addEventListener("hashchange", () => handleRoute());
       async function createNewProject() {
