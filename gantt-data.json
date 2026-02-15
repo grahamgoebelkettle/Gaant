@@ -45,9 +45,25 @@
           "phaseSecondary": null,
           "party": "Unassigned",
           "start": "2/14",
-          "end": "2/20",
+          "end": "3/3",
           "startDate": "2026-02-14T07:00:00.000Z",
-          "endDate": "2026-02-20T07:00:00.000Z",
+          "endDate": "2026-03-04T05:59:59.481Z",
+          "star": false,
+          "overview": "",
+          "subTasks": [],
+          "blockers": [],
+          "links": [],
+          "dependsOn": null
+        },
+        {
+          "task": "my first task",
+          "phase": "development",
+          "phaseSecondary": null,
+          "party": "Unassigned",
+          "start": "4/7",
+          "end": "4/30",
+          "startDate": "2026-04-07T08:30:10.368Z",
+          "endDate": "2026-04-30T13:30:12.672Z",
           "star": false,
           "overview": "",
           "subTasks": [],
@@ -102,7 +118,11 @@
         "snapToSprint": false,
         "moveTasksWhenSprintExtended": false,
         "allowIndependentDependencies": false,
-        "responsibleParties": []
+        "responsibleParties": [],
+        "scrollPosition": {
+          "scrollTop": 0,
+          "scrollLeft": 43
+        }
       },
       "view": "default",
       "custom_palettes": []
