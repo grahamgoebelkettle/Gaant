@@ -2,7 +2,7 @@
   "projects": [
     {
       "id": "p-1771131136904",
-      "name": "ladies first!",
+      "name": "Cosmo",
       "createdAt": 1771131136904
     },
     {
@@ -48,7 +48,7 @@
         }
       ],
       "settings": {
-        "title": "ladies first!",
+        "title": "Cosmo",
         "description": "new description",
         "phases": [
           {
