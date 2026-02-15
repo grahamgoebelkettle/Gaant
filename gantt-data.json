@@ -240,22 +240,6 @@
           "blockers": [],
           "links": [],
           "dependsOn": null
-        },
-        {
-          "task": "my first task",
-          "phase": "ideation",
-          "phaseSecondary": null,
-          "party": "Unassigned",
-          "start": "3/10",
-          "end": "3/16",
-          "startDate": "2026-03-10T22:59:59.436Z",
-          "endDate": "2026-03-16T22:59:59.436Z",
-          "star": false,
-          "overview": "",
-          "subTasks": [],
-          "blockers": [],
-          "links": [],
-          "dependsOn": null
         }
       ],
       "settings": {
