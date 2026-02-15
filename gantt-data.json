@@ -1,0 +1,20 @@
+{
+  "projects": [
+    {
+      "id": "p-sample",
+      "name": "Sample project",
+      "createdAt": 1739548800000
+    }
+  ],
+  "boards": {
+    "p-sample": {
+      "tasks": [],
+      "settings": {
+        "title": "Sample project",
+        "description": ""
+      },
+      "view": "default",
+      "custom_palettes": []
+    }
+  }
+}
