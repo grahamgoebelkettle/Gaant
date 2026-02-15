@@ -43,7 +43,7 @@
       ],
       "settings": {
         "title": "Sample project copy",
-        "description": "Drag bars to reschedule • Drag edges to change dates • Drag rows to reorder • Click a row to expand details • Click cells to edit",
+        "description": "new description",
         "phases": [
           {
             "id": "discovery",
