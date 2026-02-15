@@ -31,7 +31,9 @@
           "star": false,
           "overview": "second green task",
           "subTasks": [
-            ""
+            "grinch",
+            "trees",
+            "emerald"
           ],
           "blockers": [],
           "links": [],
