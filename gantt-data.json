@@ -7,7 +7,7 @@
     },
     {
       "id": "p-1771131140680",
-      "name": "two",
+      "name": "deux",
       "createdAt": 1771131140680
     },
     {
@@ -174,7 +174,7 @@
         }
       ],
       "settings": {
-        "title": "two",
+        "title": "deux",
         "description": "Drag bars to reschedule • Drag edges to change dates • Drag rows to reorder • Click a row to expand details • Click cells to edit",
         "phases": [
           {
