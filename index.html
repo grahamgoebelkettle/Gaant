@@ -8891,7 +8891,7 @@
           return fetch(apiUrl, {
             cache: "no-store",
             credentials: "omit",
-            headers: { "Accept": "application/vnd.github.raw", "Cache-Control": "no-cache", "Pragma": "no-cache" }
+            headers: { "Accept": "application/vnd.github.raw" }
           }).then(function (r) {
             if (!r.ok) throw new Error(r.status + " " + r.statusText);
             return r.text().then(function (text) {
@@ -8909,9 +8909,7 @@
             credentials: "omit",
             headers: {
               "Content-Type": "application/json",
-              "Authorization": authHeader,
-              "Cache-Control": "no-cache",
-              "Pragma": "no-cache"
+              "Authorization": authHeader
             },
             body: JSON.stringify({ query: query, variables: { owner: gh.owner, name: gh.repo, expr: expr } })
           }).then(function (r) {
