@@ -125,7 +125,18 @@
         }
       },
       "view": "default",
-      "custom_palettes": []
+      "custom_palettes": [
+        {
+          "name": "My palette",
+          "colors": [
+            "#f01997",
+            "#16a34a",
+            "#15803d",
+            "#166534",
+            "#14532d"
+          ]
+        }
+      ]
     },
     "p-1771131140680": {
       "tasks": [
