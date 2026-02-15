@@ -16,13 +16,13 @@
       "tasks": [
         {
           "task": "my first task",
-          "phase": "discovery",
+          "phase": "ideation",
           "phaseSecondary": null,
           "party": "Unassigned",
-          "start": "2/14",
-          "end": "3/3",
-          "startDate": "2026-02-14T07:00:00.000Z",
-          "endDate": "2026-03-04T05:59:59.481Z",
+          "start": "2/8",
+          "end": "2/25",
+          "startDate": "2026-02-08T07:00:00.000Z",
+          "endDate": "2026-02-26T05:59:59.481Z",
           "star": false,
           "overview": "",
           "subTasks": [],
