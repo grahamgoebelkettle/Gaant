@@ -226,10 +226,10 @@
           "phase": "development",
           "phaseSecondary": null,
           "party": "Unassigned",
-          "start": "4/10",
-          "end": "4/16",
-          "startDate": "2026-04-10T09:29:59.481Z",
-          "endDate": "2026-04-16T09:29:59.481Z",
+          "start": "4/17",
+          "end": "5/5",
+          "startDate": "2026-04-18T02:59:55.968Z",
+          "endDate": "2026-05-06T05:29:55.449Z",
           "star": false,
           "overview": "",
           "subTasks": [],
@@ -240,11 +240,55 @@
       ],
       "settings": {
         "title": "Blue blaze",
-        "description": "",
+        "description": "Drag bars to reschedule • Drag edges to change dates • Drag rows to reorder • Click a row to expand details • Click cells to edit",
         "scrollPosition": {
           "scrollTop": 0,
-          "scrollLeft": 0
-        }
+          "scrollLeft": 497
+        },
+        "phases": [
+          {
+            "id": "discovery",
+            "name": "Discovery",
+            "color": "#eab308",
+            "sprints": 2
+          },
+          {
+            "id": "ideation",
+            "name": "Ideation",
+            "color": "#0d9488",
+            "sprints": 2
+          },
+          {
+            "id": "development",
+            "name": "Development",
+            "color": "#0284c7",
+            "sprints": 2
+          },
+          {
+            "id": "review",
+            "name": "Review",
+            "color": "#14b8a6",
+            "sprints": 2
+          },
+          {
+            "id": "delivery",
+            "name": "Delivery",
+            "color": "#6366f1",
+            "sprints": 2
+          }
+        ],
+        "paletteIndex": 0,
+        "dependencyGapDays": 0,
+        "rowAppearance": "default",
+        "strokeMode": false,
+        "showDurationOnBar": false,
+        "projectStartDate": "2026-02-15",
+        "projectEndDate": null,
+        "phaseDurationMode": "fixed",
+        "snapToSprint": false,
+        "moveTasksWhenSprintExtended": false,
+        "allowIndependentDependencies": false,
+        "responsibleParties": []
       },
       "view": "default",
       "custom_palettes": []
