@@ -32,7 +32,7 @@
     },
     {
       "id": "p-1771140518298",
-      "name": "999999",
+      "name": "one million!!!",
       "createdAt": 1771140518298
     }
   ],
@@ -369,13 +369,13 @@
       "tasks": [
         {
           "task": "my first task",
-          "phase": "discovery",
+          "phase": "ideation",
           "phaseSecondary": null,
           "party": "Unassigned",
-          "start": "2/15",
-          "end": "2/21",
-          "startDate": "2026-02-15T07:00:00.000Z",
-          "endDate": "2026-02-21T07:00:00.000Z",
+          "start": "4/16",
+          "end": "4/22",
+          "startDate": "2026-04-16T18:53:54.372Z",
+          "endDate": "2026-04-22T18:53:54.372Z",
           "star": false,
           "overview": "",
           "subTasks": [],
@@ -385,8 +385,8 @@
         }
       ],
       "settings": {
-        "title": "999999",
-        "description": ""
+        "title": "one million!!!",
+        "description": "Drag bars to reschedule • Drag edges to change dates • Drag rows to reorder • Click a row to expand details • Click cells to edit"
       },
       "view": "default",
       "custom_palettes": []
