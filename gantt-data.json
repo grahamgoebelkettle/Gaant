@@ -24,6 +24,11 @@
       "id": "p-1771137300485",
       "name": "this is brand new!",
       "createdAt": 1771137300485
+    },
+    {
+      "id": "p-1771137962676",
+      "name": "Untitled project",
+      "createdAt": 1771137962676
     }
   ],
   "boards": {
@@ -297,6 +302,15 @@
           "scrollTop": 0,
           "scrollLeft": 683
         }
+      },
+      "view": "default",
+      "custom_palettes": []
+    },
+    "p-1771137962676": {
+      "tasks": [],
+      "settings": {
+        "title": "Untitled project",
+        "description": ""
       },
       "view": "default",
       "custom_palettes": []
