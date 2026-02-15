@@ -281,6 +281,20 @@
     }
     .gantt-task-cell .task-name-wrap { flex: 1; min-width: 0; display: flex; align-items: center; gap: 4px; }
     .gantt-task-cell .task-text { flex: 1; min-width: 0; }
+    .task-cell-phase-pill {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+      margin-left: auto;
+      font-size: 12px;
+      color: var(--text-secondary, #737373);
+    }
+    .task-cell-phase-pill-label { white-space: nowrap; }
+    .task-cell-phase-pill-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    @media (min-width: 769px) {
+      .task-cell-phase-pill { display: none !important; }
+    }
     .task-dependency-icon {
       flex-shrink: 0;
       display: inline-flex;
@@ -1333,38 +1347,36 @@
     .settings-btn:hover { color: var(--text-primary); background: var(--bg-hover); }
     .settings-btn svg { width: 20px; height: 20px; }
     .settings-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.3);
-      z-index: 100010;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.2s ease, visibility 0.2s ease;
-    }
-    .settings-overlay.open {
-      opacity: 1;
-      visibility: visible;
+      display: none;
     }
     .settings-drawer {
-      position: fixed;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      width: 400px;
-      max-width: 100%;
+      width: 100%;
       height: 100%;
-      max-height: 100vh;
-      background: var(--bg-surface);
-      box-shadow: -4px 0 24px rgba(0,0,0,0.3);
-      z-index: 100011;
       display: flex;
       flex-direction: column;
       min-height: 0;
-      transform: translateX(100%);
-      transition: transform 0.25s ease;
     }
-    .settings-overlay.open .settings-drawer {
-      transform: translateX(0);
+    .settings-sidebar {
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-surface);
+      border-left: none;
+      transition: width 0.2s ease;
+      min-height: 0;
+      z-index: 100;
+      box-shadow: none;
+    }
+    .app-views-wrap.settings-sidebar-open .settings-sidebar {
+      width: 320px;
+      overflow: visible;
+      border-left: 1px solid var(--border-default);
+      box-shadow: -4px 0 16px rgba(0,0,0,0.08);
     }
     .settings-drawer-header {
       padding: 20px 24px;
@@ -1484,6 +1496,63 @@
       margin: 0;
       cursor: pointer;
       flex-shrink: 0;
+    }
+    .settings-toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .settings-toggle-label {
+      font-weight: 500;
+      line-height: 1.2;
+      cursor: pointer;
+      flex: 1;
+    }
+    .settings-toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+    .settings-toggle-switch input {
+      opacity: 0;
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      cursor: pointer;
+    }
+    .settings-toggle-slider {
+      position: absolute;
+      inset: 0;
+      border-radius: 999px;
+      background: var(--border-strong);
+      transition: background 0.2s;
+    }
+    .settings-toggle-slider::after {
+      content: "";
+      position: absolute;
+      left: 2px;
+      top: 2px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--bg-body);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+      transition: transform 0.2s;
+    }
+    .settings-toggle-switch input:checked + .settings-toggle-slider {
+      background: var(--color-general-primary);
+    }
+    .settings-toggle-switch input:checked + .settings-toggle-slider::after {
+      transform: translateX(20px);
+    }
+    .settings-toggle-switch input:focus-visible + .settings-toggle-slider {
+      box-shadow: 0 0 0 2px var(--color-general-primary);
     }
     .settings-segmented {
       display: flex;
@@ -1789,8 +1858,9 @@
     .settings-party-item span { flex: 1; min-width: 0; }
     .settings-party-item button { flex-shrink: 0; padding: 2px 8px; font-size: 12px; color: var(--text-tertiary); background: transparent; border: none; border-radius: 4px; cursor: pointer; font-family: inherit; }
     .settings-party-item button:hover { color: #b91c1c; background: rgba(185,28,28,0.1); }
-    .settings-add-party-row { display: flex; gap: 8px; align-items: center; }
-    .settings-party-input { flex: 1; min-width: 0; padding: 8px 12px; font-size: 13px; border: 1px solid var(--border-strong); border-radius: 6px; font-family: inherit; }
+    .settings-add-party-row { display: flex; gap: 8px; align-items: center; width: 100%; box-sizing: border-box; }
+    .settings-add-party-row .settings-add-phase { width: auto; flex-shrink: 0; margin-top: 0; }
+    .settings-party-input { flex: 1; min-width: 0; padding: 10px 14px; font-size: 14px; border: 1px solid var(--border-strong); border-radius: 6px; font-family: inherit; min-height: 40px; box-sizing: border-box; }
     .settings-auto-populate-btn {
       width: 100%;
       margin-top: 8px;
@@ -2255,20 +2325,53 @@
         display: none !important;
       }
       .gantt-row {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr) minmax(72px, max-content);
         min-width: 0;
         max-width: 100%;
       }
-      .gantt-row .gantt-cell:nth-child(n+2) {
-        display: none;
+      .gantt-row:not(.gantt-header) {
+        min-height: 52px;
+      }
+      .gantt-row .gantt-cell:nth-child(n+3) {
+        display: none !important;
       }
       .gantt-row .gantt-cell:first-child {
         grid-column: 1;
-        width: 100%;
         min-width: 0;
         max-width: 100%;
         box-sizing: border-box;
-        overflow: hidden;
+        overflow: visible;
+        padding: 14px 10px;
+      }
+      .gantt-row .gantt-cell:nth-child(2),
+      .gantt-row .gantt-phase-cell {
+        display: flex !important;
+        grid-column: 2;
+        align-items: center;
+        justify-content: flex-end;
+        padding: 14px 10px 14px 0;
+        flex-shrink: 0;
+        min-width: 0;
+      }
+      .gantt-row .gantt-phase-cell .gantt-phase-dropdown-wrap {
+        flex-shrink: 0;
+        min-width: max-content;
+      }
+      .gantt-row .gantt-phase-cell .gantt-phase-dropdown {
+        flex: none;
+        min-width: 0;
+      }
+      .gantt-row .gantt-phase-cell .gantt-phase-dropdown-trigger {
+        font-size: 13px;
+        width: auto;
+        min-width: 0;
+      }
+      .gantt-row .gantt-phase-cell .gantt-phase-dropdown-trigger,
+      .gantt-row .gantt-phase-cell .gantt-phase-dropdown-trigger span {
+        color: var(--text-primary);
+      }
+      .gantt-header .gantt-cell:nth-child(2) {
+        text-align: right;
       }
       .gantt-row .gantt-task-cell .task-name-wrap,
       .gantt-row .gantt-task-cell .task-text {
@@ -2279,7 +2382,20 @@
         word-break: break-word;
       }
       .gantt-row .gantt-task-cell {
-        overflow: hidden;
+        overflow: visible;
+        font-size: 16px;
+      }
+      .task-cell-phase-pill {
+        display: flex !important;
+        align-items: center;
+        gap: 4px;
+        flex-shrink: 0;
+        margin-left: auto;
+        font-size: 12px;
+        color: var(--text-secondary);
+      }
+      .task-cell-phase-pill-label {
+        white-space: nowrap;
       }
       .gantt-detail-row {
         padding: 20px 10px 24px;
@@ -2299,6 +2415,41 @@
         grid-column: 1 / -1;
         width: 100%;
       }
+    }
+    @media (max-width: 768px) {
+      .gantt-row {
+        grid-template-columns: minmax(0, 1fr) minmax(72px, max-content);
+      }
+      .gantt-row .gantt-cell:nth-child(n+3) {
+        display: none !important;
+      }
+      .gantt-row .gantt-cell:nth-child(2),
+      .gantt-row .gantt-phase-cell {
+        display: flex !important;
+        grid-column: 2;
+      }
+      .gantt-row .gantt-phase-cell .gantt-phase-dropdown-wrap {
+        flex-shrink: 0;
+        min-width: max-content;
+      }
+      .gantt-row .gantt-phase-cell .gantt-phase-dropdown-trigger {
+        width: auto;
+      }
+      .gantt-header .gantt-cell:nth-child(2) {
+        text-align: right;
+      }
+      .task-cell-phase-pill {
+        display: flex !important;
+        align-items: center;
+        gap: 4px;
+        flex-shrink: 0;
+        margin-left: auto;
+        font-size: 12px;
+        color: var(--text-secondary);
+      }
+      .task-cell-phase-pill-label {
+        white-space: nowrap;
+      }
       .gantt-detail-row .task-detail-toolbar {
         right: 10px;
       }
@@ -2317,11 +2468,17 @@
       .task-detail-mobile-tooltip .gantt-bar-tooltip-desc {
         display: none !important;
       }
+      .task-detail-mobile-tooltip .gantt-bar-tooltip-move-label { font-size: 12px; }
+      .task-detail-mobile-tooltip .gantt-bar-tooltip-row { font-size: 14px; color: var(--text-secondary); margin-top: 6px; }
+      .task-detail-mobile-tooltip .gantt-bar-tooltip-row .gantt-bar-tooltip-icon { width: 16px; height: 16px; }
+      .task-detail-mobile-tooltip .gantt-phase-dropdown-trigger { font-size: 14px; }
+      .gantt-detail-row .task-detail-field-depends-on { display: none !important; }
     }
     @media (min-width: 481px) {
       .task-detail-mobile-tooltip { display: none; }
     }
-    .app-views-wrap { flex: 1; min-height: 0; position: relative; min-width: 0; }
+    .app-views-wrap { position: relative; flex: 1; min-height: 0; min-width: 0; display: flex; flex-direction: row; }
+    .app-views-inner { flex: 1; min-width: 0; position: relative; display: flex; flex-direction: column; }
     .app-view {
       position: absolute;
       inset: 0;
@@ -2516,6 +2673,8 @@
     .storage-modal-panel.active { display: block; }
     .storage-modal-panel-desc { font-size: 13px; color: var(--text-secondary); margin: 0 0 16px 0; line-height: 1.45; }
     .storage-modal-use-btn { margin-top: 16px; }
+    .settings-storage-inline .storage-modal-tabs { margin-top: 8px; margin-bottom: 12px; }
+    .settings-storage-inline .storage-modal-panel { margin-top: 0; }
     @media (max-width: 480px) {
       .shared-file-modal-overlay { padding: 0; align-items: stretch; justify-content: stretch; }
       .shared-file-modal { width: 100%; height: 100vh; max-height: 100vh; border-radius: 0; border-left: none; border-right: none; border-top: none; padding: 0; }
@@ -2938,7 +3097,8 @@
   </style>
 </head>
 <body>
-  <div class="app-views-wrap">
+  <div class="app-views-wrap" id="appViewsWrap">
+  <div class="app-views-inner">
   <div id="landingView" class="app-view">
     <div class="landing-inner">
       <h1 class="landing-title">Choose how to store your data</h1>
@@ -2963,7 +3123,7 @@
   <div id="homeView" class="app-view">
     <div class="home-sticky-header">
       <div class="home-header-row">
-        <h1><span id="homePageTitle" contenteditable="true">Gantt projects</span> <span class="home-project-count-badge" id="homeProjectCountBadge" contenteditable="false">0</span></h1>
+        <h1><span id="homePageTitle" contenteditable="true">Boards</span> <span class="home-project-count-badge" id="homeProjectCountBadge" contenteditable="false">0</span></h1>
         <div class="home-header-actions">
           <div class="gantt-auth-wrap gantt-auth-user-menu" id="ganttAuthWrap" style="display: none;">
             <button type="button" class="gantt-auth-user-trigger" id="ganttAuthUserTrigger" aria-label="Account menu" aria-expanded="false" aria-haspopup="true">
@@ -2991,17 +3151,17 @@
             <input type="file" id="localRestoreFileInput" accept=".json,application/json" style="display: none;">
             <button type="button" class="home-shared-file-btn" id="localRestoreFromFile">Restore from file</button>
           </div>
-          <button type="button" class="home-shared-file-btn" id="storageSettingsBtn" style="display: none;">Settings</button>
-          <button type="button" class="home-new-project-btn" id="homeFab" aria-label="New project">+ New project</button>
+          <button type="button" class="home-shared-file-btn" id="homeSettingsBtn">Settings</button>
+          <button type="button" class="home-new-project-btn" id="homeFab" aria-label="New board">+ New board</button>
         </div>
       </div>
-      <p class="home-subtitle" id="homePageDescription" contenteditable="true">Create and open project schedules. Each project has its own tasks and settings.</p>
+      <p class="home-subtitle" id="homePageDescription" contenteditable="true">Create and open boards. Each board has its own tasks and settings.</p>
     </div>
     <div class="home-project-list" id="homeProjectList"></div>
   </div>
 
   <div id="ganttView" class="app-view">
-    <a href="#/" class="home-back-link" id="homeBackLink">← All projects</a>
+    <a href="#/" class="home-back-link" id="homeBackLink">← All boards</a>
     <header class="page-header">
       <div class="page-header-title-wrap">
         <h1 id="pageTitle" contenteditable="true">Project Schedule</h1>
@@ -3015,160 +3175,16 @@
         <option value="default">Default (8 weeks)</option>
         <option value="project">Entire project</option>
       </select>
-      <button type="button" class="settings-btn" id="settingsBtn" title="Project settings">
+      <button type="button" class="settings-btn" id="settingsBtn" title="Board settings">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
       </button>
     </div>
   </header>
 
-  <div class="settings-overlay" id="settingsOverlay">
-    <div class="settings-drawer">
-      <div class="settings-drawer-header">
-        <h2>Project Settings</h2>
-        <button type="button" class="settings-drawer-close" id="settingsClose">&times;</button>
-      </div>
-      <div class="settings-tabs">
-        <button type="button" class="settings-tab active" data-tab="function">General</button>
-        <button type="button" class="settings-tab" data-tab="details">Details</button>
-        <button type="button" class="settings-tab" data-tab="style">Style</button>
-      </div>
-      <div class="settings-drawer-body">
-        <div class="settings-tab-panel active" id="settingsTabFunction">
-          <div class="settings-section">
-            <label>Title</label>
-            <input type="text" id="settingsTitle" placeholder="Project Schedule">
-          </div>
-          <div class="settings-section">
-            <label>Description</label>
-            <textarea id="settingsDescription" placeholder="Describe your project..."></textarea>
-          </div>
-          <div class="settings-section">
-            <label>Project start date</label>
-            <input type="date" id="settingsProjectStartDate">
-            <small class="settings-hint">When set, the timeline stays fixed at this date; changing task dates won't shift it.</small>
-          </div>
-          <div class="settings-section">
-            <label>Project end date</label>
-            <input type="date" id="settingsProjectEndDate">
-            <small class="settings-hint">When set, the timeline is capped at this date; the chart won't extend beyond it.</small>
-          </div>
-          <div class="settings-section">
-            <label>Dependent tasks</label>
-            <select id="settingsDependencyGap" aria-hidden="true" style="position:absolute;opacity:0;pointer-events:none;height:0;width:0;">
-              <option value="0">0 days (start when previous ends)</option>
-              <option value="1">1 day</option>
-              <option value="2">2 days</option>
-              <option value="3">3 days</option>
-              <option value="5">5 days</option>
-              <option value="7">1 week</option>
-              <option value="14">2 weeks</option>
-            </select>
-            <div class="settings-dependent-wrap" id="settingsDependentWrap">
-              <button type="button" class="settings-dependent-trigger" id="settingsDependentTrigger" aria-expanded="false" aria-haspopup="true">0 days (start when previous ends)</button>
-              <div class="settings-dependent-panel" id="settingsDependentPanel" role="menu">
-                <button type="button" class="settings-dependent-option" role="menuitem" data-value="0">0 days (start when previous ends)</button>
-                <button type="button" class="settings-dependent-option" role="menuitem" data-value="1">1 day</button>
-                <button type="button" class="settings-dependent-option" role="menuitem" data-value="2">2 days</button>
-                <button type="button" class="settings-dependent-option" role="menuitem" data-value="3">3 days</button>
-                <button type="button" class="settings-dependent-option" role="menuitem" data-value="5">5 days</button>
-                <button type="button" class="settings-dependent-option" role="menuitem" data-value="7">1 week</button>
-                <button type="button" class="settings-dependent-option" role="menuitem" data-value="14">2 weeks</button>
-                <div class="settings-dependent-divider"></div>
-                <div class="settings-dependent-checkbox-wrap">
-                  <label class="settings-checkbox-label">
-                    <input type="checkbox" id="settingsIndependentDependencies">
-                    <span>Independent start dates & phases for dependencies</span>
-                  </label>
-                  <small class="settings-hint">When enabled, dependent tasks can have their own start date and phase instead of following the parent. The link remains for tracking; dates are not auto-adjusted.</small>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="settings-section">
-            <label class="settings-checkbox-label">
-              <input type="checkbox" id="settingsShowDurationOnBar">
-              <span>Always show days on bar</span>
-            </label>
-            <small class="settings-hint">When enabled, the task duration (e.g. 7 days) is shown on every bar instead of only on hover.</small>
-          </div>
-        </div>
-        <div class="settings-tab-panel" id="settingsTabStyle">
-          <div class="settings-section">
-            <label>View</label>
-            <select id="settingsRowAppearance" class="settings-select">
-              <option value="compact">Compact</option>
-              <option value="default">Default</option>
-              <option value="fill">Fill</option>
-            </select>
-            <small class="settings-hint">Row density and how the task bar area is displayed.</small>
-          </div>
-          <div class="settings-section">
-            <label>Bar style</label>
-            <div class="settings-segmented" id="settingsBarStyle" role="group" aria-label="Bar style">
-              <button type="button" class="settings-segmented-option" data-value="fill">Fill</button>
-              <button type="button" class="settings-segmented-option" data-value="stroke">Stroke</button>
-            </div>
-          </div>
-          <div class="settings-section">
-            <label>Color Palette</label>
-            <div class="settings-palette-grid" id="settingsPaletteGrid"></div>
-            <button type="button" class="settings-save-palette-btn" id="settingsSavePalette">Save current colors as palette</button>
-          </div>
-        </div>
-        <div class="settings-tab-panel" id="settingsTabDetails">
-          <div class="settings-section">
-            <label>Phase duration</label>
-            <select id="settingsPhaseDurationMode">
-              <option value="fixed" selected>Fixed (set sprints per phase)</option>
-              <option value="dynamic">Dynamic based on child tasks</option>
-            </select>
-            <small class="settings-hint">Dynamic: phase header width reflects the date range of tasks in that phase. Fixed: set a number of sprints (2 weeks each) per phase.</small>
-          </div>
-          <div class="settings-section">
-            <label>Phases</label>
-            <div class="settings-phase-list" id="settingsPhaseList" data-phase-mode="fixed"></div>
-            <button type="button" class="settings-add-phase" id="settingsAddPhase">+ Add phase</button>
-          </div>
-          <div class="settings-section">
-            <label class="settings-checkbox-label">
-              <input type="checkbox" id="settingsMoveTasksWhenSprintExtended">
-              <span>Move tasks when a sprint is extended</span>
-            </label>
-            <small class="settings-hint">When enabled (fixed phases only), increasing a phase's sprint count will shift later tasks so they stay after the extended phase.</small>
-          </div>
-          <div class="settings-section settings-snap-to-sprint-wrap" id="settingsSnapToSprintWrap">
-            <label class="settings-checkbox-label">
-              <input type="checkbox" id="settingsSnapToSprint">
-              <span>Snap to sprint</span>
-            </label>
-            <small class="settings-hint">When enabled, dragging a task start or end date near a sprint boundary (every 2 weeks) will snap it to that date.</small>
-          </div>
-          <div class="settings-section">
-            <label>Responsible parties</label>
-            <p class="settings-hint" style="margin-top: 0;">Names shown in the Responsible dropdown for tasks. Saved with the project.</p>
-            <div class="settings-party-list" id="settingsResponsiblePartiesList"></div>
-            <div class="settings-add-party-row">
-              <input type="text" id="settingsPartyInput" placeholder="Add name, press Enter" class="settings-party-input" />
-              <button type="button" class="settings-add-phase" id="settingsAddParty">+ Add</button>
-            </div>
-          </div>
-          <div class="settings-section">
-            <label>Sample data</label>
-            <button type="button" class="settings-auto-populate-btn" id="settingsAutoPopulate">Auto-populate 5 linked tasks</button>
-            <small class="settings-hint">Replaces all tasks with 5 sample tasks (Research → Design → Review → Build → Launch) linked consecutively. Useful to explore the chart without starting from scratch.</small>
-          </div>
-        </div>
-      </div>
-      <div class="settings-drawer-footer">
-        <button type="button" class="settings-save-btn" id="settingsSave">Save</button>
-      </div>
-    </div>
-  </div>
-
   <div class="task-dependency-tooltip" id="taskDependencyTooltip" role="tooltip"></div>
   <div class="detach-confirm-popup" id="detachConfirmPopup" role="dialog" aria-labelledby="detachConfirmMsg">
     <div class="detach-confirm-msg" id="detachConfirmMsg"></div>
-    <p class="detach-confirm-hint" id="detachConfirmHint">You can allow dependent tasks to have their own dates in Settings → General → Dependent tasks.</p>
+    <p class="detach-confirm-hint" id="detachConfirmHint">You can allow dependent tasks to have their own dates in Board settings → General → Dependent tasks.</p>
     <div class="detach-confirm-actions">
       <button type="button" class="detach-confirm-cancel">Keep link</button>
       <button type="button" class="detach-confirm-detach">Detach</button>
@@ -3176,7 +3192,7 @@
   </div>
   <div class="detach-confirm-popup phase-confirm-popup" id="phaseConfirmPopup" role="dialog" aria-labelledby="phaseConfirmMsg">
     <div class="detach-confirm-msg" id="phaseConfirmMsg"></div>
-    <p class="phase-confirm-hint">You can allow dependent tasks to have their own dates in Settings → General → Dependent tasks.</p>
+    <p class="phase-confirm-hint">You can allow dependent tasks to have their own dates in Board settings → General → Dependent tasks.</p>
     <div class="detach-confirm-actions">
       <button type="button" class="phase-confirm-keep">Keep current phase</button>
       <button type="button" class="phase-confirm-move">Move to phase</button>
@@ -3278,6 +3294,252 @@
     </div>
   </div>
   </div><!-- /#ganttView -->
+  </div><!-- /.app-views-inner -->
+  <div class="settings-sidebar" id="settingsSidebar">
+  <div class="settings-drawer">
+      <div class="settings-drawer-header">
+        <h2 id="settingsSidebarTitle">Settings</h2>
+        <button type="button" class="settings-drawer-close" id="settingsClose">&times;</button>
+      </div>
+      <div class="settings-tabs settings-tabs--home" id="settingsTabsHome">
+        <button type="button" class="settings-tab active" data-tab="function">General</button>
+        <button type="button" class="settings-tab" data-tab="storage">Storage</button>
+      </div>
+      <div class="settings-tabs settings-tabs--board" id="settingsTabsBoard" style="display: none;">
+        <button type="button" class="settings-tab active" data-tab="function">General</button>
+        <button type="button" class="settings-tab" data-tab="details">Details</button>
+        <button type="button" class="settings-tab" data-tab="style">Style</button>
+      </div>
+      <div class="settings-drawer-body">
+        <div class="settings-tab-panel active" id="settingsTabFunction">
+          <div id="settingsGeneralHome" class="settings-general-context">
+            <div class="settings-section">
+              <label>Name</label>
+              <input type="text" id="settingsHomeName" placeholder="Boards">
+            </div>
+            <div class="settings-section">
+              <label>Description</label>
+              <textarea id="settingsHomeDescription" placeholder="Describe your boards..."></textarea>
+            </div>
+            <div class="settings-section">
+              <div class="settings-toggle-row">
+                <label for="settingsTimelinePreviews" class="settings-toggle-label">Show timeline previews in cards</label>
+                <label class="settings-toggle-switch" aria-hidden="true">
+                  <input type="checkbox" id="settingsTimelinePreviews" checked>
+                  <span class="settings-toggle-slider"></span>
+                </label>
+              </div>
+              <small class="settings-hint">When on, each board card on the home screen shows a small timeline preview.</small>
+            </div>
+          </div>
+          <div id="settingsGeneralBoard" class="settings-general-context" style="display: none;">
+            <div class="settings-section">
+              <label>Title</label>
+              <input type="text" id="settingsTitle" placeholder="Board title">
+            </div>
+            <div class="settings-section">
+              <label>Description</label>
+              <textarea id="settingsDescription" placeholder="Describe your board..."></textarea>
+            </div>
+            <div class="settings-section">
+              <label>Project start date</label>
+              <input type="date" id="settingsProjectStartDate">
+              <small class="settings-hint">When set, the timeline stays fixed at this date; changing task dates won't shift it.</small>
+            </div>
+            <div class="settings-section">
+              <label>Project end date</label>
+              <input type="date" id="settingsProjectEndDate">
+              <small class="settings-hint">When set, the timeline is capped at this date; the board won't extend beyond it.</small>
+            </div>
+            <div class="settings-section">
+              <label>Dependent tasks</label>
+              <select id="settingsDependencyGap" aria-hidden="true" style="position:absolute;opacity:0;pointer-events:none;height:0;width:0;">
+                <option value="0">0 days (start when previous ends)</option>
+                <option value="1">1 day</option>
+                <option value="2">2 days</option>
+                <option value="3">3 days</option>
+                <option value="5">5 days</option>
+                <option value="7">1 week</option>
+                <option value="14">2 weeks</option>
+              </select>
+              <div class="settings-dependent-wrap" id="settingsDependentWrap">
+                <button type="button" class="settings-dependent-trigger" id="settingsDependentTrigger" aria-expanded="false" aria-haspopup="true">0 days (start when previous ends)</button>
+                <div class="settings-dependent-panel" id="settingsDependentPanel" role="menu">
+                  <button type="button" class="settings-dependent-option" role="menuitem" data-value="0">0 days (start when previous ends)</button>
+                  <button type="button" class="settings-dependent-option" role="menuitem" data-value="1">1 day</button>
+                  <button type="button" class="settings-dependent-option" role="menuitem" data-value="2">2 days</button>
+                  <button type="button" class="settings-dependent-option" role="menuitem" data-value="3">3 days</button>
+                  <button type="button" class="settings-dependent-option" role="menuitem" data-value="5">5 days</button>
+                  <button type="button" class="settings-dependent-option" role="menuitem" data-value="7">1 week</button>
+                  <button type="button" class="settings-dependent-option" role="menuitem" data-value="14">2 weeks</button>
+                  <div class="settings-dependent-divider"></div>
+                  <div class="settings-dependent-checkbox-wrap">
+                    <div class="settings-toggle-row">
+                      <label for="settingsIndependentDependencies" class="settings-toggle-label">Independent start dates & phases for dependencies</label>
+                      <label class="settings-toggle-switch" aria-hidden="true">
+                        <input type="checkbox" id="settingsIndependentDependencies">
+                        <span class="settings-toggle-slider"></span>
+                      </label>
+                    </div>
+                    <small class="settings-hint">When enabled, dependent tasks can have their own start date and phase instead of following the parent. The link remains for tracking; dates are not auto-adjusted.</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="settings-tab-panel" id="settingsTabDetails">
+          <div class="settings-section">
+            <label>Phase duration</label>
+            <select id="settingsPhaseDurationMode">
+              <option value="fixed" selected>Fixed (set sprints per phase)</option>
+              <option value="dynamic">Dynamic based on child tasks</option>
+            </select>
+            <small class="settings-hint">Dynamic: phase header width reflects the date range of tasks in that phase. Fixed: set a number of sprints (2 weeks each) per phase.</small>
+          </div>
+          <div class="settings-section">
+            <label>Phases</label>
+            <div class="settings-phase-list" id="settingsPhaseList" data-phase-mode="fixed"></div>
+            <button type="button" class="settings-add-phase" id="settingsAddPhase">+ Add phase</button>
+          </div>
+          <div class="settings-section">
+            <div class="settings-toggle-row" title="When enabled (fixed phases only), increasing a phase's sprint count will shift later tasks so they stay after the extended phase.">
+              <label for="settingsMoveTasksWhenSprintExtended" class="settings-toggle-label">Move tasks when a sprint is extended</label>
+              <label class="settings-toggle-switch" aria-hidden="true">
+                <input type="checkbox" id="settingsMoveTasksWhenSprintExtended">
+                <span class="settings-toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+          <div class="settings-section settings-snap-to-sprint-wrap" id="settingsSnapToSprintWrap">
+            <div class="settings-toggle-row" title="When enabled, dragging a task start or end date near a sprint boundary (every 2 weeks) will snap it to that date.">
+              <label for="settingsSnapToSprint" class="settings-toggle-label">Snap to sprint</label>
+              <label class="settings-toggle-switch" aria-hidden="true">
+                <input type="checkbox" id="settingsSnapToSprint">
+                <span class="settings-toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+          <div class="settings-section">
+            <label>Responsible parties</label>
+            <p class="settings-hint" style="margin-top: 0;">Names shown in the Responsible dropdown for tasks. Saved with the project.</p>
+            <div class="settings-party-list" id="settingsResponsiblePartiesList"></div>
+            <div class="settings-add-party-row">
+              <input type="text" id="settingsPartyInput" placeholder="Add name, press Enter" class="settings-party-input" />
+              <button type="button" class="settings-add-phase" id="settingsAddParty">+ Add</button>
+            </div>
+          </div>
+          <div class="settings-section">
+            <label>Sample data</label>
+            <button type="button" class="settings-auto-populate-btn" id="settingsAutoPopulate">Auto-populate 5 linked tasks</button>
+            <small class="settings-hint">Replaces all tasks with 5 sample tasks (Research → Design → Review → Build → Launch) linked consecutively. Useful to explore the board without starting from scratch.</small>
+          </div>
+        </div>
+        <div class="settings-tab-panel" id="settingsTabStyle">
+          <div class="settings-section">
+            <div class="settings-toggle-row">
+              <label for="settingsShowDurationOnBar" class="settings-toggle-label">Always show days on bar</label>
+              <label class="settings-toggle-switch" aria-hidden="true">
+                <input type="checkbox" id="settingsShowDurationOnBar">
+                <span class="settings-toggle-slider"></span>
+              </label>
+            </div>
+            <small class="settings-hint">When enabled, the task duration (e.g. 7 days) is shown on every bar instead of only on hover.</small>
+          </div>
+          <div class="settings-section">
+            <label>View</label>
+            <select id="settingsRowAppearance" class="settings-select">
+              <option value="compact">Compact</option>
+              <option value="default">Default</option>
+              <option value="fill">Fill</option>
+            </select>
+            <small class="settings-hint">Row density and how the task bar area is displayed.</small>
+          </div>
+          <div class="settings-section">
+            <label>Bar style</label>
+            <div class="settings-segmented" id="settingsBarStyle" role="group" aria-label="Bar style">
+              <button type="button" class="settings-segmented-option" data-value="fill">Fill</button>
+              <button type="button" class="settings-segmented-option" data-value="stroke">Stroke</button>
+            </div>
+          </div>
+          <div class="settings-section">
+            <label>Color Palette</label>
+            <div class="settings-palette-grid" id="settingsPaletteGrid"></div>
+            <button type="button" class="settings-save-palette-btn" id="settingsSavePalette">Save current colors as palette</button>
+          </div>
+        </div>
+        <div class="settings-tab-panel" id="settingsTabStorage">
+          <div class="settings-section settings-storage-inline">
+            <label>Where data is stored</label>
+            <div class="storage-modal-tabs" role="tablist">
+              <button type="button" class="storage-modal-tab active" role="tab" id="storageTabExternal" data-tab="external" aria-selected="true"><span class="storage-tab-label">External</span><span class="storage-tab-check" aria-hidden="true"></span></button>
+              <button type="button" class="storage-modal-tab" role="tab" id="storageTabLocal" data-tab="local" aria-selected="false"><span class="storage-tab-label">Local</span><span class="storage-tab-check" aria-hidden="true"></span></button>
+            </div>
+            <div id="storagePanelExternal" class="storage-modal-panel active" role="tabpanel">
+              <div class="settings-section">
+                <label>GitHub sync</label>
+                <label for="sharedFileUrl">JSON URL (GitHub raw or any CORS-accessible URL)</label>
+                <div class="shared-file-input-wrap">
+                  <input type="url" id="sharedFileUrl" placeholder="https://raw.githubusercontent.com/.../gantt-data.json" />
+                  <div class="shared-file-input-icons">
+                    <button type="button" class="shared-file-input-icon" id="sharedFileLoad" title="Load from URL" aria-label="Load from URL"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+                    <button type="button" class="shared-file-input-icon" id="sharedFileRefresh" title="Refresh" aria-label="Refresh"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></button>
+                    <button type="button" class="shared-file-input-icon" id="sharedFileDownload" title="Download JSON" aria-label="Download JSON"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+                  </div>
+                </div>
+                <div class="shared-file-modal-status" id="sharedFileModalStatus">
+                  <span class="shared-file-modal-status-dot none" id="sharedFileModalStatusDot"></span>
+                  <span class="shared-file-modal-status-text" id="sharedFileModalStatusText">Not set</span>
+                </div>
+                <div class="shared-file-modal-section">
+                  <label for="sharedFileGitHubToken">Push to GitHub (owner): Personal Access Token with <code>repo</code> scope</label>
+                  <div class="shared-file-modal-token-row">
+                    <div class="shared-file-input-wrap shared-file-input-wrap-token">
+                      <input type="password" id="sharedFileGitHubToken" placeholder="ghp_..." autocomplete="off" />
+                      <div class="shared-file-input-icons">
+                        <button type="button" class="shared-file-input-icon" id="sharedFileClearToken" title="Clear token" aria-label="Clear token"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+                        <button type="button" class="shared-file-input-icon" id="sharedFilePush" title="Push to GitHub" aria-label="Push to GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="settings-section" style="margin-top: 20px;">
+                <label>Supabase (cloud save)</label>
+                <button type="button" class="home-shared-file-btn" id="settingsSupabaseAuthBtn">Log in or configure Supabase</button>
+                <small class="settings-hint" id="settingsSupabaseHint">If the button does nothing, enable Supabase in template.html (uncomment the Supabase script line).</small>
+              </div>
+            </div>
+            <div id="storagePanelLocal" class="storage-modal-panel" role="tabpanel">
+              <p class="settings-hint" style="margin-top: 0;">Choose how to store data on this device. Save applies your choice.</p>
+              <div class="settings-section">
+                <label class="settings-checkbox-label">
+                  <input type="radio" name="storageLocalType" id="storageLocalStorage" value="local_storage" />
+                  <span>Local storage</span>
+                </label>
+                <small class="settings-hint">Store in the browser with optional backup/restore to a file. Full editing.</small>
+                <div class="shared-file-modal-actions" style="margin-top: 10px;">
+                  <button type="button" class="home-shared-file-btn" id="storageModalBackupToFile">Backup to file</button>
+                  <input type="file" id="storageModalRestoreFileInput" accept=".json,application/json" style="display: none;">
+                  <button type="button" class="home-shared-file-btn" id="storageModalRestoreFromFile">Restore from file</button>
+                </div>
+              </div>
+              <div class="settings-section">
+                <label class="settings-checkbox-label">
+                  <input type="radio" name="storageLocalType" id="storageLocalCache" value="local_cache" />
+                  <span>Local cache</span>
+                </label>
+                <small class="settings-hint">Browser cache only. No file backup; data can be lost if cache is cleared. Not recommended for important data.</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="settings-drawer-footer">
+        <button type="button" class="settings-save-btn" id="settingsSave">Save</button>
+      </div>
+    </div>
+  </div><!-- /.settings-sidebar -->
   </div><!-- /.app-views-wrap -->
 
   <span class="home-readonly-badge" id="homeReadonlyBadge" aria-hidden="true" style="display: none;">
@@ -3325,67 +3587,6 @@
         </div>
       </div>
       <div class="auth-error" id="ganttAuthError" role="alert"></div>
-    </div>
-  </div>
-
-  <div class="shared-file-modal-overlay" id="sharedFileModalOverlay">
-    <div class="shared-file-modal">
-      <div class="shared-file-modal-header">
-        <h3>Storage &amp; sync</h3>
-        <button type="button" class="shared-file-modal-close" id="sharedFileModalClose" title="Close" aria-label="Close">&times;</button>
-      </div>
-      <div class="storage-modal-tabs" role="tablist">
-        <button type="button" class="storage-modal-tab active" role="tab" id="storageTabGitHub" data-tab="github" aria-selected="true"><span class="storage-tab-label">Sync with GitHub</span><span class="storage-tab-check" aria-hidden="true"></span></button>
-        <button type="button" class="storage-modal-tab" role="tab" id="storageTabLocalStorage" data-tab="local_storage" aria-selected="false"><span class="storage-tab-label">Local storage</span><span class="storage-tab-check" aria-hidden="true"></span></button>
-        <button type="button" class="storage-modal-tab" role="tab" id="storageTabLocalCache" data-tab="local_cache" aria-selected="false"><span class="storage-tab-label">Local cache</span><span class="storage-tab-check" aria-hidden="true"></span></button>
-      </div>
-      <div id="storagePanelGitHub" class="storage-modal-panel active" role="tabpanel">
-        <label for="sharedFileUrl">JSON URL (GitHub raw or any CORS-accessible URL)</label>
-        <div class="shared-file-input-wrap">
-          <input type="url" id="sharedFileUrl" placeholder="https://raw.githubusercontent.com/.../gantt-data.json" />
-          <div class="shared-file-input-icons">
-            <button type="button" class="shared-file-input-icon" id="sharedFileLoad" title="Load from URL" aria-label="Load from URL"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
-            <button type="button" class="shared-file-input-icon" id="sharedFileRefresh" title="Refresh" aria-label="Refresh"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></button>
-            <button type="button" class="shared-file-input-icon" id="sharedFileDownload" title="Download JSON" aria-label="Download JSON"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
-          </div>
-        </div>
-        <div class="shared-file-modal-status" id="sharedFileModalStatus">
-          <span class="shared-file-modal-status-dot none" id="sharedFileModalStatusDot"></span>
-          <span class="shared-file-modal-status-text" id="sharedFileModalStatusText">Not set</span>
-        </div>
-        <div class="shared-file-modal-section">
-          <label for="sharedFileGitHubToken">Push to GitHub (owner): Personal Access Token with <code>repo</code> scope</label>
-          <div class="shared-file-modal-token-row">
-            <div class="shared-file-input-wrap shared-file-input-wrap-token">
-              <input type="password" id="sharedFileGitHubToken" placeholder="ghp_..." autocomplete="off" />
-              <div class="shared-file-input-icons">
-                <button type="button" class="shared-file-input-icon" id="sharedFileClearToken" title="Clear token" aria-label="Clear token"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-                <button type="button" class="shared-file-input-icon" id="sharedFilePush" title="Push to GitHub" aria-label="Push to GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="shared-file-modal-actions storage-modal-use-btn">
-          <button type="button" class="home-new-project-btn" id="storageModalUseGitHub">Use GitHub sync</button>
-        </div>
-      </div>
-      <div id="storagePanelLocalStorage" class="storage-modal-panel" role="tabpanel">
-        <p class="storage-modal-panel-desc">Store data in the browser and optionally backup or restore from a gantt-data.json file on your device. Full editing; no GitHub required.</p>
-        <div class="shared-file-modal-actions">
-          <button type="button" class="home-shared-file-btn" id="storageModalBackupToFile">Backup to file</button>
-          <input type="file" id="storageModalRestoreFileInput" accept=".json,application/json" style="display: none;">
-          <button type="button" class="home-shared-file-btn" id="storageModalRestoreFromFile">Restore from file</button>
-        </div>
-        <div class="shared-file-modal-actions storage-modal-use-btn">
-          <button type="button" class="home-new-project-btn" id="storageModalUseLocalStorage">Use local storage</button>
-        </div>
-      </div>
-      <div id="storagePanelLocalCache" class="storage-modal-panel" role="tabpanel">
-        <p class="storage-modal-panel-desc">Rely only on browser cache. No file backup; data can be lost if cache is cleared. Full editing; not recommended for important data.</p>
-        <div class="shared-file-modal-actions storage-modal-use-btn">
-          <button type="button" class="home-shared-file-btn" id="storageModalUseLocalCache">Use local cache (not recommended)</button>
-        </div>
-      </div>
     </div>
   </div>
 
@@ -4483,6 +4684,9 @@
       detailRow.appendChild(inner);
       renderTaskDetailContent(task, inner, detailRow);
       row.insertAdjacentElement("afterend", detailRow);
+      if (window.matchMedia("(max-width: 480px)").matches) {
+        row.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
     }
 
     document.addEventListener("keydown", (e) => {
@@ -4718,7 +4922,7 @@
       ];
       fields.forEach((f, i) => {
         const field = document.createElement("div");
-        field.className = "task-detail-field";
+        field.className = "task-detail-field" + (f.type === "dependsOn" ? " task-detail-field-depends-on" : "");
         field.innerHTML = "<label>" + (FIELD_ICONS[f.key] || FIELD_ICONS.dependsOn) + "<span>" + f.label + "</span></label>";
         const value = document.createElement("div");
         value.className = "task-detail-view-value";
@@ -4895,7 +5099,7 @@
       container.appendChild(overviewField);
 
       const dependsOnField = document.createElement("div");
-      dependsOnField.className = "task-detail-field";
+      dependsOnField.className = "task-detail-field task-detail-field-depends-on";
       dependsOnField.innerHTML = '<label>' + FIELD_ICONS.dependsOn + '<span>Depends on</span></label>';
       const dependsOnSelect = document.createElement("select");
       dependsOnSelect.className = "task-detail-depends-on";
@@ -5698,7 +5902,7 @@
         const pid = task.phase || PHASES[0]?.id;
         const sid = task.phaseSecondary && task.phaseSecondary !== pid ? task.phaseSecondary : null;
         if (PHASES.length === 0 && !pid) {
-          label.textContent = "Add phases in Settings";
+          label.textContent = "Add phases in Board settings";
         } else {
           label.textContent = sid
             ? (PHASES.find(x => x.id === pid)?.name || pid) + " \u2192 " + (PHASES.find(x => x.id === sid)?.name || sid)
@@ -5730,7 +5934,7 @@
       const label = document.createElement("span");
       const sid = currentPhaseSecondaryId && currentPhaseSecondaryId !== currentPhaseId ? currentPhaseSecondaryId : null;
       if (PHASES.length === 0 && !currentPhaseId) {
-        label.textContent = "Add phases in Settings";
+        label.textContent = "Add phases in Board settings";
       } else {
         label.textContent = sid
           ? (PHASES.find(p => p.id === currentPhaseId)?.name || currentPhaseId) + " \u2192 " + (PHASES.find(p => p.id === sid)?.name || sid)
@@ -5746,7 +5950,7 @@
       list.className = "gantt-phase-dropdown-list gantt-bar-tooltip-phase-dropdown-list";
       const hint = document.createElement("div");
       hint.className = "gantt-phase-dropdown-hint";
-      hint.textContent = PHASES.length === 0 ? "Add phases in project Settings" : "Shift+click for 2nd phase";
+      hint.textContent = PHASES.length === 0 ? "Add phases in Board settings" : "Shift+click for 2nd phase";
       hint.style.cssText = "font-size:10px;color:#a3a3a3;padding:4px 10px 6px;border-bottom:1px solid #404040;";
       list.appendChild(hint);
       PHASES.forEach(p => {
@@ -6356,7 +6560,7 @@
 
     function renderPhaseHeaders() {
       if (PHASES.length === 0) {
-        const html = '<div class="phase-header-cell" style="grid-column:1/span 4"></div><div class="phase-header-timeline"><div class="phase-header-cell phase-header-empty" style="flex:1;background:var(--bg-hover);color:var(--text-tertiary);font-size:12px;">Add phases in Settings</div></div>';
+        const html = '<div class="phase-header-cell" style="grid-column:1/span 4"></div><div class="phase-header-timeline"><div class="phase-header-cell phase-header-empty" style="flex:1;background:var(--bg-hover);color:var(--text-tertiary);font-size:12px;">Add phases in Board settings</div></div>';
         document.getElementById("phaseHeaderRow").innerHTML = html;
         return;
       }
@@ -6423,6 +6627,20 @@
       taskText.textContent = (task.star ? "★ " : "") + task.task;
       nameWrap.appendChild(taskText);
       taskCell.appendChild(nameWrap);
+      const phasePill = document.createElement("span");
+      phasePill.className = "task-cell-phase-pill";
+      phasePill.setAttribute("aria-hidden", "true");
+      const pillDot = document.createElement("span");
+      pillDot.className = "task-cell-phase-pill-dot";
+      const pillLabel = document.createElement("span");
+      pillLabel.className = "task-cell-phase-pill-label";
+      const phaseId = task.phase || (typeof PHASES !== "undefined" && PHASES[0] ? PHASES[0].id : "");
+      const phaseName = typeof PHASES !== "undefined" && PHASES.length ? (PHASES.find(function (p) { return p.id === phaseId; })?.name || phaseId) : phaseId;
+      pillDot.style.background = typeof getPhaseColor === "function" ? getPhaseColor(phaseId) : "#737373";
+      pillLabel.textContent = phaseName || "—";
+      phasePill.appendChild(pillDot);
+      phasePill.appendChild(pillLabel);
+      taskCell.appendChild(phasePill);
       const renameBtn = document.createElement("button");
       renameBtn.className = "task-rename-btn";
       renameBtn.type = "button";
@@ -7243,7 +7461,44 @@
       });
     }
 
+    function openSettingsSidebar(context) {
+      window._settingsContext = context || (currentProjectId ? "board" : "home");
+      var titleEl = document.getElementById("settingsSidebarTitle");
+      var tabsHome = document.getElementById("settingsTabsHome");
+      var tabsBoard = document.getElementById("settingsTabsBoard");
+      var homePanel = document.getElementById("settingsGeneralHome");
+      var boardPanel = document.getElementById("settingsGeneralBoard");
+      if (titleEl) titleEl.textContent = window._settingsContext === "board" ? "Board settings" : "Settings";
+      if (tabsHome) tabsHome.style.display = window._settingsContext === "home" ? "" : "none";
+      if (tabsBoard) tabsBoard.style.display = window._settingsContext === "board" ? "" : "none";
+      if (homePanel) homePanel.style.display = window._settingsContext === "home" ? "" : "none";
+      if (boardPanel) boardPanel.style.display = window._settingsContext === "board" ? "" : "none";
+      document.getElementById("appViewsWrap")?.classList.add("settings-sidebar-open");
+      document.querySelectorAll(".settings-tab").forEach(function (t) { t.classList.remove("active"); });
+      document.querySelectorAll(".settings-tab-panel").forEach(function (p) { p.classList.remove("active"); });
+      if (window._settingsContext === "board") {
+        var generalTab = tabsBoard ? tabsBoard.querySelector('.settings-tab[data-tab="function"]') : null;
+        var generalPanel = document.getElementById("settingsTabFunction");
+        if (generalTab) generalTab.classList.add("active");
+        if (generalPanel) generalPanel.classList.add("active");
+      } else {
+        var generalTab = tabsHome ? tabsHome.querySelector('.settings-tab[data-tab="function"]') : null;
+        var generalPanel = document.getElementById("settingsTabFunction");
+        if (generalTab) generalTab.classList.add("active");
+        if (generalPanel) generalPanel.classList.add("active");
+      }
+    }
+    function openHomeSettings() {
+      openSettingsSidebar("home");
+      var nameEl = document.getElementById("settingsHomeName");
+      var descEl = document.getElementById("settingsHomeDescription");
+      var previewEl = document.getElementById("settingsTimelinePreviews");
+      if (nameEl) nameEl.value = (typeof localStorage !== "undefined" && localStorage.getItem(HOME_TITLE_KEY)) || DEFAULT_HOME_TITLE;
+      if (descEl) descEl.value = (typeof localStorage !== "undefined" && localStorage.getItem(HOME_DESC_KEY)) || DEFAULT_HOME_DESC;
+      if (previewEl) previewEl.checked = (typeof localStorage !== "undefined" && localStorage.getItem(HOME_TIMELINE_PREVIEWS_KEY) !== "false");
+    }
     function openSettingsModal() {
+      openSettingsSidebar("board");
       const s = loadProjectSettings() || {};
       const header = loadPageHeader();
       document.getElementById("settingsTitle").value = header.title;
@@ -7303,23 +7558,7 @@
         inputWrap.appendChild(colorInp);
         inputWrap.appendChild(inp);
         inputWrap.appendChild(removeBtn);
-        const sprintsWrap = document.createElement("div");
-        sprintsWrap.className = "settings-phase-sprints";
-        const sprintsInner = document.createElement("div");
-        sprintsInner.className = "settings-phase-sprints-inner";
-        const sprintsInp = document.createElement("input");
-        sprintsInp.type = "number";
-        sprintsInp.min = "1";
-        sprintsInp.max = "52";
-        sprintsInp.value = Math.max(1, Math.min(52, parseInt(p.sprints, 10) || 2));
-        const sprintsSuffix = document.createElement("span");
-        sprintsSuffix.className = "sprints-suffix";
-        sprintsSuffix.textContent = "sprints";
-        sprintsInner.appendChild(sprintsInp);
-        sprintsInner.appendChild(sprintsSuffix);
-        sprintsWrap.appendChild(sprintsInner);
         item.appendChild(inputWrap);
-        item.appendChild(sprintsWrap);
         phaseList.appendChild(item);
       };
       PHASES.forEach((p, i) => renderPhaseItem(p, i));
@@ -7515,18 +7754,37 @@
         paletteGrid.appendChild(opt);
         opt.classList.add("selected");
       };
-      document.getElementById("settingsOverlay").classList.add("open");
+      document.getElementById("appViewsWrap")?.classList.add("settings-sidebar-open");
       const addFab = document.getElementById("addTaskFab");
       if (addFab) addFab.style.display = "none";
       document.getElementById("fabPhaseMenu")?.classList.remove("visible");
     }
     function closeSettingsModal() {
       applyRowAppearance();
-      document.getElementById("settingsOverlay").classList.remove("open");
+      document.getElementById("appViewsWrap")?.classList.remove("settings-sidebar-open");
       if (currentProjectId && typeof window.updateWriteAccessUI === "function") window.updateWriteAccessUI();
     }
     function saveSettingsFromModal() {
       if (typeof window.hasWriteAccess === "function" && !window.hasWriteAccess()) return;
+      if (window._settingsContext === "home") {
+        var nameEl = document.getElementById("settingsHomeName");
+        var homeDescEl = document.getElementById("settingsHomeDescription");
+        var previewEl = document.getElementById("settingsTimelinePreviews");
+        var name = (nameEl && nameEl.value ? nameEl.value.trim() : "") || DEFAULT_HOME_TITLE;
+        var homeDesc = (homeDescEl && homeDescEl.value ? homeDescEl.value.trim() : "") || DEFAULT_HOME_DESC;
+        try {
+          localStorage.setItem(HOME_TITLE_KEY, name);
+          localStorage.setItem(HOME_DESC_KEY, homeDesc);
+          localStorage.setItem(HOME_TIMELINE_PREVIEWS_KEY, previewEl && previewEl.checked ? "true" : "false");
+        } catch (e) {}
+        var homeTitleEl = document.getElementById("homePageTitle");
+        var pageDescEl = document.getElementById("homePageDescription");
+        if (homeTitleEl) homeTitleEl.textContent = name;
+        if (pageDescEl) pageDescEl.textContent = homeDesc;
+        closeSettingsModal();
+        if (typeof renderHomeView === "function") renderHomeView();
+        return;
+      }
       const title = document.getElementById("settingsTitle").value.trim() || DEFAULT_PAGE_TITLE;
       const desc = document.getElementById("settingsDescription").value.trim() || DEFAULT_PAGE_DESCRIPTION;
       const phases = [];
@@ -7618,6 +7876,43 @@
       tasks.forEach((_, i) => { if (tasks.some(t => t.dependsOn === i)) propagateDependencyChanges(i); });
       if (typeof renderPhaseHeaders === "function") renderPhaseHeaders();
       if (typeof updateChartRange === "function") updateChartRange();
+
+      // Apply storage settings only when Storage tab was the active tab in the sidebar
+      var storageTabActive = !!document.querySelector('.settings-tab[data-tab="storage"].active');
+      var panelExternal = document.getElementById("storagePanelExternal");
+      var panelLocal = document.getElementById("storagePanelLocal");
+      var externalActive = storageTabActive && panelExternal && panelExternal.classList.contains("active");
+      var localActive = storageTabActive && panelLocal && panelLocal.classList.contains("active");
+      if (externalActive && typeof setStorageMode === "function") {
+        var urlEl = document.getElementById("sharedFileUrl");
+        var tokenEl = document.getElementById("sharedFileGitHubToken");
+        try {
+          if (urlEl && (urlEl.value || "").trim()) localStorage.setItem(SHARED_FILE_URL_KEY, urlEl.value.trim());
+          if (tokenEl && (tokenEl.value || "").trim()) localStorage.setItem(GITHUB_TOKEN_KEY, tokenEl.value.trim());
+        } catch (e) {}
+        setStorageMode("github");
+        if (typeof applyStorageModeUI === "function") applyStorageModeUI("github");
+        currentProjectId = null;
+        if (typeof location !== "undefined") location.hash = "#/";
+        if (typeof handleRoute === "function") handleRoute();
+        if (typeof window.__doLoadFromStoredUrl === "function") window.__doLoadFromStoredUrl();
+        else if (typeof window.__fetchSharedUpdates === "function") window.__fetchSharedUpdates();
+        if (typeof updateWriteAccessUI === "function") updateWriteAccessUI();
+      } else if (localActive && typeof setStorageMode === "function") {
+        var radio = document.querySelector('input[name="storageLocalType"]:checked');
+        var localMode = (radio && radio.value) || "local_storage";
+        if (localMode === "local_cache") {
+          try { localStorage.removeItem(SHARED_FILE_URL_KEY); localStorage.removeItem(GITHUB_TOKEN_KEY); } catch (e) {}
+          if (typeof clearLocalProjectData === "function") clearLocalProjectData();
+        }
+        setStorageMode(localMode);
+        if (typeof applyStorageModeUI === "function") applyStorageModeUI(localMode);
+        currentProjectId = null;
+        if (typeof location !== "undefined") location.hash = "#/";
+        if (typeof handleRoute === "function") handleRoute();
+        if (typeof updateWriteAccessUI === "function") updateWriteAccessUI();
+      }
+
       closeSettingsModal();
     }
 
@@ -7783,8 +8078,9 @@
     }
     const HOME_TITLE_KEY = "gantt-home-title";
     const HOME_DESC_KEY = "gantt-home-description";
-    const DEFAULT_HOME_TITLE = "Gantt projects";
-    const DEFAULT_HOME_DESC = "Create and open project schedules. Each project has its own tasks and settings.";
+    const HOME_TIMELINE_PREVIEWS_KEY = "gantt-home-timeline-previews";
+    const DEFAULT_HOME_TITLE = "Boards";
+    const DEFAULT_HOME_DESC = "Create and open boards. Each board has its own tasks and settings.";
     let homePageHeaderInited = false;
     function saveHomePageHeader() {
       const titleEl = document.getElementById("homePageTitle");
@@ -7839,14 +8135,18 @@
           });
         }
         if (!isEditMode) {
-          const previewWrap = document.createElement("div");
-          previewWrap.className = "home-project-timeline-preview";
-          if (window.ganttStorage?.isCloudEnabled()) {
-            window.ganttStorage.ensureBoardDataLoaded(p.id).then(() => renderHomeTimelinePreview(p.id, previewWrap));
-          } else {
-            renderHomeTimelinePreview(p.id, previewWrap);
+          let showPreviews = true;
+          try { showPreviews = localStorage.getItem(HOME_TIMELINE_PREVIEWS_KEY) !== "false"; } catch (e) {}
+          if (showPreviews) {
+            const previewWrap = document.createElement("div");
+            previewWrap.className = "home-project-timeline-preview";
+            if (window.ganttStorage?.isCloudEnabled()) {
+              window.ganttStorage.ensureBoardDataLoaded(p.id).then(() => renderHomeTimelinePreview(p.id, previewWrap));
+            } else {
+              renderHomeTimelinePreview(p.id, previewWrap);
+            }
+            card.appendChild(previewWrap);
           }
-          card.appendChild(previewWrap);
         }
         const body = document.createElement("div");
         body.className = "home-project-card-body";
@@ -7856,8 +8156,8 @@
           const nameInput = document.createElement("input");
           nameInput.type = "text";
           nameInput.className = "home-project-name-input";
-          nameInput.placeholder = "Project name";
-          nameInput.value = p.name || "Untitled project";
+          nameInput.placeholder = "Board name";
+          nameInput.value = p.name || "Untitled board";
           nameInput.addEventListener("click", (e) => e.stopPropagation());
           info.appendChild(nameInput);
           const descInput = document.createElement("textarea");
@@ -7869,7 +8169,7 @@
         } else {
           const name = document.createElement("div");
           name.className = "home-project-name";
-          name.textContent = p.name || "Untitled project";
+          name.textContent = p.name || "Untitled board";
           info.appendChild(name);
           const desc = getProjectDescription(p.id);
           if (desc) {
@@ -7929,10 +8229,10 @@
           doneBtn.addEventListener("click", async (e) => {
             e.preventDefault();
             e.stopPropagation();
-            const nameVal = card.querySelector(".home-project-name-input").value.trim() || "Untitled project";
+            const nameVal = card.querySelector(".home-project-name-input").value.trim() || "Untitled board";
             const descVal = card.querySelector(".home-project-desc-input").value.trim();
             if (isProjectNameTaken(nameVal, p.id)) {
-              if (typeof showToast === "function") showToast("Duplicate project name. Each project must have a unique name—please choose a different name.", { type: "error" });
+              if (typeof showToast === "function") showToast("Duplicate board name. Each board must have a unique name—please choose a different name.", { type: "error" });
               return;
             }
             ensureProjectInList(p.id, nameVal);
@@ -7945,7 +8245,7 @@
           const duplicateBtn = document.createElement("button");
           duplicateBtn.type = "button";
           duplicateBtn.className = "home-project-action-btn home-project-duplicate-btn";
-          duplicateBtn.title = "Duplicate project";
+          duplicateBtn.title = "Duplicate board";
           duplicateBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
           duplicateBtn.addEventListener("click", async (e) => {
             e.preventDefault();
@@ -7965,7 +8265,7 @@
           e.preventDefault();
           e.stopPropagation();
           if (typeof window.hasWriteAccess === "function" && !window.hasWriteAccess()) return;
-          if (!confirm("Delete this project? Tasks and settings will be removed. This cannot be undone.")) return;
+          if (!confirm("Delete this board? Tasks and settings will be removed. This cannot be undone.")) return;
           pushProjectsListUndo();
           if (p.id === homeEditProjectId) homeEditProjectId = null;
           if (window.ganttStorage?.isCloudEnabled()) {
@@ -8018,6 +8318,7 @@
       const homeView = document.getElementById("homeView");
       const ganttView = document.getElementById("ganttView");
       if (!id) {
+        if (typeof closeSettingsModal === "function") closeSettingsModal();
         currentProjectId = null;
         renderHomeView();
         const addFab = document.getElementById("addTaskFab");
@@ -8066,7 +8367,7 @@
     }
     function runSamplePopulate() {
       if (PHASES.length === 0) {
-        if (typeof showToast === "function") showToast("Add at least one phase in Settings first.");
+        if (typeof showToast === "function") showToast("Add at least one phase in Board settings first.");
         openSettingsModal();
         return;
       }
@@ -8148,8 +8449,6 @@
       if (titleEl) titleEl.addEventListener("blur", saveHeader);
       if (descEl) descEl.addEventListener("blur", saveHeader);
       document.getElementById("settingsBtn")?.addEventListener("click", openSettingsModal);
-      document.getElementById("settingsClose")?.addEventListener("click", closeSettingsModal);
-      document.getElementById("settingsSave")?.addEventListener("click", saveSettingsFromModal);
       document.getElementById("settingsBarStyle")?.addEventListener("click", (e) => {
         const opt = e.target.closest(".settings-segmented-option");
         if (!opt) return;
@@ -8230,18 +8529,6 @@
         closeSettingsModal();
       });
       setupPhaseListDrag(document.getElementById("settingsPhaseList"));
-      document.getElementById("settingsOverlay")?.addEventListener("click", (e) => { if (e.target.id === "settingsOverlay") closeSettingsModal(); });
-      document.querySelectorAll(".settings-tab").forEach(tab => {
-        tab.addEventListener("click", () => {
-          const tabId = tab.dataset.tab;
-          document.querySelectorAll(".settings-tab").forEach(t => t.classList.remove("active"));
-          document.querySelectorAll(".settings-tab-panel").forEach(p => p.classList.remove("active"));
-          tab.classList.add("active");
-          const panelId = tabId === "function" ? "Function" : tabId === "style" ? "Style" : tabId === "details" ? "Details" : "Function";
-          const panel = document.getElementById("settingsTab" + panelId);
-          if (panel) panel.classList.add("active");
-        });
-      });
       document.addEventListener("click", (e) => {
         if (e.target.closest(".task-detail-add-btn") || e.target.closest(".task-detail-list-remove")) return;
         if (!e.target.closest("#ganttGrid")) {
@@ -9099,6 +9386,7 @@
       window.ganttStorage.onAuthChange(updateAuthUI);
 
       if (loginBtn) loginBtn.addEventListener("click", openModal);
+      window.openGanttAuthModal = openModal;
       if (userTrigger && wrap) {
         userTrigger.addEventListener("click", (e) => {
           e.stopPropagation();
@@ -9254,7 +9542,7 @@
     function applyStorageModeUI(mode) {
       var sec = document.getElementById("sharedFileSection");
       var backupSec = document.getElementById("localBackupSection");
-      var storageBtn = document.getElementById("storageSettingsBtn");
+      var storageBtn = document.getElementById("homeSettingsBtn");
       if (mode === "github") {
         if (sec) sec.style.display = "";
         if (backupSec) backupSec.style.display = "none";
@@ -9273,22 +9561,56 @@
       }
       if (typeof updateWriteAccessUI === "function") updateWriteAccessUI();
     }
+    function initSettingsSidebar() {
+      document.getElementById("homeSettingsBtn")?.addEventListener("click", openHomeSettings);
+      document.getElementById("settingsClose")?.addEventListener("click", closeSettingsModal);
+      document.getElementById("settingsSave")?.addEventListener("click", saveSettingsFromModal);
+      document.getElementById("settingsSupabaseAuthBtn")?.addEventListener("click", function () {
+        closeSettingsModal();
+        if (typeof window.openGanttAuthModal === "function") window.openGanttAuthModal();
+      });
+      document.getElementById("settingsOpenSyncBtn")?.addEventListener("click", function () {
+        closeSettingsModal();
+        if (typeof window.openStorageModal === "function") window.openStorageModal();
+      });
+      document.querySelectorAll(".settings-tabs .settings-tab").forEach(function (tab) {
+        tab.addEventListener("click", function () {
+          var tabId = this.dataset.tab;
+          var tabRow = this.closest(".settings-tabs");
+          if (!tabRow) return;
+          tabRow.querySelectorAll(".settings-tab").forEach(function (t) { t.classList.remove("active"); });
+          this.classList.add("active");
+          document.querySelectorAll(".settings-tab-panel").forEach(function (p) { p.classList.remove("active"); });
+          var panelId = tabId === "function" ? "Function" : tabId === "style" ? "Style" : tabId === "details" ? "Details" : tabId === "storage" ? "Storage" : "Function";
+          var panel = document.getElementById("settingsTab" + panelId);
+          if (panel) panel.classList.add("active");
+          if (tabId === "function") {
+            var isBoard = tabRow.id === "settingsTabsBoard";
+            var homePanel = document.getElementById("settingsGeneralHome");
+            var boardPanel = document.getElementById("settingsGeneralBoard");
+            if (homePanel) homePanel.style.display = isBoard ? "none" : "";
+            if (boardPanel) boardPanel.style.display = isBoard ? "" : "none";
+          }
+        });
+      });
+    }
     async function bootstrap() {
       migrateLegacySingleProject();
       initAuthUI();
+      initSettingsSidebar();
       (function setupStorageModalTabs() {
-        var overlay = document.getElementById("sharedFileModalOverlay");
         var tabs = document.querySelectorAll(".storage-modal-tab");
         var panels = document.querySelectorAll(".storage-modal-panel");
         function updateStorageTabChecks() {
           var mode = getStorageMode() || "github";
+          var tab = (mode === "github") ? "external" : "local";
           tabs.forEach(function (t) {
-            t.classList.toggle("storage-tab-selected", t.dataset.tab === mode);
+            t.classList.toggle("storage-tab-selected", t.dataset.tab === tab);
           });
         }
-        function switchStorageTab(mode) {
-          var tabId = "storageTab" + (mode === "github" ? "GitHub" : mode === "local_storage" ? "LocalStorage" : "LocalCache");
-          var panelId = "storagePanel" + (mode === "github" ? "GitHub" : mode === "local_storage" ? "LocalStorage" : "LocalCache");
+        function switchStorageTab(tab) {
+          var tabId = "storageTab" + (tab === "external" ? "External" : "Local");
+          var panelId = "storagePanel" + (tab === "external" ? "External" : "Local");
           tabs.forEach(function (t) {
             var isActive = t.id === tabId;
             t.classList.toggle("active", isActive);
@@ -9298,54 +9620,44 @@
             p.classList.toggle("active", p.id === panelId);
           });
           updateStorageTabChecks();
+          if (tab === "local") {
+            var mode = getStorageMode() || "local_storage";
+            var radio = document.getElementById(mode === "local_cache" ? "storageLocalCache" : "storageLocalStorage");
+            if (radio) radio.checked = true;
+          }
         }
-        window.switchStorageTab = switchStorageTab;
+        window.switchStorageTab = function (tab) {
+          switchStorageTab(tab);
+        };
+        window.closeStorageModal = function () {
+          document.getElementById("appViewsWrap")?.classList.remove("settings-sidebar-open");
+        };
         window.openStorageModal = function () {
           if (typeof initSharedFile === "function") initSharedFile();
-          switchStorageTab(getStorageMode() || "github");
-          if (overlay) overlay.classList.add("visible");
+          window._settingsContext = "home";
+          var titleEl = document.getElementById("settingsSidebarTitle");
+          var tabsHome = document.getElementById("settingsTabsHome");
+          var tabsBoard = document.getElementById("settingsTabsBoard");
+          if (titleEl) titleEl.textContent = "Settings";
+          if (tabsHome) tabsHome.style.display = "";
+          if (tabsBoard) tabsBoard.style.display = "none";
+          var mode = getStorageMode() || "github";
+          switchStorageTab(mode === "github" ? "external" : "local");
+          document.getElementById("appViewsWrap")?.classList.add("settings-sidebar-open");
+          document.querySelectorAll(".settings-tab").forEach(function (t) { t.classList.remove("active"); });
+          document.querySelectorAll(".settings-tab-panel").forEach(function (p) { p.classList.remove("active"); });
+          var storageTab = document.querySelector('.settings-tab[data-tab="storage"]');
+          var storagePanel = document.getElementById("settingsTabStorage");
+          if (storageTab) storageTab.classList.add("active");
+          if (storagePanel) storagePanel.classList.add("active");
           if (typeof updateModalStatus === "function") updateModalStatus();
         };
         tabs.forEach(function (t) {
           t.addEventListener("click", function () { switchStorageTab(t.dataset.tab); });
         });
-        function closeStorageModal() {
-          if (overlay) overlay.classList.remove("visible");
-        }
-        function refreshHomeAfterStorageChange() {
-          currentProjectId = null;
-          if (typeof location !== "undefined") location.hash = "#/";
-          if (typeof handleRoute === "function") handleRoute();
-        }
-        document.getElementById("storageModalUseGitHub")?.addEventListener("click", function () {
-          setStorageMode("github");
-          applyStorageModeUI("github");
-          refreshHomeAfterStorageChange();
-          if (typeof window.__doLoadFromStoredUrl === "function") window.__doLoadFromStoredUrl();
-          else if (typeof window.__fetchSharedUpdates === "function") window.__fetchSharedUpdates();
-          if (typeof updateWriteAccessUI === "function") updateWriteAccessUI();
-          closeStorageModal();
-          if (typeof showToast === "function") showToast("Using GitHub sync.", { type: "success" });
-        });
-        document.getElementById("storageModalUseLocalStorage")?.addEventListener("click", function () {
-          setStorageMode("local_storage");
-          applyStorageModeUI("local_storage");
-          refreshHomeAfterStorageChange();
-          closeStorageModal();
-          if (typeof showToast === "function") showToast("Using local storage with file backup.", { type: "success" });
-        });
-        document.getElementById("storageModalUseLocalCache")?.addEventListener("click", function () {
-          setStorageMode("local_cache");
-          try {
-            localStorage.removeItem(SHARED_FILE_URL_KEY);
-            localStorage.removeItem(GITHUB_TOKEN_KEY);
-          } catch (e) {}
-          clearLocalProjectData();
-          applyStorageModeUI("local_cache");
-          refreshHomeAfterStorageChange();
-          closeStorageModal();
-          if (typeof showToast === "function") showToast("Using local cache only. Cache cleared.", { type: "success" });
-        });
+        var mode = getStorageMode() || "github";
+        var localRadio = document.getElementById(mode === "local_cache" ? "storageLocalCache" : "storageLocalStorage");
+        if (localRadio) localRadio.checked = true;
         document.getElementById("storageModalBackupToFile")?.addEventListener("click", function () {
           var snap = exportSharedSnapshot();
           var blob = new Blob([JSON.stringify(snap, null, 2)], { type: "application/json" });
@@ -9368,15 +9680,13 @@
               importSharedSnapshot(data);
               if (typeof handleRoute === "function") { location.hash = "#/"; handleRoute(); }
               if (typeof renderHomeView === "function") renderHomeView();
-              closeStorageModal();
+              if (typeof window.closeStorageModal === "function") window.closeStorageModal();
               if (typeof showToast === "function") showToast("Restored from file.", { type: "success" });
             } catch (e) { if (typeof showToast === "function") showToast("Restore failed: " + (e && e.message ? e.message : String(e)), { type: "error" }); }
             storageRestoreInput.value = "";
           };
           r.readAsText(f);
         });
-        if (overlay) overlay.addEventListener("click", function (e) { if (e.target === overlay) closeStorageModal(); });
-        document.getElementById("storageSettingsBtn")?.addEventListener("click", function () { window.openStorageModal(); });
       })();
       var landingView = document.getElementById("landingView");
       var homeViewEl = document.getElementById("homeView");
@@ -9427,7 +9737,7 @@
         window.hasWriteAccess = function () { return true; };
         var sec = document.getElementById("sharedFileSection");
         if (sec) sec.style.display = "none";
-        var storageBtn = document.getElementById("storageSettingsBtn");
+        var storageBtn = document.getElementById("homeSettingsBtn");
         if (storageBtn) storageBtn.style.display = "";
         if (getStorageMode() === "local_storage") {
           var backupSec = document.getElementById("localBackupSection");
@@ -9533,17 +9843,17 @@
           if (modalStatusText) modalStatusText.textContent = synced ? "Synced" + (st.type !== "none" ? " \u2022 " + (st.type === "github" ? "GitHub: " + st.label : st.label) : "") : "Local";
         }
         function openSharedFileModal() {
+          if (typeof window.openStorageModal === "function") window.openStorageModal();
           if (window.switchStorageTab) window.switchStorageTab("github");
           try {
             if (urlInput) urlInput.value = localStorage.getItem(SHARED_FILE_URL_KEY) || EXAMPLE_SHARED_FILE_URL;
             if (tokenInput) tokenInput.value = localStorage.getItem(GITHUB_TOKEN_KEY) || "";
           } catch (e) {}
           updateModalStatus();
-          if (modalOverlay) modalOverlay.classList.add("visible");
         }
         function closeSharedFileModal() {
           try { if (tokenInput && tokenInput.value.trim()) localStorage.setItem(GITHUB_TOKEN_KEY, tokenInput.value.trim()); } catch (e) {}
-          if (modalOverlay) modalOverlay.classList.remove("visible");
+          document.getElementById("appViewsWrap")?.classList.remove("settings-sidebar-open");
           updateHomeStatus();
           if (typeof updateWriteAccessUI === "function") updateWriteAccessUI();
         }
@@ -9558,7 +9868,6 @@
           if (typeof updateWriteAccessUI === "function") updateWriteAccessUI();
           if (typeof showToast === "function") showToast("Token cleared.", { type: "success" });
         });
-        if (modalOverlay) modalOverlay.addEventListener("click", function (e) { if (e.target === modalOverlay) closeSharedFileModal(); });
         if (urlInput) urlInput.addEventListener("input", updateModalStatus);
         updateHomeStatus();
         function sharedJsonFetchOptions() {
@@ -9775,6 +10084,12 @@
             try { var d = JSON.parse(text); return d.message || d.error || (Array.isArray(d.errors) && d.errors[0] && d.errors[0].message) || statusToMessage(status) || status + " error"; } catch (e) { return text && text.length < 120 ? text : (statusToMessage(status) || status + " error"); }
           }
           var snap = exportSharedSnapshot();
+          if (snap.boards) {
+            Object.keys(snap.boards).forEach(function (id) {
+              delete snap.boards[id].view;
+              if (snap.boards[id].settings && typeof snap.boards[id].settings === "object") delete snap.boards[id].settings.rowAppearance;
+            });
+          }
           var json = JSON.stringify(snap, null, 2);
           var content;
           try { content = btoa(unescape(encodeURIComponent(json))); } catch (e) { showPushError("Could not encode data."); if (pushBtn) pushBtn.disabled = false; return; }
