@@ -2254,8 +2254,10 @@
     .home-shared-file-status { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
     .home-shared-file-status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
     .home-shared-file-status-dot.github { background: #238636; }
+    .home-shared-file-status-dot.synced { background: #238636; }
     .home-shared-file-status-dot.custom { background: var(--text-tertiary); }
     .home-shared-file-status-dot.none { background: var(--stroke-default); }
+    .home-shared-file-status-dot.local { background: var(--stroke-default); }
     .home-shared-file-status-text { font-size: 13px; color: var(--text-secondary); }
     .home-shared-file-status-text strong { color: var(--text-primary); font-weight: 600; }
     .home-shared-file-open-btn { padding: 8px 14px; font-size: 13px; border-radius: 6px; border: 1px solid var(--border-strong); background: var(--bg-surface); color: var(--text-primary); cursor: pointer; font-family: inherit; }
@@ -2267,8 +2269,10 @@
     .shared-file-modal .shared-file-modal-status { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; padding: 10px 12px; background: var(--bg-subtle); border-radius: 8px; font-size: 13px; }
     .shared-file-modal .shared-file-modal-status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
     .shared-file-modal .shared-file-modal-status-dot.github { background: #238636; }
+    .shared-file-modal .shared-file-modal-status-dot.synced { background: #238636; }
     .shared-file-modal .shared-file-modal-status-dot.custom { background: var(--text-tertiary); }
     .shared-file-modal .shared-file-modal-status-dot.none { background: var(--stroke-default); }
+    .shared-file-modal .shared-file-modal-status-dot.local { background: var(--stroke-default); }
     .shared-file-modal label { display: block; font-size: 12px; font-weight: 500; color: var(--text-secondary); margin-bottom: 4px; }
     .shared-file-modal input[type="url"], .shared-file-modal input[type="password"] { width: 100%; padding: 10px 12px; margin-bottom: 12px; border-radius: 6px; border: 1px solid var(--border-strong); font-size: 14px; box-sizing: border-box; }
     .shared-file-modal .shared-file-modal-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
@@ -2709,7 +2713,7 @@
       <div class="home-shared-file" id="sharedFileSection">
         <div class="home-shared-file-status">
           <span class="home-shared-file-status-dot none" id="sharedFileStatusDot"></span>
-          <span class="home-shared-file-status-text" id="sharedFileStatusText">Shared file: Not set</span>
+          <span class="home-shared-file-status-text" id="sharedFileStatusText">Local</span>
           <button type="button" class="home-shared-file-open-btn" id="sharedFileOpenModal">Sync settings</button>
         </div>
       </div>
@@ -3098,6 +3102,7 @@
     const PROJECTS_LIST_KEY = "gantt-projects";
     const SHARED_FILE_URL_KEY = "gantt-shared-file-url";
     const GITHUB_TOKEN_KEY = "gantt-github-token";
+    const SHARED_FILE_POLL_MS = 15000;
     const EXAMPLE_SHARED_FILE_URL = "https://raw.githubusercontent.com/grahamgoebelkettle/Gaant/refs/heads/main/gantt-data.json";
     function getCustomPalettesKey() {
       return "gantt-custom-palettes-" + (currentProjectId || "default");
@@ -3149,6 +3154,7 @@
     function saveProjectsListLocal(list) {
       try {
         localStorage.setItem(PROJECTS_LIST_KEY, JSON.stringify(list));
+        if (window.notifySharedDataChanged) window.notifySharedDataChanged();
       } catch (e) { console.warn("Could not save projects list:", e); }
     }
     function loadProjectsList() {
@@ -3412,6 +3418,7 @@
       }
       try {
         localStorage.setItem(getCustomPalettesKey(), JSON.stringify(palettes));
+        if (window.notifySharedDataChanged) window.notifySharedDataChanged();
       } catch (e) { console.warn("Could not save custom palettes:", e); }
     }
     function getSavedView() {
@@ -3427,6 +3434,7 @@
         return;
       }
       localStorage.setItem(getViewKey(), view);
+      if (window.notifySharedDataChanged) window.notifySharedDataChanged();
     }
     const DEFAULT_PAGE_TITLE = "Project Schedule";
     const DEFAULT_PAGE_DESCRIPTION = "Drag bars to reschedule • Drag edges to change dates • Drag rows to reorder • Click a row to expand details • Click cells to edit";
@@ -3449,6 +3457,7 @@
       }
       try {
         localStorage.setItem(getSettingsKey(), JSON.stringify(settings));
+        if (window.notifySharedDataChanged) window.notifySharedDataChanged();
       } catch (e) { console.warn("Could not save project settings:", e); }
     }
     const JIRA_BASE_URL = ""; // e.g. "https://your-team.atlassian.net" — leave empty to only linkify full URLs
@@ -3527,6 +3536,7 @@
       }
       try {
         localStorage.setItem(getCacheKey(), JSON.stringify(toSave));
+        if (window.notifySharedDataChanged) window.notifySharedDataChanged();
       } catch (e) {
         console.warn("Could not save tasks:", e);
       }
@@ -7188,6 +7198,7 @@
         s.title = title != null ? String(title).trim() : "";
         s.description = description != null ? String(description).trim() : "";
         localStorage.setItem("gantt-settings-" + projectId, JSON.stringify(s));
+        if (window.notifySharedDataChanged) window.notifySharedDataChanged();
       } catch (e) { console.warn("Could not save project title/description:", e); }
     }
     function getProjectTaskCount(projectId) {
@@ -8809,18 +8820,23 @@
           if (m) return { type: "github", label: m[1] + "/" + m[2] };
           return { type: "custom", label: "Custom URL" };
         }
+        function isSynced() {
+          try { var u = localStorage.getItem(SHARED_FILE_URL_KEY); return !!(u && u.trim()); } catch (e) { return false; }
+        }
         function updateHomeStatus() {
+          var synced = isSynced();
           var url = "";
           try { url = localStorage.getItem(SHARED_FILE_URL_KEY) || EXAMPLE_SHARED_FILE_URL; } catch (e) {}
           var st = getSharedFileStatus(url);
-          if (statusDot) { statusDot.className = "home-shared-file-status-dot " + st.type; }
-          if (statusText) statusText.innerHTML = st.type === "none" ? "Shared file: Not set" : st.type === "github" ? "GitHub: <strong>" + st.label + "</strong>" : "Shared file: <strong>" + st.label + "</strong>";
+          if (statusDot) { statusDot.className = "home-shared-file-status-dot " + (synced ? "synced" : "local"); }
+          if (statusText) statusText.innerHTML = synced ? "<strong>Synced</strong>" + (st.type !== "none" ? " \u2022 " + (st.type === "github" ? "GitHub: " + st.label : st.label) : "") : "Local";
         }
         function updateModalStatus() {
           var url = (urlInput && urlInput.value) ? urlInput.value : "";
           var st = getSharedFileStatus(url);
-          if (modalStatusDot) { modalStatusDot.className = "shared-file-modal-status-dot " + st.type; }
-          if (modalStatusText) modalStatusText.textContent = st.type === "none" ? "Not set" : st.type === "github" ? "GitHub: " + st.label : st.label;
+          var synced = isSynced();
+          if (modalStatusDot) { modalStatusDot.className = "shared-file-modal-status-dot " + (synced ? "synced" : "local"); }
+          if (modalStatusText) modalStatusText.textContent = synced ? "Synced" + (st.type !== "none" ? " \u2022 " + (st.type === "github" ? "GitHub: " + st.label : st.label) : "") : "Local";
         }
         function openSharedFileModal() {
           try {
@@ -8840,11 +8856,51 @@
         if (modalOverlay) modalOverlay.addEventListener("click", function (e) { if (e.target === modalOverlay) closeSharedFileModal(); });
         if (urlInput) urlInput.addEventListener("input", updateModalStatus);
         updateHomeStatus();
+        function sharedJsonFetchOptions() {
+          return {
+            cache: "no-store",
+            credentials: "omit",
+            headers: { "Cache-Control": "no-cache", "Pragma": "no-cache" }
+          };
+        }
+        function sharedJsonUrl(u) {
+          var base = (u && u.trim()) || "";
+          var sep = base.indexOf("?") >= 0 ? "&" : "?";
+          return base + sep + "_=" + Date.now() + "&r=" + Math.random().toString(36).slice(2);
+        }
+        function fetchSharedUpdates() {
+          if (document.visibilityState !== "visible" || !isSynced()) return;
+          var url;
+          try { url = localStorage.getItem(SHARED_FILE_URL_KEY); } catch (e) { return; }
+          if (!url || !url.trim()) return;
+          fetch(sharedJsonUrl(url), sharedJsonFetchOptions())
+            .then(function (r) { if (!r.ok) return null; return r.json(); })
+            .then(function (data) {
+              if (!data || !data.projects || !Array.isArray(data.projects)) return;
+              var current = exportSharedSnapshot();
+              var currentStr = JSON.stringify(current);
+              var newStr = JSON.stringify(data);
+              if (currentStr === newStr) return;
+              importSharedSnapshot(data);
+              updateHomeStatus();
+              updateModalStatus();
+              if (typeof handleRoute === "function") handleRoute();
+              else {
+                if (typeof renderHomeView === "function") renderHomeView();
+                if (currentProjectId && typeof initGantt === "function") initGantt();
+              }
+              if (typeof showToast === "function") showToast("Data updated from shared file.", { type: "success" });
+            })
+            .catch(function () {});
+        }
+        window.__fetchSharedUpdates = fetchSharedUpdates;
+        setInterval(fetchSharedUpdates, SHARED_FILE_POLL_MS);
+        document.addEventListener("visibilitychange", function () { if (document.visibilityState === "visible") fetchSharedUpdates(); });
+        if (isSynced()) setTimeout(fetchSharedUpdates, 2000);
         function doLoad(url) {
           var u = (url && url.trim()) || "";
           if (!u) { if (typeof showToast === "function") showToast("Enter a URL first.", { type: "error" }); return; }
-          var fetchUrl = u + (u.indexOf("?") >= 0 ? "&" : "?") + "t=" + Date.now();
-          fetch(fetchUrl, { cache: "no-store" })
+          fetch(sharedJsonUrl(u), sharedJsonFetchOptions())
             .then(function (r) { if (!r.ok) throw new Error(r.status + " " + r.statusText); return r.json(); })
             .then(function (data) {
               importSharedSnapshot(data);
@@ -8852,8 +8908,11 @@
               if (urlInput) urlInput.value = u;
               updateHomeStatus();
               updateModalStatus();
-              if (typeof renderHomeView === "function") renderHomeView();
-              location.hash = "#/";
+              if (typeof handleRoute === "function") { location.hash = "#/"; handleRoute(); } else {
+                if (typeof renderHomeView === "function") renderHomeView();
+                if (currentProjectId && typeof initGantt === "function") initGantt();
+                location.hash = "#/";
+              }
               if (typeof showToast === "function") showToast("Loaded shared file.", { type: "success" });
             })
             .catch(function (e) { if (typeof showToast === "function") showToast("Load failed: " + (e && e.message ? e.message : String(e)), { type: "error" }); });
@@ -8900,8 +8959,9 @@
           var pathEnc = gh.path.split("/").map(function (p) { return encodeURIComponent(p); }).join("/");
           var api = "https://api.github.com/repos/" + encodeURIComponent(gh.owner) + "/" + encodeURIComponent(gh.repo) + "/contents/" + pathEnc;
           var authHeader = /^ghp_/.test(token) ? "token " + token : "Bearer " + token;
+          var fetchOpts = { cache: "no-store", credentials: "omit", mode: "cors", referrerPolicy: "no-referrer" };
           function getSha() {
-            return fetch(api + "?ref=" + encodeURIComponent(gh.branch), { headers: { "Accept": "application/vnd.github.v3+json", "Authorization": authHeader } })
+            return fetch(api + "?ref=" + encodeURIComponent(gh.branch), Object.assign({ method: "GET", headers: { "Accept": "application/vnd.github.v3+json", "Authorization": authHeader } }, fetchOpts))
               .then(function (r) {
                 return r.text().then(function (text) {
                   if (r.status === 404) return { sha: null };
@@ -8911,7 +8971,7 @@
               });
           }
           function doPut(sha) {
-            return fetch(api, {
+            return fetch(api, Object.assign({
               method: "PUT",
               headers: {
                 "Accept": "application/vnd.github.v3+json",
@@ -8924,7 +8984,7 @@
                 branch: gh.branch,
                 sha: sha || undefined
               })
-            });
+            }, fetchOpts));
           }
           getSha()
             .then(function (o) {
@@ -8940,7 +9000,13 @@
             .then(function (r) {
               return r.text().then(function (text) {
                 if (!r.ok) throw new Error(readErrorFromBody(text, r.status));
-                try { if (token && token.trim()) localStorage.setItem(GITHUB_TOKEN_KEY, token.trim()); } catch (e) {}
+                try {
+                  if (token && token.trim()) localStorage.setItem(GITHUB_TOKEN_KEY, token.trim());
+                  var rawUrl = "https://raw.githubusercontent.com/" + gh.owner + "/" + gh.repo + "/refs/heads/" + gh.branch + "/" + gh.path;
+                  localStorage.setItem(SHARED_FILE_URL_KEY, rawUrl);
+                } catch (e) {}
+                updateHomeStatus();
+                updateModalStatus();
                 if (typeof showToast === "function") showToast("Pushed to GitHub. Others can Refresh to see changes.", { type: "success" });
               });
             })
@@ -8970,6 +9036,25 @@
           pushToGitHub(token, gh, btn);
         }
         document.addEventListener("click", onPushClick, true);
+        var autoPushTimer = null;
+        var AUTO_PUSH_DEBOUNCE_MS = 3000;
+        function doAutoPush() {
+          if (window.ganttStorage && window.ganttStorage.isCloudEnabled && window.ganttStorage.isCloudEnabled()) return;
+          if (!isSynced()) return;
+          var token;
+          try { token = localStorage.getItem(GITHUB_TOKEN_KEY); } catch (e) { return; }
+          if (!token || !token.trim()) return;
+          var url;
+          try { url = localStorage.getItem(SHARED_FILE_URL_KEY); } catch (e) { return; }
+          var gh = parseGitHubRawUrl(url);
+          if (!gh) return;
+          pushToGitHub(token.trim(), gh, null);
+        }
+        function scheduleAutoPush() {
+          clearTimeout(autoPushTimer);
+          autoPushTimer = setTimeout(doAutoPush, AUTO_PUSH_DEBOUNCE_MS);
+        }
+        window.notifySharedDataChanged = scheduleAutoPush;
       })();
       window.addEventListener("hashchange", () => handleRoute());
       async function createNewProject() {
@@ -9044,6 +9129,7 @@
         });
       })();
       await handleRoute();
+      if (typeof window.__fetchSharedUpdates === "function") window.__fetchSharedUpdates();
     }
     if (document.readyState === "loading") {
       document.addEventListener("DOMContentLoaded", bootstrap);
