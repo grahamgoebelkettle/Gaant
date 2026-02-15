@@ -29,6 +29,11 @@
       "id": "p-1771139546918",
       "name": "777 7777",
       "createdAt": 1771139546919
+    },
+    {
+      "id": "p-1771140021872",
+      "name": "Untitled project",
+      "createdAt": 1771140021872
     }
   ],
   "boards": {
@@ -313,6 +318,12 @@
           "scrollLeft": 268
         }
       },
+      "view": "default",
+      "custom_palettes": []
+    },
+    "p-1771140021872": {
+      "tasks": [],
+      "settings": {},
       "view": "default",
       "custom_palettes": []
     }
