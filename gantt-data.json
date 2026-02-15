@@ -12,17 +12,17 @@
     },
     {
       "id": "p-1771131140680",
-      "name": "Sample project copy (2)",
+      "name": "Three",
       "createdAt": 1771131140680
     },
     {
       "id": "p-1771131853990",
-      "name": "May fourth",
+      "name": "Four",
       "createdAt": 1771131853990
     },
     {
       "id": "p-1771132173996",
-      "name": "from cursor back",
+      "name": "Five",
       "createdAt": 1771132185399
     }
   ],
@@ -143,7 +143,7 @@
         }
       ],
       "settings": {
-        "title": "Sample project copy (2)",
+        "title": "Three",
         "description": "Drag bars to reschedule • Drag edges to change dates • Drag rows to reorder • Click a row to expand details • Click cells to edit",
         "phases": [
           {
@@ -213,7 +213,7 @@
         }
       ],
       "settings": {
-        "title": "May fourth",
+        "title": "Four",
         "description": "Drag bars to reschedule • Drag edges to change dates • Drag rows to reorder • Click a row to expand details • Click cells to edit"
       },
       "view": "default",
@@ -239,7 +239,7 @@
         }
       ],
       "settings": {
-        "title": "from cursor back",
+        "title": "Five",
         "description": "Drag bars to reschedule • Drag edges to change dates • Drag rows to reorder • Click a row to expand details • Click cells to edit",
         "scrollPosition": {
           "scrollTop": 0,
