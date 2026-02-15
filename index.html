@@ -8873,15 +8873,54 @@
           var sep = base.indexOf("?") >= 0 ? "&" : "?";
           return base + sep + "_=" + Date.now() + "&r=" + Math.random().toString(36).slice(2);
         }
+        var lastFetchedOid = null;
+        function parseGitHubRawUrl(url) {
+          if (!url || typeof url !== "string") return null;
+          var u = url.trim();
+          var m = u.match(/raw\.githubusercontent\.com\/([^/]+)\/([^/]+)\/refs\/heads\/([^/]+)\/(.+)/);
+          return m ? { owner: m[1], repo: m[2], branch: m[3], path: m[4] } : null;
+        }
+        function fetchViaGitHubGraphQL(gh, token) {
+          var expr = gh.branch + ":" + gh.path;
+          var query = "query($owner: String!, $name: String!, $expr: String!) { repository(owner: $owner, name: $name) { object(expression: $expr) { oid ... on Blob { text } } } }";
+          var authHeader = /^ghp_/.test(token) ? "token " + token : "Bearer " + token;
+          return fetch("https://api.github.com/graphql", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": authHeader },
+            body: JSON.stringify({ query: query, variables: { owner: gh.owner, name: gh.repo, expr: expr } })
+          }).then(function (r) { return r.json(); });
+        }
         function fetchSharedUpdates() {
           if (document.visibilityState !== "visible" || !isSynced()) return;
           var url;
           try { url = localStorage.getItem(SHARED_FILE_URL_KEY); } catch (e) { return; }
           if (!url || !url.trim()) return;
-          fetch(sharedJsonUrl(url), sharedJsonFetchOptions())
-            .then(function (r) { if (!r.ok) return null; return r.json(); })
+          var gh = parseGitHubRawUrl(url);
+          var token;
+          try { token = localStorage.getItem(GITHUB_TOKEN_KEY); } catch (e) {}
+          token = (token && token.trim()) || null;
+          var fetchPromise;
+          if (gh && token) {
+            fetchPromise = fetchViaGitHubGraphQL(gh, token).then(function (res) {
+              if (res.errors && res.errors.length) return null;
+              var obj = res.data && res.data.repository && res.data.repository.object;
+              if (!obj || !obj.text) return null;
+              if (obj.oid === lastFetchedOid) return { skip: true };
+              lastFetchedOid = obj.oid;
+              try { return JSON.parse(obj.text); } catch (e) { return null; }
+            });
+          } else {
+            fetchPromise = fetch(sharedJsonUrl(url), sharedJsonFetchOptions())
+              .then(function (r) { if (!r.ok) return null; return r.json(); })
+              .then(function (data) {
+                if (data && data.projects) lastFetchedOid = null;
+                return data;
+              });
+          }
+          fetchPromise
             .then(function (data) {
-              if (!data || !data.projects || !Array.isArray(data.projects)) return;
+              if (!data || data.skip) return;
+              if (!data.projects || !Array.isArray(data.projects)) return;
               var current = exportSharedSnapshot();
               var currentStr = JSON.stringify(current);
               var newStr = JSON.stringify(data);
@@ -8905,8 +8944,24 @@
         function doLoad(url) {
           var u = (url && url.trim()) || "";
           if (!u) { if (typeof showToast === "function") showToast("Enter a URL first.", { type: "error" }); return; }
-          fetch(sharedJsonUrl(u), sharedJsonFetchOptions())
-            .then(function (r) { if (!r.ok) throw new Error(r.status + " " + r.statusText); return r.json(); })
+          var gh = parseGitHubRawUrl(u);
+          var token;
+          try { token = localStorage.getItem(GITHUB_TOKEN_KEY); } catch (e) {}
+          token = (token && token.trim()) || null;
+          var loadPromise;
+          if (gh && token) {
+            loadPromise = fetchViaGitHubGraphQL(gh, token).then(function (res) {
+              if (res.errors && res.errors.length) throw new Error(res.errors[0].message || "GraphQL error");
+              var obj = res.data && res.data.repository && res.data.repository.object;
+              if (!obj || !obj.text) throw new Error("File not found");
+              lastFetchedOid = obj.oid;
+              return JSON.parse(obj.text);
+            });
+          } else {
+            loadPromise = fetch(sharedJsonUrl(u), sharedJsonFetchOptions())
+              .then(function (r) { if (!r.ok) throw new Error(r.status + " " + r.statusText); return r.json(); });
+          }
+          loadPromise
             .then(function (data) {
               importSharedSnapshot(data);
               try { localStorage.setItem(SHARED_FILE_URL_KEY, u); } catch (e) {}
@@ -8937,12 +8992,6 @@
           URL.revokeObjectURL(a.href);
           if (typeof showToast === "function") showToast("Downloaded gantt-data.json. Commit to your repo so others can Load/Refresh.", { type: "success" });
         });
-        function parseGitHubRawUrl(url) {
-          if (!url || typeof url !== "string") return null;
-          var u = url.trim();
-          var m = u.match(/raw\.githubusercontent\.com\/([^/]+)\/([^/]+)\/refs\/heads\/([^/]+)\/(.+)/);
-          return m ? { owner: m[1], repo: m[2], branch: m[3], path: m[4] } : null;
-        }
         function pushToGitHub(token, gh, pushBtn) {
           function showPushError(msg) { safeToast("Push failed: " + msg, { type: "error" }); }
           function statusToMessage(status) {
