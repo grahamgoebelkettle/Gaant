@@ -7,6 +7,13 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
     :root {
+      /* Motion — reusable across pages and elements */
+      --motion-duration-fast: 150ms;
+      --motion-duration-normal: 200ms;
+      --motion-duration-slow: 280ms;
+      --motion-easing: ease-out;
+      --motion-easing-emphasis: cubic-bezier(0.2, 0, 0, 1);
+      --motion-easing-decelerate: cubic-bezier(0, 0, 0.2, 1);
       --button-radius: 8px;
       --color-general-primary: #171717;
       --color-general-primary-hover: #262626;
@@ -48,6 +55,10 @@
         --shadow-md: 0 4px 12px rgba(0,0,0,0.5);
       }
     }
+    /* Motion utilities — use for cohesive transitions */
+    .motion-fast { transition-duration: var(--motion-duration-fast); transition-timing-function: var(--motion-easing); }
+    .motion-normal { transition-duration: var(--motion-duration-normal); transition-timing-function: var(--motion-easing); }
+    .motion-slow { transition-duration: var(--motion-duration-slow); transition-timing-function: var(--motion-easing-decelerate); }
     * { box-sizing: border-box; }
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
@@ -326,6 +337,27 @@
       white-space: nowrap;
     }
     .task-dependency-tooltip.visible { opacity: 1; }
+    .custom-tooltip {
+      position: fixed;
+      z-index: 100100;
+      padding: 6px 10px;
+      background: var(--text-primary);
+      color: var(--bg-body);
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 1.35;
+      border-radius: 6px;
+      box-shadow: var(--shadow-md);
+      pointer-events: none;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.15s, visibility 0.15s, transform 0.1s;
+      max-width: 240px;
+      white-space: normal;
+      word-wrap: break-word;
+    }
+    .custom-tooltip.visible { opacity: 1; visibility: visible; }
+    .custom-tooltip.measuring { opacity: 0; visibility: hidden; left: 0; top: 0; }
     .detach-confirm-popup {
       position: fixed;
       z-index: 10000;
@@ -447,7 +479,7 @@
       text-align: left;
       width: 100%;
     }
-    .phase-select-menu-item:hover { background: #404040; }
+    .phase-select-menu-item:hover { background: rgba(255,255,255,0.06); }
     .phase-select-menu-item .phase-swatch {
       width: 12px;
       height: 12px;
@@ -590,7 +622,7 @@
       z-index: 10000;
       opacity: 0;
       visibility: hidden;
-      transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+      transition: opacity var(--motion-duration-normal) var(--motion-easing-decelerate), transform var(--motion-duration-normal) var(--motion-easing-decelerate), visibility var(--motion-duration-normal) var(--motion-easing-decelerate);
       display: flex;
       align-items: center;
       gap: 6px;
@@ -973,6 +1005,13 @@
     .add-task-fab:active {
       transform: scale(0.98);
     }
+    .add-task-fab-icon {
+      display: inline-block;
+      transition: transform 0.25s ease;
+    }
+    .add-task-fab.fab-open .add-task-fab-icon {
+      transform: rotate(45deg);
+    }
     .fab-phase-menu {
       position: fixed;
       z-index: 10001;
@@ -1003,7 +1042,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 8px 14px;
+      padding: 10px 14px;
       cursor: pointer;
       border: none;
       background: transparent;
@@ -1013,12 +1052,21 @@
       text-align: left;
       width: 100%;
     }
-    .fab-phase-menu-item:hover { background: #404040; }
+    .fab-phase-menu-item:hover { background: rgba(255,255,255,0.06); }
     .fab-phase-menu-item .phase-swatch {
       width: 12px;
       height: 12px;
       border-radius: 3px;
       flex-shrink: 0;
+    }
+    .fab-phase-menu-item-icon {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      opacity: 0.9;
+    }
+    .fab-phase-menu-item-disabled .fab-phase-menu-item-icon {
+      opacity: 0.6;
     }
     .fab-phase-menu-item-disabled {
       cursor: default;
@@ -1029,7 +1077,8 @@
       font-size: 11px;
       color: #a3a3a3;
       font-weight: 400;
-      margin-left: 4px;
+      margin-left: auto;
+      flex-shrink: 0;
     }
     @media (prefers-color-scheme: dark) {
       .add-task-fab {
@@ -1063,6 +1112,13 @@
     .home-new-project-btn:hover {
       opacity: 0.9;
     }
+    .home-new-project-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .home-new-project-btn:disabled:hover {
+      opacity: 0.5;
+    }
     .home-new-project-btn-dropdown {
       display: inline-flex;
       align-items: center;
@@ -1079,36 +1135,33 @@
       z-index: 1000;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 8px 14px;
+      gap: 8px;
+      padding: 8px 12px;
       font-size: 13px;
       font-weight: 500;
       color: var(--text-secondary);
-      background: rgba(255, 255, 255, 0.65);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border: 1px solid rgba(0, 0, 0, 0.06);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
       border-radius: 8px;
-      pointer-events: none;
+      cursor: pointer;
       font-family: inherit;
     }
-    .home-readonly-badge svg {
-      width: 14px;
-      height: 14px;
-      opacity: 0.85;
+    .home-readonly-badge:hover { background: var(--bg-hover); }
+    .home-readonly-badge-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
       flex-shrink: 0;
+      background: #238636;
     }
+    .home-readonly-badge.status-syncing .home-readonly-badge-dot { background: #d97706; animation: home-sync-dot-pulse 1.2s ease-in-out infinite; }
+    .home-readonly-badge.status-error .home-readonly-badge-dot { background: #dc2626; }
     @media (prefers-color-scheme: dark) {
       .home-new-project-btn {
         background: #ffffff;
         color: #171717;
       }
-      .home-readonly-badge {
-        background: rgba(23, 23, 23, 0.5);
-        border-color: rgba(255, 255, 255, 0.08);
-        color: var(--text-tertiary);
-      }
-      .home-readonly-badge svg { opacity: 0.7; }
+      .home-readonly-badge:hover { background: var(--bg-hover); }
     }
     .week-label { 
       font-weight: 500;
@@ -1117,7 +1170,7 @@
     .gantt-phase-cell {
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
       gap: 4px;
       color: var(--text-primary);
     }
@@ -1366,24 +1419,27 @@
       justify-content: center;
     }
     .settings-btn:hover { color: var(--text-primary); background: var(--bg-hover); }
-    .settings-btn svg { width: 20px; height: 20px; }
+    .settings-btn svg { width: 20px; height: 20px; transition: transform 0.3s ease; }
+    .settings-btn:hover svg { transform: rotate(90deg); }
     .settings-overlay {
       display: none;
     }
     .settings-drawer {
       width: 100%;
       height: 100%;
+      max-height: 100%;
       display: flex;
       flex-direction: column;
       min-height: 0;
+      overflow: hidden;
     }
     .settings-sidebar {
       position: fixed;
-      right: 0;
-      top: 0;
-      bottom: 0;
-      width: 320px;
-      height: 100vh;
+      inset: 0;
+      left: auto;
+      width: 376px;
+      max-height: 100vh;
+      max-height: 100dvh;
       overflow: hidden;
       display: flex;
       flex-direction: column;
@@ -1393,7 +1449,7 @@
       z-index: 100;
       box-shadow: none;
       transform: translateX(100%);
-      transition: transform 0.25s ease;
+      transition: transform var(--motion-duration-slow) var(--motion-easing-decelerate);
       padding: 0;
       margin: 0;
     }
@@ -1426,6 +1482,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      transition: background var(--motion-duration-fast) var(--motion-easing), color var(--motion-duration-fast) var(--motion-easing);
     }
     .settings-drawer-close:hover { background: var(--bg-subtle); color: var(--text-primary); }
     .settings-tabs {
@@ -1451,6 +1508,7 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      transition: color var(--motion-duration-fast) var(--motion-easing), border-bottom-color var(--motion-duration-fast) var(--motion-easing), background var(--motion-duration-fast) var(--motion-easing);
     }
     .settings-tab:hover { color: var(--text-primary); }
     .settings-tab.active {
@@ -1458,15 +1516,28 @@
       border-bottom-color: var(--color-general-primary);
       background: var(--bg-surface);
     }
-    .settings-tab-panel { display: none; }
-    .settings-tab-panel.active { display: block; }
     .settings-drawer-body {
+      display: grid;
+      grid-template-rows: minmax(0, 1fr);
       padding: 24px;
       flex: 1 1 0;
       min-height: 0;
       overflow-y: auto;
       overflow-x: hidden;
       -webkit-overflow-scrolling: touch;
+    }
+    .settings-tab-panel {
+      grid-area: 1 / 1;
+      min-height: 0;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity var(--motion-duration-slow) var(--motion-easing-decelerate), visibility var(--motion-duration-slow) var(--motion-easing-decelerate);
+    }
+    .settings-tab-panel.active {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
     }
     .settings-section { margin-bottom: 24px; }
     .settings-section:last-child { margin-bottom: 0; }
@@ -1562,7 +1633,7 @@
       inset: 0;
       border-radius: 999px;
       background: var(--border-strong);
-      transition: background 0.2s;
+      transition: background var(--motion-duration-normal) var(--motion-easing);
     }
     .settings-toggle-slider::after {
       content: "";
@@ -1574,7 +1645,7 @@
       border-radius: 50%;
       background: var(--bg-body);
       box-shadow: 0 1px 2px rgba(0,0,0,0.2);
-      transition: transform 0.2s;
+      transition: transform var(--motion-duration-normal) var(--motion-easing-decelerate);
     }
     .settings-toggle-switch input:checked + .settings-toggle-slider {
       background: var(--color-general-primary);
@@ -1957,14 +2028,15 @@
       justify-content: flex-end;
       gap: 8px;
       flex-shrink: 0;
+      background: var(--bg-surface);
     }
     @media (max-width: 900px), (max-height: 700px) {
-      .settings-sidebar { max-height: 100vh; height: 100vh; overflow: hidden; }
-      .settings-drawer { max-height: 100vh; min-height: 0; }
+      .settings-sidebar { inset: 0; left: auto; }
+      .settings-drawer { max-height: 100%; }
     }
     @media (max-width: 480px) {
-      .settings-sidebar { width: 100%; }
-      .settings-drawer { width: 100%; height: 100vh; max-height: 100vh; }
+      .settings-sidebar { width: 100%; left: 0; }
+      .settings-drawer { width: 100%; }
       .settings-drawer-header { padding: 16px 16px 16px 20px; }
       .settings-drawer-header h2 { font-size: 17px; }
       .settings-drawer-close { width: 44px; height: 44px; font-size: 24px; flex-shrink: 0; }
@@ -2554,7 +2626,7 @@
       .task-detail-mobile-tooltip { display: none; }
     }
     .app-views-wrap { position: relative; flex: 1; min-height: 0; min-width: 0; display: flex; flex-direction: row; }
-    .app-views-inner { flex: 1; min-width: 0; position: relative; display: flex; flex-direction: column; }
+    .app-views-inner { flex: 1; min-width: 0; min-height: 0; position: relative; display: flex; flex-direction: column; }
     .app-view {
       position: absolute;
       inset: 0;
@@ -2643,6 +2715,12 @@
       overflow-y: auto;
       overflow-x: hidden;
     }
+    #homeView.active:has(.home-project-list.is-empty) {
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
+      overflow-y: visible;
+    }
     @media (max-width: 480px) {
       #homeView.active { padding: 16px 10px 24px; }
     }
@@ -2651,23 +2729,6 @@
       margin-bottom: 16px;
     }
     #homeView h1 { margin-bottom: 8px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-    #homePageTitle {
-      cursor: text;
-      border-radius: 4px;
-      padding: 2px 4px;
-      margin: -2px -4px;
-    }
-    #homePageDescription {
-      cursor: text;
-      border-radius: 4px;
-      padding: 2px 4px;
-      margin: -2px -4px;
-    }
-    #homePageTitle:focus,
-    #homePageDescription:focus {
-      outline: none;
-      box-shadow: inset 0 0 0 1px var(--color-general-primary);
-    }
     .home-project-count-badge {
       display: inline-flex;
       align-items: center;
@@ -2688,6 +2749,9 @@
     .home-shared-file-input { flex: 1; min-width: 200px; padding: 8px 10px; font-size: 13px; border: 1px solid var(--border-default); border-radius: 6px; font-family: inherit; }
     .home-shared-file-btn { padding: 8px 12px; font-size: 13px; border-radius: var(--button-radius); border: 1px solid var(--border-strong); background: var(--bg-surface); color: var(--text-primary); cursor: pointer; font-family: inherit; }
     .home-shared-file-btn:hover { background: var(--bg-hover); }
+    .home-settings-icon-btn { width: 36px; height: 36px; padding: 0; display: flex; align-items: center; justify-content: center; min-width: 36px; border: none; }
+    .home-settings-icon-btn svg { width: 18px; height: 18px; transition: transform 0.3s ease; }
+    .home-settings-icon-btn:hover svg { transform: rotate(90deg); }
     .home-shared-file-push { margin-top: 12px; }
     .home-shared-file-push .home-shared-file-label { margin-bottom: 4px; }
     .home-shared-file-status { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 0; }
@@ -2697,6 +2761,8 @@
     .home-shared-file-status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
     .home-shared-file-status-dot.github { background: #238636; }
     .home-shared-file-status-dot.synced { background: #238636; }
+    .home-shared-file-status-dot.synced.syncing { background: #d97706; }
+    .home-shared-file-status-dot.synced.error { background: #dc2626; }
     .home-shared-file-status-dot.custom { background: var(--text-tertiary); }
     .home-shared-file-status-dot.none { background: var(--stroke-default); }
     .home-shared-file-status-dot.local { background: var(--stroke-default); }
@@ -2724,7 +2790,7 @@
     .shared-file-modal .shared-file-modal-status-dot.none { background: var(--stroke-default); }
     .shared-file-modal .shared-file-modal-status-dot.local { background: var(--stroke-default); }
     .shared-file-modal label { display: block; font-size: 12px; font-weight: 500; color: var(--text-secondary); margin-bottom: 4px; }
-    .shared-file-input-wrap { display: flex; align-items: stretch; margin-bottom: 12px; border: 1px solid var(--border-strong); border-radius: 6px; background: var(--bg-surface); transition: box-shadow 0.15s ease; }
+    .shared-file-input-wrap { display: flex; align-items: stretch; margin-bottom: 12px; border: 1px solid var(--border-strong); border-radius: 6px; background: var(--bg-surface); transition: box-shadow var(--motion-duration-fast) var(--motion-easing); }
     .shared-file-input-wrap:focus-within { box-shadow: 0 0 0 1px var(--color-general-primary); outline: none; }
     .shared-file-input-wrap input { flex: 1; min-width: 0; padding: 10px 12px; border: none; border-radius: 6px 0 0 6px; font-size: 14px; box-sizing: border-box; background: transparent; color: var(--text-primary); font-family: inherit; }
     .shared-file-input-wrap input::placeholder { color: var(--text-tertiary); opacity: 1; }
@@ -2764,20 +2830,56 @@
       border: 1px solid var(--border-default);
       border-radius: 8px;
       cursor: pointer;
-      transition: border-color 0.2s, background 0.2s;
+      transition: border-color var(--motion-duration-normal) var(--motion-easing), background var(--motion-duration-normal) var(--motion-easing);
       box-sizing: border-box;
     }
     .storage-type-tile:hover { border-color: var(--border-strong); background: var(--bg-hover); }
+    .storage-type-tile:focus { outline: none; }
+    .storage-type-tile:focus-visible { outline: 1px solid rgba(99, 102, 241, 0.4); outline-offset: 1px; }
     .storage-type-tile.selected {
       border-color: var(--color-general-primary);
-      background: rgba(99, 102, 241, 0.08);
+    }
+    .storage-type-tile.selected::after {
+      content: "";
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 18px;
+      height: 18px;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E") no-repeat center;
+      background-size: contain;
+      pointer-events: none;
     }
     .storage-type-tile.selected .storage-type-tile-title { font-weight: 600; }
-    .storage-type-tile-title { font-size: 14px; font-weight: 500; color: var(--text-primary); margin: 0 0 2px 0; }
+    .storage-type-tile-content { display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-subtle); }
+    .storage-type-tile.selected .storage-type-tile-content { display: block; }
+    .storage-type-tile-content .shared-file-input-wrap { margin-bottom: 8px; }
+    .storage-type-tile-content .shared-file-modal-section { margin-top: 12px; }
+    .storage-type-tile-content .shared-file-modal-status { display: flex; align-items: center; gap: 6px; margin-top: 6px; margin-bottom: 0; padding: 0; font-size: 12px; color: var(--text-tertiary); min-height: 18px; }
+    .storage-type-tile-content .shared-file-modal-status-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .storage-type-tile-content .shared-file-modal-status-dot.github,
+    .storage-type-tile-content .shared-file-modal-status-dot.synced { background: #238636; }
+    .storage-type-tile-content .shared-file-modal-status-dot.syncing { animation: home-sync-dot-pulse 1.2s ease-in-out infinite; }
+    .storage-type-tile-content .shared-file-modal-status-dot.custom { background: var(--text-tertiary); }
+    .storage-type-tile-content .shared-file-modal-status-dot.none,
+    .storage-type-tile-content .shared-file-modal-status-dot.local { background: var(--stroke-default); }
+    .storage-type-tile-content label { display: block; font-size: 12px; font-weight: 500; color: var(--text-secondary); margin-bottom: 4px; }
+    .storage-type-tile-content .shared-file-input-wrap { display: flex; align-items: stretch; border: 1px solid var(--border-strong); border-radius: 6px; background: var(--bg-surface); transition: box-shadow var(--motion-duration-fast) var(--motion-easing); }
+    .storage-type-tile-content .shared-file-input-wrap:focus-within { box-shadow: 0 0 0 1px var(--color-general-primary); outline: none; }
+    .storage-type-tile-content .shared-file-input-wrap input { flex: 1; min-width: 0; padding: 10px 12px; border: none; border-radius: 6px 0 0 6px; font-size: 14px; box-sizing: border-box; background: transparent; color: var(--text-primary); font-family: inherit; }
+    .storage-type-tile-content .shared-file-input-icons { display: flex; align-items: center; gap: 2px; padding: 0 6px 0 8px; flex-shrink: 0; border-left: 1px solid var(--border-subtle); }
+    .storage-type-tile-content .shared-file-input-icon { width: 28px; height: 28px; min-height: 28px; padding: 0; border: none; border-radius: 4px; background: transparent; color: var(--text-secondary); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+    .storage-type-tile-content .shared-file-input-icon:hover { background: var(--bg-hover); color: var(--text-primary); }
+    .storage-type-tile-content .shared-file-input-icon svg { width: 16px; height: 16px; }
+    .storage-type-tile-content .storage-github-error { display: none; margin-top: 10px; padding: 8px 10px; font-size: 12px; color: #b91c1c; background: rgba(185, 28, 28, 0.1); border: 1px solid rgba(185, 28, 28, 0.3); border-radius: 6px; }
+    .storage-type-tile-content .storage-github-error.visible { display: block; }
+    .storage-type-tile-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .storage-type-tile-actions .home-shared-file-btn { margin: 0; }
+    .storage-type-tile-heading { display: flex; align-items: center; gap: 10px; margin-bottom: 2px; }
+    .storage-type-tile-icon { flex-shrink: 0; color: var(--text-secondary); }
+    .storage-type-tile-icon svg { width: 20px; height: 20px; }
+    .storage-type-tile-title { font-size: 14px; font-weight: 500; color: var(--text-primary); margin: 0; }
     .storage-type-tile-desc { font-size: 12px; color: var(--text-secondary); margin: 0; line-height: 1.35; }
-    .storage-details { margin-top: 4px; padding-top: 16px; border-top: 1px solid var(--border-default); }
-    .storage-details-panel { display: none; }
-    .storage-details-panel.active { display: block; }
     .storage-local-tile-actions { margin-top: 0; padding-top: 0; border-top: none; display: flex; flex-wrap: wrap; gap: 8px; }
     .storage-local-tile-actions .home-shared-file-btn { margin: 0; }
     .storage-local-tiles { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
@@ -2966,6 +3068,169 @@
       gap: 16px;
       width: 100%;
     }
+    .home-project-list.is-empty {
+      flex: 1 1 0;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .home-project-list.is-empty::before,
+    .home-project-list.is-empty::after {
+      content: "";
+      flex: 1;
+      min-height: 0;
+    }
+    .home-empty-state {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 44px 24px;
+      min-height: 120px;
+      margin-top: 32px;
+    }
+    .home-empty-state-visual {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 20px;
+      width: 220px;
+    }
+    .home-empty-state-bar {
+      height: 12px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+    .home-empty-state-bar.bar-1 {
+      width: 40px;
+      background: #6366f1;
+      margin-left: 0;
+    }
+    .home-empty-state-bar.bar-2 {
+      width: 56px;
+      background: #8b5cf6;
+      margin-left: 40px;
+      animation: home-empty-bar2-pulse 5.4s ease-in-out infinite;
+    }
+    .home-empty-state-bar.bar-3 {
+      width: 52px;
+      background: #a78bfa;
+      margin-left: 96px;
+      animation: home-empty-bar3-pulse 5.4s ease-in-out infinite;
+    }
+    .home-empty-state-bar.bar-4 {
+      width: 28px;
+      background: #c4b5fd;
+      margin-left: 148px;
+      animation: home-empty-bar4-shift 5.4s ease-in-out infinite;
+    }
+    /* Bar 2: expand → hold (through bar 3 cycle) → contract last */
+    @keyframes home-empty-bar2-pulse {
+      0%, 100% { width: 56px; }
+      20%, 70% { width: 78px; }
+      85% { width: 56px; }
+    }
+    /* Bar 3: move with bar 2 expand → grow → contract → (bar 2 contracts) */
+    @keyframes home-empty-bar3-pulse {
+      0% { margin-left: 96px; width: 52px; }
+      20% { margin-left: 118px; width: 52px; }
+      45% { margin-left: 118px; width: 74px; }
+      70% { margin-left: 118px; width: 52px; }
+      85%, 100% { margin-left: 96px; width: 52px; }
+    }
+    /* Bar 4: follows bar 3 end */
+    @keyframes home-empty-bar4-shift {
+      0%, 100% { margin-left: 148px; }
+      20%, 70% { margin-left: 170px; }
+      45% { margin-left: 192px; }
+      85% { margin-left: 148px; }
+    }
+    .home-empty-state-new-btn {
+      height: 14px;
+      min-width: 72px;
+      padding: 0 14px;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 4px;
+      border: none;
+      background: var(--color-general-primary);
+      color: var(--bg-body);
+      cursor: pointer;
+      font-family: inherit;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.2s;
+    }
+    .home-empty-state-new-btn:hover {
+      opacity: 0.9;
+    }
+    @media (prefers-color-scheme: dark) {
+      .home-empty-state-new-btn {
+        background: #ffffff;
+        color: #171717;
+      }
+      .home-empty-state-bar.bar-1 { background: #818cf8; }
+      .home-empty-state-bar.bar-2 { background: #a78bfa; }
+      .home-empty-state-bar.bar-3 { background: #c4b5fd; }
+      .home-empty-state-bar.bar-4 { background: #ddd6fe; }
+    }
+    .home-empty-state-create-btn {
+      height: auto;
+      min-width: auto;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: var(--button-radius);
+      border: none;
+      background: var(--color-general-primary);
+      color: var(--bg-body);
+      cursor: pointer;
+      font-family: inherit;
+      margin-top: 16px;
+      transition: opacity 0.2s;
+    }
+    .home-empty-state-create-btn:hover {
+      opacity: 0.9;
+    }
+    @media (prefers-color-scheme: dark) {
+      .home-empty-state-create-btn {
+        background: #ffffff;
+        color: #171717;
+      }
+    }
+    .home-empty-state-line {
+      width: 100%;
+      height: 2px;
+      background: var(--text-tertiary);
+      opacity: 0.2;
+      border-radius: 1px;
+      margin-top: 4px;
+    }
+    .home-empty-state-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0 0 4px 0;
+      line-height: 1.3;
+    }
+    .home-empty-state-subtitle {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin: 0 0 0 0;
+      line-height: 1.4;
+      max-width: 280px;
+    }
+    .home-empty-state-hint {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      margin: 0;
+    }
     @media (max-width: 900px) {
       .home-project-list { grid-template-columns: repeat(2, 1fr); }
     }
@@ -2992,6 +3257,24 @@
       border-radius: 8px;
       box-shadow: var(--shadow-sm);
       overflow: hidden;
+      animation: home-project-card-appear 0.35s ease-out forwards;
+      animation-fill-mode: both;
+    }
+    .home-project-card.edit-mode { animation-delay: 0; }
+    .home-project-list .home-project-card:nth-child(1) { animation-delay: 0ms; }
+    .home-project-list .home-project-card:nth-child(2) { animation-delay: 45ms; }
+    .home-project-list .home-project-card:nth-child(3) { animation-delay: 90ms; }
+    .home-project-list .home-project-card:nth-child(4) { animation-delay: 135ms; }
+    .home-project-list .home-project-card:nth-child(5) { animation-delay: 180ms; }
+    .home-project-list .home-project-card:nth-child(6) { animation-delay: 225ms; }
+    .home-project-list .home-project-card:nth-child(7) { animation-delay: 270ms; }
+    .home-project-list .home-project-card:nth-child(8) { animation-delay: 315ms; }
+    .home-project-list .home-project-card:nth-child(9) { animation-delay: 360ms; }
+    .home-project-list .home-project-card:nth-child(10) { animation-delay: 405ms; }
+    .home-project-list .home-project-card:nth-child(n+11) { animation-delay: 450ms; }
+    @keyframes home-project-card-appear {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     .home-project-card { cursor: pointer; }
     .home-project-card:hover { border-color: var(--border-strong); }
@@ -3036,6 +3319,7 @@
       justify-content: center;
       border-radius: 0;
       background: var(--bg-subtle, #f5f5f5);
+      contain: layout;
     }
     @media (prefers-color-scheme: dark) {
       .home-project-timeline-preview { background: var(--bg-subtle, #262626); }
@@ -3252,6 +3536,7 @@
 </head>
 <body>
   <div class="task-dependency-tooltip" id="taskDependencyTooltip" role="tooltip"></div>
+  <div class="custom-tooltip" id="customTooltip" role="tooltip" aria-hidden="true"></div>
   <div class="detach-confirm-popup" id="detachConfirmPopup" role="dialog" aria-labelledby="detachConfirmMsg">
     <div class="detach-confirm-msg" id="detachConfirmMsg"></div>
     <p class="detach-confirm-hint" id="detachConfirmHint">You can allow dependent tasks to have their own dates in Board settings → Tasks → Dependent tasks.</p>
@@ -3279,15 +3564,16 @@
     <div class="phase-select-menu-title">Phase</div>
     <div class="phase-select-menu-list" id="phaseSelectMenuList"></div>
   </div>
-  <div class="fab-phase-menu" id="fabPhaseMenu" role="menu" aria-label="Start in phase">
-    <div class="fab-phase-menu-title">Start in phase</div>
+  <div class="fab-phase-menu" id="fabPhaseMenu" role="menu" aria-label="New task">
+    <div class="fab-phase-menu-title">New task</div>
     <div class="fab-phase-menu-list" id="fabPhaseMenuList"></div>
   </div>
   <div class="home-new-board-menu fab-phase-menu" id="homeNewBoardMenu" role="menu" aria-label="New board options">
     <div class="fab-phase-menu-list">
-      <button type="button" class="fab-phase-menu-item" data-action="scratch" role="menuitem">Start from Scratch</button>
-      <button type="button" class="fab-phase-menu-item" data-action="linked" role="menuitem">Linked board</button>
-      <button type="button" class="fab-phase-menu-item fab-phase-menu-item-disabled" data-action="templates" role="menuitem" disabled>Templates <span class="fab-phase-menu-badge">coming soon</span></button>
+      <button type="button" class="fab-phase-menu-item" data-action="scratch" role="menuitem"><span class="fab-phase-menu-item-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg></span>Start from Scratch</button>
+      <button type="button" class="fab-phase-menu-item" data-action="linked" role="menuitem"><span class="fab-phase-menu-item-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"/></svg></span>Linked board</button>
+      <button type="button" class="fab-phase-menu-item fab-phase-menu-item-disabled" data-action="templates" role="menuitem" disabled><span class="fab-phase-menu-item-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"/></svg></span>Templates <span class="fab-phase-menu-badge">soon</span></button>
+      <button type="button" class="fab-phase-menu-item fab-phase-menu-item-disabled" data-action="excel" role="menuitem" disabled><span class="fab-phase-menu-item-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 8.25H7.5a2.25 2.25 0 0 0-2.25 2.25v9a2.25 2.25 0 0 0 2.25 2.25h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25H15M9 12l3 3m0 0 3-3m-3 3V2.25"/></svg></span>Upload from Excel <span class="fab-phase-menu-badge">soon</span></button>
     </div>
   </div>
   <div class="app-views-wrap" id="appViewsWrap">
@@ -3316,11 +3602,11 @@
   <div id="homeView" class="app-view">
     <div class="home-sticky-header">
       <div class="home-header-row">
-        <h1><span id="homePageTitle" contenteditable="true">Boards</span> <span class="home-project-count-badge" id="homeProjectCountBadge" contenteditable="false">0</span></h1>
+        <h1><span id="homePageTitle">Boards</span> <span class="home-project-count-badge" id="homeProjectCountBadge" contenteditable="false">0</span></h1>
         <div class="home-header-actions">
           <div class="gantt-auth-wrap gantt-auth-user-menu" id="ganttAuthWrap" style="display: none;">
             <button type="button" class="gantt-auth-user-trigger" id="ganttAuthUserTrigger" aria-label="Account menu" aria-expanded="false" aria-haspopup="true">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/></svg>
             </button>
             <div class="gantt-auth-user-dropdown" id="ganttAuthUserDropdown" role="menu">
               <div class="gantt-auth-dropdown-section-title">Account</div>
@@ -3344,11 +3630,13 @@
             <input type="file" id="localRestoreFileInput" accept=".json,application/json" style="display: none;">
             <button type="button" class="home-shared-file-btn" id="localRestoreFromFile">Restore from file</button>
           </div>
-          <button type="button" class="home-shared-file-btn" id="homeSettingsBtn">Settings</button>
-          <button type="button" class="home-new-project-btn" id="homeFab" aria-label="New board">+ New board</button>
+          <button type="button" class="home-shared-file-btn home-settings-icon-btn" id="homeSettingsBtn" data-tooltip="Settings" aria-label="Settings">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z"/><circle cx="12" cy="12" r="2.5" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+          </button>
+          <button type="button" class="home-new-project-btn" id="homeFab" aria-label="New board" data-tooltip-disabled="Read-only: add an access token in Sync Settings to create boards.">+ New board</button>
         </div>
       </div>
-      <p class="home-subtitle" id="homePageDescription" contenteditable="true">Create and open boards. Each board has its own tasks and settings.</p>
+      <p class="home-subtitle" id="homePageDescription">Create and open boards. Each board has its own tasks and settings.</p>
     </div>
     <div class="home-project-list" id="homeProjectList"></div>
   </div>
@@ -3357,8 +3645,8 @@
     <a href="#/" class="home-back-link" id="homeBackLink">← All boards</a>
     <header class="page-header">
       <div class="page-header-title-wrap">
-        <h1 id="pageTitle" contenteditable="true">Project Schedule</h1>
-        <p class="subtitle" id="pageDescription" contenteditable="true">Drag bars to reschedule • Drag edges to change dates • Drag rows to reorder • Click a row to expand details • Click cells to edit</p>
+        <h1 id="pageTitle">Project Schedule</h1>
+        <p class="subtitle" id="pageDescription">Drag bars to reschedule • Drag edges to change dates • Drag rows to reorder • Click a row to expand details • Click cells to edit</p>
       </div>
       <div class="chart-controls">
       <label for="viewMode">View:</label>
@@ -3368,8 +3656,8 @@
         <option value="default">Default (8 weeks)</option>
         <option value="project">Entire project</option>
       </select>
-      <button type="button" class="settings-btn" id="settingsBtn" title="Board settings">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <button type="button" class="settings-btn" id="settingsBtn" data-tooltip="Board settings">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z"/><circle cx="12" cy="12" r="2.5" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
       </button>
     </div>
   </header>
@@ -3390,7 +3678,7 @@
       <line x1="0" y1="-2" x2="0" y2="2" stroke="#737373" stroke-width="1" stroke-linecap="round"/>
     </g>
   </svg>
-  <button class="gantt-dependency-unlink-btn" id="ganttDependencyUnlinkBtn" type="button" title="Unlink tasks">
+  <button class="gantt-dependency-unlink-btn" id="ganttDependencyUnlinkBtn" type="button" data-tooltip="Unlink tasks">
     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M18.84 12.25l1.72-1.71h-.02a5.004 5.004 0 0 0-.12-7.07 5.006 5.006 0 0 0-6.95 0l-1.72 1.71"/>
       <path d="M5.17 11.75l-1.71 1.71a5.004 5.004 0 0 0 .12 7.07 5.006 5.006 0 0 0 6.95 0l1.71-1.71"/>
@@ -3414,7 +3702,7 @@
     <div class="gantt-bar-tooltip-row gantt-bar-tooltip-depends">
       <span class="gantt-bar-tooltip-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></span>
       <span class="gantt-bar-tooltip-text"></span>
-      <span class="gantt-bar-tooltip-dep-unlink-wrap" style="display:none"><button type="button" class="gantt-bar-tooltip-dep-unlink" title="Unlink" aria-label="Unlink"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.84 12.25l1.72-1.71h-.02a5.004 5.004 0 0 0-.12-7.07 5.006 5.006 0 0 0-6.95 0l-1.72 1.71"/><path d="M5.17 11.75l-1.71 1.71a5.004 5.004 0 0 0 .12 7.07 5.006 5.006 0 0 0 6.95 0l1.71-1.71"/><line x1="8" y1="2" x2="8" y2="5"/><line x1="2" y1="8" x2="5" y2="8"/><line x1="16" y1="19" x2="16" y2="22"/><line x1="19" y1="16" x2="22" y2="16"/></svg></button></span>
+      <span class="gantt-bar-tooltip-dep-unlink-wrap" style="display:none"><button type="button" class="gantt-bar-tooltip-dep-unlink" data-tooltip="Unlink" aria-label="Unlink"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.84 12.25l1.72-1.71h-.02a5.004 5.004 0 0 0-.12-7.07 5.006 5.006 0 0 0-6.95 0l-1.72 1.71"/><path d="M5.17 11.75l-1.71 1.71a5.004 5.004 0 0 0 .12 7.07 5.006 5.006 0 0 0 6.95 0l1.71-1.71"/><line x1="8" y1="2" x2="8" y2="5"/><line x1="2" y1="8" x2="5" y2="8"/><line x1="16" y1="19" x2="16" y2="22"/><line x1="19" y1="16" x2="22" y2="16"/></svg></button></span>
     </div>
     <div class="gantt-bar-tooltip-row gantt-bar-tooltip-dates">
       <span class="gantt-bar-tooltip-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg></span>
@@ -3450,11 +3738,11 @@
       <p>Configure phases and settings, or add sample tasks to explore the chart.</p>
       <div class="gantt-empty-state-actions">
         <button type="button" class="btn-empty-primary" id="ganttEmptyConfigure">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z"/><circle cx="12" cy="12" r="2.5" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
           Configure project
         </button>
         <button type="button" class="btn-empty-secondary" id="ganttEmptyPopulate">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0 1 18 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.25m-8.25-3 1.5 1.5 3-3.75"/></svg>
           Add sample tasks
         </button>
       </div>
@@ -3582,7 +3870,7 @@
             </div>
           </div>
           <div class="settings-section">
-            <div class="settings-toggle-row" title="When enabled (fixed phases only), increasing a phase's sprint count will shift later tasks so they stay after the extended phase.">
+            <div class="settings-toggle-row" data-tooltip="When enabled (fixed phases only), increasing a phase's sprint count will shift later tasks so they stay after the extended phase.">
               <label for="settingsMoveTasksWhenSprintExtended" class="settings-toggle-label">Move tasks when a sprint is extended</label>
               <label class="settings-toggle-switch" aria-hidden="true">
                 <input type="checkbox" id="settingsMoveTasksWhenSprintExtended">
@@ -3591,7 +3879,7 @@
             </div>
           </div>
           <div class="settings-section settings-snap-to-sprint-wrap" id="settingsSnapToSprintWrap">
-            <div class="settings-toggle-row" title="When enabled, dragging a task start or end date near a sprint boundary (every 2 weeks) will snap it to that date.">
+            <div class="settings-toggle-row" data-tooltip="When enabled, dragging a task start or end date near a sprint boundary (every 2 weeks) will snap it to that date.">
               <label for="settingsSnapToSprint" class="settings-toggle-label">Snap to sprint</label>
               <label class="settings-toggle-switch" aria-hidden="true">
                 <input type="checkbox" id="settingsSnapToSprint">
@@ -3644,67 +3932,79 @@
             <div class="storage-type-picker" role="group" aria-label="Storage type">
               <div class="storage-type-tiles" id="storageTypeTiles">
                 <div class="storage-type-tile" data-value="github" role="button" tabindex="0">
-                  <div class="storage-type-tile-title">GitHub sync</div>
+                  <div class="storage-type-tile-heading">
+                    <span class="storage-type-tile-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 7.5h-.15A4.5 4.5 0 1 0 7.5 16.5h9a4.5 4.5 0 1 0-.15-9h-.15M12 12v9m0-9l3 3m-3-3l-3 3"/></svg></span>
+                    <span class="storage-type-tile-title">GitHub sync</span>
+                  </div>
                   <div class="storage-type-tile-desc">Load and push a gantt-data.json file to a GitHub repo.</div>
-                </div>
-                <div class="storage-type-tile" data-value="supabase" role="button" tabindex="0">
-                  <div class="storage-type-tile-title">Supabase (cloud)</div>
-                  <div class="storage-type-tile-desc">Cloud save with login. Boards sync across devices.</div>
-                </div>
-                <div class="storage-type-tile" data-value="local_storage" role="button" tabindex="0" title="Stored in browser local storage. Data will be erased if browser cache or site data is cleared. Use backup/restore to save a copy.">
-                  <div class="storage-type-tile-title">Local storage</div>
-                  <div class="storage-type-tile-desc">Store in the browser with optional backup/restore to a file.</div>
-                </div>
-                <div class="storage-type-tile" data-value="local_cache" role="button" tabindex="0" title="Stored in browser cache. Data will be erased if browser cache or site data is cleared. Not recommended for important data.">
-                  <div class="storage-type-tile-title">Local cache</div>
-                  <div class="storage-type-tile-desc">Browser cache only. Data can be lost if cache is cleared. Not recommended.</div>
-                </div>
-              </div>
-              <div class="storage-details" id="storageDetails">
-                <div class="storage-details-panel" id="storageDetailsGitHub" data-type="github">
-                  <label for="sharedFileUrl" title="JSON URL (GitHub raw or any CORS-accessible URL)">Sync File</label>
-                  <div class="shared-file-input-wrap">
-                    <input type="url" id="sharedFileUrl" placeholder="https://raw.githubusercontent.com/.../gantt-data.json" />
-                    <div class="shared-file-input-icons">
-                      <button type="button" class="shared-file-input-icon" id="sharedFileLoad" title="Load from URL" aria-label="Load from URL"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
-                      <button type="button" class="shared-file-input-icon" id="sharedFileRefresh" title="Refresh" aria-label="Refresh"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></button>
-                      <button type="button" class="shared-file-input-icon" id="sharedFileDownload" title="Download JSON" aria-label="Download JSON"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
-                    </div>
-                  </div>
-                  <div class="shared-file-modal-status" id="sharedFileModalStatus">
-                    <span class="shared-file-modal-status-dot none" id="sharedFileModalStatusDot"></span>
-                    <span class="shared-file-modal-status-text" id="sharedFileModalStatusText">Not set</span>
-                  </div>
-                  <div class="shared-file-modal-section">
-                    <label for="sharedFileGitHubToken" title="Push to GitHub (owner): Personal Access Token with repo scope">Access Token</label>
-                    <div class="shared-file-modal-token-row">
-                      <div class="shared-file-input-wrap shared-file-input-wrap-token">
-                        <input type="password" id="sharedFileGitHubToken" placeholder="ghp_..." autocomplete="off" />
-                        <div class="shared-file-input-icons">
-                          <button type="button" class="shared-file-input-icon" id="sharedFileClearToken" title="Clear token" aria-label="Clear token"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-                          <button type="button" class="shared-file-input-icon" id="sharedFilePush" title="Push to GitHub" aria-label="Push to GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></button>
-                        </div>
+                  <div class="storage-type-tile-content">
+                    <label for="sharedFileUrl" data-tooltip="JSON URL (GitHub raw or any CORS-accessible URL)">Sync File</label>
+                    <div class="shared-file-input-wrap">
+                      <input type="url" id="sharedFileUrl" placeholder="https://raw.githubusercontent.com/.../gantt-data.json" />
+                      <div class="shared-file-input-icons">
+                        <button type="button" class="shared-file-input-icon" id="sharedFileLoad" data-tooltip="Load from URL" aria-label="Load from URL"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+                        <button type="button" class="shared-file-input-icon" id="sharedFileRefresh" data-tooltip="Refresh" aria-label="Refresh"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></button>
+                        <button type="button" class="shared-file-input-icon" id="sharedFileDownload" data-tooltip="Download JSON" aria-label="Download JSON"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
                       </div>
                     </div>
-                    <div class="shared-file-modal-status shared-file-modal-token-status" id="sharedFileModalTokenStatus">
-                      <span class="shared-file-modal-status-dot none" id="sharedFileModalTokenStatusDot"></span>
-                      <span class="shared-file-modal-status-text" id="sharedFileModalTokenStatusText">Not set</span>
+                    <div class="shared-file-modal-status" id="sharedFileModalStatus">
+                      <span class="shared-file-modal-status-dot none" id="sharedFileModalStatusDot"></span>
+                      <span class="shared-file-modal-status-text" id="sharedFileModalStatusText">Not set</span>
+                    </div>
+                    <div class="shared-file-modal-section">
+                      <label for="sharedFileGitHubToken" data-tooltip="Push to GitHub (owner): Personal Access Token with repo scope">Access Token</label>
+                      <div class="shared-file-modal-token-row">
+                        <div class="shared-file-input-wrap shared-file-input-wrap-token">
+                          <input type="password" id="sharedFileGitHubToken" placeholder="ghp_..." autocomplete="off" />
+                          <div class="shared-file-input-icons">
+                            <button type="button" class="shared-file-input-icon" id="sharedFileClearToken" data-tooltip="Clear token" aria-label="Clear token"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+                            <button type="button" class="shared-file-input-icon" id="sharedFilePush" data-tooltip="Push to GitHub" aria-label="Push to GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></button>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="shared-file-modal-status shared-file-modal-token-status" id="sharedFileModalTokenStatus">
+                        <span class="shared-file-modal-status-dot none" id="sharedFileModalTokenStatusDot"></span>
+                        <span class="shared-file-modal-status-text" id="sharedFileModalTokenStatusText">Not set</span>
+                      </div>
+                      <small class="settings-hint">Files are read-only without an access token. Add a Personal Access Token with repo scope to push changes.</small>
+                    </div>
+                    <div class="storage-github-error" id="storageGitHubError" role="alert"></div>
+                  </div>
+                </div>
+                <div class="storage-type-tile" data-value="supabase" role="button" tabindex="0">
+                  <div class="storage-type-tile-heading">
+                    <span class="storage-type-tile-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg></span>
+                    <span class="storage-type-tile-title">Supabase (cloud)</span>
+                  </div>
+                  <div class="storage-type-tile-desc">Cloud save with login. Boards sync across devices.</div>
+                  <div class="storage-type-tile-content">
+                    <button type="button" class="home-shared-file-btn" id="settingsSupabaseAuthBtn">Log in or configure Supabase</button>
+                    <small class="settings-hint" id="settingsSupabaseHint">If the button does nothing, enable Supabase in template.html (uncomment the Supabase script line).</small>
+                  </div>
+                </div>
+                <div class="storage-type-tile" data-value="local_storage" role="button" tabindex="0" data-tooltip="Stored in browser local storage. Data will be erased if browser cache or site data is cleared. Use backup/restore to save a copy.">
+                  <div class="storage-type-tile-heading">
+                    <span class="storage-type-tile-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125"/></svg></span>
+                    <span class="storage-type-tile-title">Local storage</span>
+                  </div>
+                  <div class="storage-type-tile-desc">Store in the browser with optional backup/restore to a file.</div>
+                  <div class="storage-type-tile-content">
+                    <div class="storage-type-tile-actions">
+                      <button type="button" class="home-shared-file-btn" id="storageModalBackupToFile">Backup to file</button>
+                      <input type="file" id="storageModalRestoreFileInput" accept=".json,application/json" style="display: none;">
+                      <button type="button" class="home-shared-file-btn" id="storageModalRestoreFromFile">Restore from file</button>
                     </div>
                   </div>
                 </div>
-                <div class="storage-details-panel" id="storageDetailsSupabase" data-type="supabase">
-                  <button type="button" class="home-shared-file-btn" id="settingsSupabaseAuthBtn">Log in or configure Supabase</button>
-                  <small class="settings-hint" id="settingsSupabaseHint">If the button does nothing, enable Supabase in template.html (uncomment the Supabase script line).</small>
-                </div>
-                <div class="storage-details-panel" id="storageDetailsLocalStorage" data-type="local_storage">
-                  <div class="storage-local-tile-actions">
-                    <button type="button" class="home-shared-file-btn" id="storageModalBackupToFile">Backup to file</button>
-                    <input type="file" id="storageModalRestoreFileInput" accept=".json,application/json" style="display: none;">
-                    <button type="button" class="home-shared-file-btn" id="storageModalRestoreFromFile">Restore from file</button>
+                <div class="storage-type-tile" data-value="local_cache" role="button" tabindex="0" data-tooltip="Stored in browser cache. Data will be erased if browser cache or site data is cleared. Not recommended for important data.">
+                  <div class="storage-type-tile-heading">
+                    <span class="storage-type-tile-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z"/></svg></span>
+                    <span class="storage-type-tile-title">Local cache</span>
                   </div>
-                </div>
-                <div class="storage-details-panel" id="storageDetailsLocalCache" data-type="local_cache">
-                  <p class="settings-hint" style="margin: 0;">No configuration needed. Save to apply.</p>
+                  <div class="storage-type-tile-desc">Browser cache only. Data can be lost if cache is cleared. Not recommended.</div>
+                  <div class="storage-type-tile-content">
+                    <p class="settings-hint" style="margin: 0;">No configuration needed. Save to apply.</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -3718,9 +4018,9 @@
   </div><!-- /.settings-sidebar -->
   </div><!-- /.app-views-wrap -->
 
-  <span class="home-readonly-badge" id="homeReadonlyBadge" aria-hidden="true" style="display: none;">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-    <span>Read-only mode</span>
+  <span class="home-readonly-badge" id="homeReadonlyBadge" role="button" tabindex="0" data-tooltip="Sync Settings" style="display: none;">
+    <span class="home-readonly-badge-dot synced" id="homeReadonlyBadgeDot"></span>
+    <span id="homeReadonlyBadgeText">Synced with Github (read)</span>
   </span>
 
   <div class="gantt-auth-modal-overlay" id="ganttAuthModalOverlay">
@@ -3772,6 +4072,59 @@
   <!-- <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script> -->
   <script src="supabase-storage.js"></script>
   <script>
+    (function initCustomTooltips() {
+      var tooltip = document.getElementById("customTooltip");
+      var showTimer, hideTimer;
+      function show(el) {
+        clearTimeout(hideTimer);
+        var text = el.getAttribute("data-tooltip-disabled") && (el.disabled === true || el.getAttribute("aria-disabled") === "true") ? el.getAttribute("data-tooltip-disabled") : el.getAttribute("data-tooltip");
+        if (!text || !text.trim()) return;
+        tooltip.textContent = text.trim();
+        tooltip.classList.add("measuring");
+        tooltip.style.left = "0";
+        tooltip.style.top = "0";
+        var ttRect = tooltip.getBoundingClientRect();
+        tooltip.classList.remove("measuring");
+        var rect = el.getBoundingClientRect();
+        var x = rect.left + (rect.width / 2) - (ttRect.width / 2);
+        var y = rect.top - ttRect.height - 6;
+        if (y < 8) y = rect.bottom + 6;
+        if (x < 8) x = 8;
+        if (x + ttRect.width > window.innerWidth - 8) x = window.innerWidth - ttRect.width - 8;
+        tooltip.style.left = x + "px";
+        tooltip.style.top = y + "px";
+        tooltip.classList.add("visible");
+        tooltip.setAttribute("aria-hidden", "false");
+      }
+      function hide() {
+        hideTimer = setTimeout(function () {
+          tooltip.classList.remove("visible");
+          tooltip.setAttribute("aria-hidden", "true");
+        }, 50);
+      }
+      document.body.addEventListener("mouseenter", function (e) {
+        var el = e.target.closest("[data-tooltip]");
+        if (!el) return;
+        clearTimeout(showTimer);
+        showTimer = setTimeout(function () { show(el); }, 400);
+      }, true);
+      document.body.addEventListener("mouseleave", function (e) {
+        var el = e.target.closest("[data-tooltip]");
+        if (!el) return;
+        clearTimeout(showTimer);
+        hide();
+      }, true);
+      document.body.addEventListener("focusin", function (e) {
+        var el = e.target.closest("[data-tooltip]");
+        if (!el) return;
+        clearTimeout(hideTimer);
+        show(el);
+      }, true);
+      document.body.addEventListener("focusout", function (e) {
+        var el = e.target.closest("[data-tooltip]");
+        if (!el || !el.contains(e.relatedTarget)) hide();
+      }, true);
+    })();
     const DEFAULT_WEEK_START = new Date(2026, 1, 2); // Feb 2, 2026
     const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
     let WEEK_START = new Date(DEFAULT_WEEK_START);
@@ -3803,6 +4156,14 @@
     }
     function setStorageMode(mode) {
       try { if (mode) localStorage.setItem(STORAGE_MODE_KEY, mode); else localStorage.removeItem(STORAGE_MODE_KEY); } catch (e) {}
+    }
+    function getStorageModeLabel(mode) {
+      if (!mode) return "Local cache";
+      if (mode === "github") return "GitHub sync";
+      if (mode === "supabase") return "Supabase (cloud)";
+      if (mode === "local_storage") return "Local storage";
+      if (mode === "local_cache") return "Local cache";
+      return mode;
     }
     function clearLocalProjectData() {
       try {
@@ -4035,6 +4396,7 @@
     }
 
     function renderHomeTimelinePreview(projectId, containerEl) {
+      if (!containerEl || !document.body.contains(containerEl)) return;
       containerEl.innerHTML = "";
       const bars = getProjectTasksForPreview(projectId);
       if (bars.length === 0) {
@@ -7281,7 +7643,10 @@
     const addBtn = document.createElement("button");
     addBtn.id = "addTaskFab";
     addBtn.className = "add-task-fab";
-    addBtn.textContent = "+";
+    const addBtnIcon = document.createElement("span");
+    addBtnIcon.className = "add-task-fab-icon";
+    addBtnIcon.textContent = "+";
+    addBtn.appendChild(addBtnIcon);
     addBtn.setAttribute("aria-label", "Add task");
     addBtn.setAttribute("aria-haspopup", "menu");
     addBtn.setAttribute("aria-expanded", "false");
@@ -7290,6 +7655,7 @@
     function closeFabPhaseMenu() {
       if (!fabPhaseMenu) return;
       fabPhaseMenu.classList.remove("visible");
+      addBtn.classList.remove("fab-open");
       addBtn.setAttribute("aria-expanded", "false");
       document.removeEventListener("click", fabPhaseMenu._outsideClick);
       document.removeEventListener("keydown", fabPhaseMenu._escapeKey);
@@ -7353,6 +7719,7 @@
       fabPhaseMenu.style.bottom = (window.innerHeight - fabRect.top + 8) + "px";
       fabPhaseMenu.style.top = "auto";
       fabPhaseMenu.classList.add("visible");
+      addBtn.classList.add("fab-open");
       addBtn.setAttribute("aria-expanded", "true");
       fabPhaseMenu._outsideClick = (e) => {
         if (fabPhaseMenu.contains(e.target) || addBtn.contains(e.target)) return;
@@ -8177,7 +8544,9 @@
       }
     }
     function saveSettingsFromModal() {
-      if (typeof window.hasWriteAccess === "function" && !window.hasWriteAccess()) return;
+      var storageTabActive = !!document.querySelector('.settings-tab[data-tab="storage"].active');
+      var allowStorageSave = storageTabActive && document.querySelector('.storage-type-tile.selected');
+      if (!allowStorageSave && typeof window.hasWriteAccess === "function" && !window.hasWriteAccess()) return;
       if (window._settingsContext === "home") {
         var nameEl = document.getElementById("settingsHomeName");
         var homeDescEl = document.getElementById("settingsHomeDescription");
@@ -8193,6 +8562,64 @@
         var pageDescEl = document.getElementById("homePageDescription");
         if (homeTitleEl) homeTitleEl.textContent = name;
         if (pageDescEl) pageDescEl.textContent = homeDesc;
+        var storageTabActive = !!document.querySelector('.settings-tab[data-tab="storage"].active');
+        var selectedTile = storageTabActive && document.querySelector('.storage-type-tile.selected');
+        var selectedType = selectedTile ? selectedTile.dataset.value : null;
+        if (selectedType && typeof setStorageMode === "function") {
+          var prevMode = typeof getStorageMode === "function" ? getStorageMode() : null;
+          var prevUrl, prevToken;
+          try { prevUrl = localStorage.getItem(SHARED_FILE_URL_KEY); prevToken = localStorage.getItem(GITHUB_TOKEN_KEY); } catch (e) {}
+          if (selectedType === "github") {
+            var urlEl = document.getElementById("sharedFileUrl");
+            var tokenEl = document.getElementById("sharedFileGitHubToken");
+            try {
+              if (urlEl && (urlEl.value || "").trim()) localStorage.setItem(SHARED_FILE_URL_KEY, urlEl.value.trim());
+              if (tokenEl && (tokenEl.value || "").trim()) localStorage.setItem(GITHUB_TOKEN_KEY, tokenEl.value.trim());
+            } catch (e) {}
+            setStorageMode("github");
+            if (typeof applyStorageModeUI === "function") applyStorageModeUI("github");
+            currentProjectId = null;
+            if (typeof location !== "undefined") location.hash = "#/";
+            if (typeof handleRoute === "function") handleRoute();
+            if (typeof window.__doLoadFromStoredUrl === "function") window.__doLoadFromStoredUrl();
+            else if (typeof window.__fetchSharedUpdates === "function") window.__fetchSharedUpdates();
+          } else if (selectedType === "supabase") {
+            if (typeof applyStorageModeUI === "function") applyStorageModeUI("supabase");
+          } else if (selectedType === "local_storage" || selectedType === "local_cache") {
+            if (selectedType === "local_cache") {
+              try { localStorage.removeItem(SHARED_FILE_URL_KEY); localStorage.removeItem(GITHUB_TOKEN_KEY); } catch (e) {}
+              if (typeof clearLocalProjectData === "function") clearLocalProjectData();
+            }
+            setStorageMode(selectedType);
+            if (typeof applyStorageModeUI === "function") applyStorageModeUI(selectedType);
+            currentProjectId = null;
+            if (typeof location !== "undefined") location.hash = "#/";
+            if (typeof handleRoute === "function") handleRoute();
+          }
+          if (typeof updateWriteAccessUI === "function") updateWriteAccessUI();
+          if (typeof showToast === "function" && typeof getStorageModeLabel === "function") {
+            showToast("Storage changed to " + getStorageModeLabel(selectedType), {
+              onUndo: function () {
+                try {
+                  if (prevMode === "github" && prevUrl) localStorage.setItem(SHARED_FILE_URL_KEY, prevUrl);
+                  if (prevMode === "github" && prevToken) localStorage.setItem(GITHUB_TOKEN_KEY, prevToken);
+                  if (selectedType === "local_cache" && prevMode !== "github") {
+                    try { if (prevUrl) localStorage.setItem(SHARED_FILE_URL_KEY, prevUrl); if (prevToken) localStorage.setItem(GITHUB_TOKEN_KEY, prevToken); } catch (e) {}
+                  }
+                } catch (e) {}
+                setStorageMode(prevMode || "local_cache");
+                if (typeof applyStorageModeUI === "function") applyStorageModeUI(prevMode || "local_cache");
+                currentProjectId = null;
+                if (typeof location !== "undefined") location.hash = "#/";
+                if (typeof handleRoute === "function") handleRoute();
+                if (prevMode === "github" && typeof window.__doLoadFromStoredUrl === "function") window.__doLoadFromStoredUrl();
+                if (typeof updateWriteAccessUI === "function") updateWriteAccessUI();
+                if (typeof renderHomeView === "function") renderHomeView();
+                if (typeof window.switchStorageTab === "function") window.switchStorageTab(prevMode === "local_storage" || prevMode === "local_cache" ? "local" : "external");
+              }
+            });
+          }
+        }
         closeSettingsModal();
         if (typeof renderHomeView === "function") renderHomeView();
         return;
@@ -8295,6 +8722,9 @@
       var selectedTile = storageTabActive && document.querySelector('.storage-type-tile.selected');
       var selectedType = selectedTile ? selectedTile.dataset.value : null;
       if (selectedType && typeof setStorageMode === "function") {
+        var prevMode = typeof getStorageMode === "function" ? getStorageMode() : null;
+        var prevUrl, prevToken;
+        try { prevUrl = localStorage.getItem(SHARED_FILE_URL_KEY); prevToken = localStorage.getItem(GITHUB_TOKEN_KEY); } catch (e) {}
         if (selectedType === "github") {
           var urlEl = document.getElementById("sharedFileUrl");
           var tokenEl = document.getElementById("sharedFileGitHubToken");
@@ -8323,6 +8753,26 @@
           if (typeof handleRoute === "function") handleRoute();
         }
         if (typeof updateWriteAccessUI === "function") updateWriteAccessUI();
+        if (typeof showToast === "function" && typeof getStorageModeLabel === "function") {
+          showToast("Storage changed to " + getStorageModeLabel(selectedType), {
+            onUndo: function () {
+              try {
+                if (prevMode === "github" && prevUrl) localStorage.setItem(SHARED_FILE_URL_KEY, prevUrl);
+                if (prevMode === "github" && prevToken) localStorage.setItem(GITHUB_TOKEN_KEY, prevToken);
+                if (selectedType === "local_cache" && prevMode !== "github") {
+                  try { if (prevUrl) localStorage.setItem(SHARED_FILE_URL_KEY, prevUrl); if (prevToken) localStorage.setItem(GITHUB_TOKEN_KEY, prevToken); } catch (e) {}
+                }
+              } catch (e) {}
+              setStorageMode(prevMode || "local_cache");
+              if (typeof applyStorageModeUI === "function") applyStorageModeUI(prevMode || "local_cache");
+              currentProjectId = null;
+              if (typeof location !== "undefined") location.hash = "#/";
+              if (typeof handleRoute === "function") handleRoute();
+              if (prevMode === "github" && typeof window.__doLoadFromStoredUrl === "function") window.__doLoadFromStoredUrl();
+              if (typeof updateWriteAccessUI === "function") updateWriteAccessUI();
+            }
+          });
+        }
       }
 
       closeSettingsModal();
@@ -8494,40 +8944,27 @@
     const DEFAULT_HOME_TITLE = "Boards";
     const DEFAULT_HOME_DESC = "Create and open boards. Each board has its own tasks and settings.";
     let homePageHeaderInited = false;
-    function saveHomePageHeader() {
-      const titleEl = document.getElementById("homePageTitle");
-      const descEl = document.getElementById("homePageDescription");
-      if (!titleEl || !descEl) return;
-      const title = (titleEl.textContent || "").trim() || DEFAULT_HOME_TITLE;
-      const desc = (descEl.textContent || "").trim() || DEFAULT_HOME_DESC;
-      localStorage.setItem(HOME_TITLE_KEY, title);
-      localStorage.setItem(HOME_DESC_KEY, desc);
-    }
     function initHomePageHeader() {
       const titleEl = document.getElementById("homePageTitle");
       const descEl = document.getElementById("homePageDescription");
       if (!titleEl || !descEl) return;
+      if (homePageHeaderInited) return;
+      homePageHeaderInited = true;
       const savedTitle = localStorage.getItem(HOME_TITLE_KEY);
       const savedDesc = localStorage.getItem(HOME_DESC_KEY);
       titleEl.textContent = (savedTitle != null && savedTitle !== "") ? savedTitle : DEFAULT_HOME_TITLE;
       descEl.textContent = (savedDesc != null && savedDesc !== "") ? savedDesc : DEFAULT_HOME_DESC;
-      if (!homePageHeaderInited) {
-        homePageHeaderInited = true;
-        const saveTitle = () => {
-          const v = (titleEl.textContent || "").trim() || DEFAULT_HOME_TITLE;
-          if (!v) titleEl.textContent = DEFAULT_HOME_TITLE;
-          localStorage.setItem(HOME_TITLE_KEY, (titleEl.textContent || "").trim() || DEFAULT_HOME_TITLE);
-        };
-        const saveDesc = () => {
-          const v = (descEl.textContent || "").trim() || DEFAULT_HOME_DESC;
-          if (!v) descEl.textContent = DEFAULT_HOME_DESC;
-          localStorage.setItem(HOME_DESC_KEY, (descEl.textContent || "").trim() || DEFAULT_HOME_DESC);
-        };
-        titleEl.addEventListener("blur", saveTitle);
-        descEl.addEventListener("blur", saveDesc);
-      }
     }
+    var _renderHomeViewTimer = null;
+    var _renderHomeViewDebounceMs = 50;
     function renderHomeView() {
+      if (_renderHomeViewTimer) clearTimeout(_renderHomeViewTimer);
+      _renderHomeViewTimer = setTimeout(function () {
+        _renderHomeViewTimer = null;
+        renderHomeViewImmediate();
+      }, _renderHomeViewDebounceMs);
+    }
+    function renderHomeViewImmediate() {
       const listEl = document.getElementById("homeProjectList");
       if (!listEl) return;
       if (typeof window.hasWriteAccess === "function" && !window.hasWriteAccess()) homeEditProjectId = null;
@@ -8536,6 +8973,16 @@
       const badgeEl = document.getElementById("homeProjectCountBadge");
       if (badgeEl) badgeEl.textContent = String(projects.length);
       listEl.innerHTML = "";
+      if (projects.length === 0) {
+        const emptyWrap = document.createElement("div");
+        emptyWrap.className = "home-empty-state";
+        emptyWrap.setAttribute("aria-live", "polite");
+        const canWrite = typeof window.hasWriteAccess === "function" && window.hasWriteAccess();
+        const createBtn = canWrite ? '<button type="button" class="home-empty-state-create-btn home-empty-state-new-btn" aria-label="Create my first board">Create my first board</button>' : "";
+        emptyWrap.innerHTML = '<div class="home-empty-state-visual"><span class="home-empty-state-bar bar-1" aria-hidden="true"></span><span class="home-empty-state-bar bar-2" aria-hidden="true"></span><span class="home-empty-state-bar bar-3" aria-hidden="true"></span><span class="home-empty-state-bar bar-4" aria-hidden="true"></span><div class="home-empty-state-line" aria-hidden="true"></div></div><h2 class="home-empty-state-title">Transform the way you work</h2><p class="home-empty-state-subtitle">Spend 10 minutes now to save 10 hours later.</p>' + createBtn;
+        listEl.appendChild(emptyWrap);
+        return;
+      }
       projects.forEach(p => {
         const isEditMode = p.id === homeEditProjectId;
         const card = document.createElement("div");
@@ -8552,10 +8999,13 @@
           const previewWrap = document.createElement("div");
           previewWrap.className = "home-project-timeline-preview" + (isEditMode ? " home-timeline-empty" : "");
           if (!isEditMode) {
+            const loadPreview = () => renderHomeTimelinePreview(p.id, previewWrap);
             if (window.ganttStorage?.isCloudEnabled()) {
-              window.ganttStorage.ensureBoardDataLoaded(p.id).then(() => renderHomeTimelinePreview(p.id, previewWrap));
+              window.ganttStorage.ensureBoardDataLoaded(p.id).then(() => {
+                setTimeout(loadPreview, 350);
+              });
             } else {
-              renderHomeTimelinePreview(p.id, previewWrap);
+              requestAnimationFrame(() => requestAnimationFrame(loadPreview));
             }
           }
           card.appendChild(previewWrap);
@@ -8772,6 +9222,7 @@
         const ganttGrid = document.getElementById("ganttGrid");
         ganttGrid?.querySelectorAll(".gantt-row:not(.gantt-header)").forEach(r => { r.draggable = true; });
         if (typeof window.updateWriteAccessUI === "function") window.updateWriteAccessUI();
+        if (typeof applyStorageModeUI === "function") applyStorageModeUI(getStorageMode() || "local_cache");
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
             if (homeView) homeView.classList.add("active");
@@ -8780,7 +9231,7 @@
         });
         return;
       }
-      if (homeView && homeView.classList.contains("active") && typeof saveHomePageHeader === "function") saveHomePageHeader();
+      if (homeView && homeView.classList.contains("active")) { /* home title/description edited in settings only */ }
       if (window.ganttStorage?.isCloudEnabled()) await window.ganttStorage.ensureBoardDataLoaded(id);
       const sameProject = currentProjectId === id;
       currentProjectId = id;
@@ -8889,24 +9340,6 @@
       if (titleEl) titleEl.textContent = header.title;
       if (descEl) descEl.textContent = header.description;
       if (currentProjectId) ensureProjectInList(currentProjectId, header.title);
-      const saveHeader = () => {
-        let title = (titleEl?.textContent || "").trim() || DEFAULT_PAGE_TITLE;
-        let desc = (descEl?.textContent || "").trim() || DEFAULT_PAGE_DESCRIPTION;
-        if (titleEl && !titleEl.textContent.trim()) { titleEl.textContent = title; }
-        if (descEl && !descEl.textContent.trim()) { descEl.textContent = desc; }
-        savePageHeader(title, desc);
-        if (currentProjectId) {
-          ensureProjectInList(currentProjectId, title);
-          const url = getProjectUrl({ id: currentProjectId, name: title });
-          if (typeof history !== "undefined" && history.replaceState) {
-            history.replaceState(null, "", url);
-          } else {
-            location.hash = url;
-          }
-        }
-      };
-      if (titleEl) titleEl.addEventListener("blur", saveHeader);
-      if (descEl) descEl.addEventListener("blur", saveHeader);
       document.getElementById("settingsBtn")?.addEventListener("click", openSettingsModal);
       document.getElementById("settingsBarStyle")?.addEventListener("click", (e) => {
         const opt = e.target.closest(".settings-segmented-option");
@@ -10058,7 +10491,7 @@
       if (mode === "github") {
         if (sec) sec.style.display = "";
         if (backupSec) backupSec.style.display = "none";
-        if (storageBtn) storageBtn.style.display = "none";
+        if (storageBtn) storageBtn.style.display = "";
         if (typeof initSharedFile === "function") initSharedFile();
       } else {
         window.hasWriteAccess = function () { return true; };
@@ -10118,7 +10551,6 @@
       initSettingsSidebar();
       (function setupStorageTypePicker() {
         var tiles = document.querySelectorAll(".storage-type-tile");
-        var detailPanels = document.querySelectorAll(".storage-details-panel");
         function getCurrentStorageType() {
           var mode = getStorageMode() || "github";
           if (window.ganttStorage?.isCloudEnabled && window.ganttStorage.isCloudEnabled()) return "supabase";
@@ -10128,11 +10560,11 @@
           tiles.forEach(function (t) {
             t.classList.toggle("selected", t.dataset.value === type);
           });
-          detailPanels.forEach(function (p) {
-            p.classList.toggle("active", p.dataset.type === type);
-          });
           if (type === "local_storage" && typeof initLocalBackupHandlers === "function") initLocalBackupHandlers();
-          if (type === "github" && typeof updateModalStatus === "function") updateModalStatus();
+          if (type === "github") {
+            if (typeof initSharedFile === "function") initSharedFile();
+            if (typeof updateModalStatus === "function") updateModalStatus();
+          }
         }
         window.switchStorageTab = function (tab) {
           if (tab === "external") switchStorageType("github");
@@ -10162,7 +10594,7 @@
           if (typeof updateModalStatus === "function") updateModalStatus();
         };
         document.getElementById("storageTypeTiles")?.addEventListener("click", function (e) {
-          if (e.target.closest(".storage-local-tile-actions")) return;
+          if (e.target.closest(".storage-type-tile-content")) return;
           var tile = e.target.closest(".storage-type-tile");
           if (!tile) return;
           switchStorageType(tile.dataset.value);
@@ -10198,7 +10630,7 @@
               if (typeof handleRoute === "function") { location.hash = "#/"; handleRoute(); }
               if (typeof renderHomeView === "function") renderHomeView();
               if (typeof window.closeStorageModal === "function") window.closeStorageModal();
-              if (typeof showToast === "function") showToast("Restored from file.", { type: "success" });
+              if (typeof showToast === "function") showToast("Boards restored from file.", { type: "success" });
             } catch (e) { if (typeof showToast === "function") showToast("Restore failed: " + (e && e.message ? e.message : String(e)), { type: "error" }); }
             storageRestoreInput.value = "";
           };
@@ -10304,21 +10736,27 @@
           var fab = document.getElementById("homeFab");
           if (fab) fab.style.display = canWrite ? "" : "none";
           var readonlyBadge = document.getElementById("homeReadonlyBadge");
-          if (readonlyBadge) readonlyBadge.style.display = canWrite ? "none" : "inline-flex";
+          var badgeText = document.getElementById("homeReadonlyBadgeText");
+          var synced = typeof isSynced === "function" && isSynced();
+          if (readonlyBadge) {
+            readonlyBadge.style.display = synced ? "inline-flex" : "none";
+            if (badgeText) {
+              if (typeof syncInProgress !== "undefined" && syncInProgress) badgeText.textContent = "Syncing…";
+              else badgeText.textContent = synced ? (canWrite ? "Synced with Github (write)" : "Synced with Github (read)") : "";
+            }
+            readonlyBadge.setAttribute("data-tooltip", synced && !canWrite ? "You are in read only, add your access token for edit access" : "Sync Settings");
+            readonlyBadge.classList.remove("status-syncing", "status-error");
+            if (synced) {
+              if (typeof syncInProgress !== "undefined" && syncInProgress) readonlyBadge.classList.add("status-syncing");
+              else if (typeof sharedFetchFailCount !== "undefined" && sharedFetchFailCount >= 2) readonlyBadge.classList.add("status-error");
+            }
+          }
           var addFab = document.getElementById("addTaskFab");
           if (addFab) addFab.style.display = canWrite ? "" : "none";
           var settingsBtn = document.getElementById("settingsBtn");
           if (settingsBtn) settingsBtn.style.display = canWrite ? "" : "none";
           var ganttView = document.getElementById("ganttView");
           if (ganttView) ganttView.classList.toggle("gantt-read-only", !canWrite);
-          var homeDesc = document.getElementById("homePageDescription");
-          if (homeDesc) homeDesc.contentEditable = String(canWrite);
-          var homeTitle = document.getElementById("homePageTitle");
-          if (homeTitle) homeTitle.contentEditable = String(canWrite);
-          var pageTitle = document.getElementById("pageTitle");
-          if (pageTitle) pageTitle.contentEditable = String(canWrite);
-          var pageDesc = document.getElementById("pageDescription");
-          if (pageDesc) pageDesc.contentEditable = String(canWrite);
           document.querySelectorAll("#ganttGrid .gantt-row:not(.gantt-header)").forEach(function (r) { r.draggable = canWrite; });
         }
         window.updateWriteAccessUI = updateWriteAccessUI;
@@ -10329,22 +10767,36 @@
             if (statusText) { statusText.textContent = "Syncing…"; statusText.style.display = ""; }
             var openBtn = document.getElementById("sharedFileOpenModal");
             if (openBtn) openBtn.style.display = "none";
+            var sec = document.getElementById("sharedFileSection");
+            if (sec && typeof getStorageMode === "function" && getStorageMode() === "github") sec.style.display = "none";
+            if (typeof updateWriteAccessUI === "function") updateWriteAccessUI();
             return;
           }
           var synced = isSynced();
-          if (statusDot) { statusDot.className = "home-shared-file-status-dot " + (synced ? "synced" : "local"); }
+          var dotClass = "home-shared-file-status-dot " + (synced ? "synced" : "local");
+          if (synced && sharedFetchFailCount >= 2) dotClass += " error";
+          if (statusDot) { statusDot.className = dotClass; }
           if (statusText) {
-            statusText.textContent = synced ? (hasWriteAccess() ? "Synced with GitHub" : "Synced (Read only)") : "";
+            statusText.textContent = synced ? (hasWriteAccess() ? "Synced with Github (write)" : "Synced with Github (read)") : "";
             statusText.style.display = synced ? "" : "none";
           }
           var openBtn = document.getElementById("sharedFileOpenModal");
           if (openBtn) openBtn.style.display = synced ? "none" : "";
+          var sec = document.getElementById("sharedFileSection");
+          if (sec && typeof getStorageMode === "function" && getStorageMode() === "github") {
+            sec.style.display = synced ? "none" : "";
+          }
           if (typeof updateWriteAccessUI === "function") updateWriteAccessUI();
         }
         function updateModalStatus() {
           var url = (urlInput && urlInput.value) ? urlInput.value : "";
           var st = getSharedFileStatus(url);
           var synced = isSynced();
+          if (syncInProgress === "pull") {
+            if (modalStatusDot) { modalStatusDot.className = "shared-file-modal-status-dot synced syncing"; }
+            if (modalStatusText) modalStatusText.textContent = "Syncing…";
+            return;
+          }
           if (modalStatusDot) { modalStatusDot.className = "shared-file-modal-status-dot " + (synced ? "synced" : "local"); }
           if (modalStatusText) modalStatusText.textContent = synced ? "Synced" + (st.type !== "none" ? " \u2022 " + (st.type === "github" ? "GitHub: " + st.label : st.label) : "") : "Local";
         }
@@ -10371,6 +10823,11 @@
         }
         if (openModalBtn) openModalBtn.addEventListener("click", openSharedFileModal);
         if (statusText) statusText.addEventListener("click", openSharedFileModal);
+        var readonlyBadgeEl = document.getElementById("homeReadonlyBadge");
+        if (readonlyBadgeEl) {
+          readonlyBadgeEl.addEventListener("click", openSharedFileModal);
+          readonlyBadgeEl.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openSharedFileModal(); } });
+        }
         if (closeModalBtn) closeModalBtn.addEventListener("click", closeSharedFileModal);
         var clearTokenBtn = document.getElementById("sharedFileClearToken");
         if (clearTokenBtn) clearTokenBtn.addEventListener("click", function () {
@@ -10450,6 +10907,19 @@
             return r.json();
           });
         }
+        function canonicalSnapshotForCompare(obj) {
+          if (obj === null || typeof obj !== "object") return obj;
+          if (Array.isArray(obj)) return obj.map(canonicalSnapshotForCompare);
+          var keys = Object.keys(obj).sort();
+          var out = {};
+          for (var i = 0; i < keys.length; i++) out[keys[i]] = canonicalSnapshotForCompare(obj[keys[i]]);
+          return out;
+        }
+        function snapshotForCompare(snap) {
+          if (!snap || !Array.isArray(snap.projects)) return snap;
+          var projects = snap.projects.slice().sort(function (a, b) { return String(a.id || "").localeCompare(String(b.id || "")); });
+          return canonicalSnapshotForCompare({ projects: projects, boards: snap.boards || {} });
+        }
         function fetchSharedUpdates() {
           if (document.visibilityState !== "visible" || !isSynced()) return;
           if (window.ganttStorage && window.ganttStorage.isCloudEnabled && window.ganttStorage.isCloudEnabled()) return;
@@ -10476,19 +10946,6 @@
                 if (data && data.projects) lastFetchedOid = null;
                 return data;
               });
-          }
-          function canonicalJson(obj) {
-            if (obj === null || typeof obj !== "object") return obj;
-            if (Array.isArray(obj)) return obj.map(canonicalJson);
-            var keys = Object.keys(obj).sort();
-            var out = {};
-            for (var i = 0; i < keys.length; i++) out[keys[i]] = canonicalJson(obj[keys[i]]);
-            return out;
-          }
-          function snapshotForCompare(snap) {
-            if (!snap || !Array.isArray(snap.projects)) return snap;
-            var projects = snap.projects.slice().sort(function (a, b) { return String(a.id || "").localeCompare(String(b.id || "")); });
-            return canonicalJson({ projects: projects, boards: snap.boards || {} });
           }
           fetchPromise
             .then(function (data) {
@@ -10535,6 +10992,7 @@
           if (!u) { if (typeof showToast === "function") showToast("Enter a URL first.", { type: "error" }); return; }
           syncInProgress = "pull";
           updateHomeStatus();
+          if (typeof updateModalStatus === "function") updateModalStatus();
           var gh = parseGitHubRawUrl(u);
           var token;
           try { token = localStorage.getItem(GITHUB_TOKEN_KEY); } catch (e) {}
@@ -10551,23 +11009,51 @@
           }
           loadPromise
             .then(function (data) {
-              importSharedSnapshot(data);
-              try { localStorage.setItem(SHARED_FILE_URL_KEY, u); } catch (e) {}
+              var current = typeof exportSharedSnapshot === "function" ? exportSharedSnapshot() : null;
+              var currentStr = current ? JSON.stringify(snapshotForCompare(current)) : "";
+              var newStr = (data && data.projects) ? JSON.stringify(snapshotForCompare(data)) : "";
+              var dataUnchanged = currentStr && newStr && currentStr === newStr;
+              if (!dataUnchanged) {
+                importSharedSnapshot(data);
+              }
+              try {
+                localStorage.setItem(SHARED_FILE_URL_KEY, u);
+                if (typeof setStorageMode === "function") setStorageMode("github");
+              } catch (e) {}
               if (urlInput) urlInput.value = u;
               updateHomeStatus();
               updateModalStatus();
-              if (typeof handleRoute === "function") { location.hash = "#/"; handleRoute(); } else {
-                if (typeof renderHomeView === "function") renderHomeView();
-                if (currentProjectId && typeof initGantt === "function") initGantt();
-                location.hash = "#/";
+              if (!dataUnchanged) {
+                var settingsOpen = !!document.getElementById("appViewsWrap")?.classList.contains("settings-sidebar-open");
+                if (settingsOpen) {
+                  currentProjectId = null;
+                  if (typeof renderHomeView === "function") renderHomeView();
+                } else {
+                  if (typeof handleRoute === "function") { location.hash = "#/"; handleRoute(); } else {
+                    if (typeof renderHomeView === "function") renderHomeView();
+                    if (currentProjectId && typeof initGantt === "function") initGantt();
+                    location.hash = "#/";
+                  }
+                }
               }
-              if (typeof showToast === "function") showToast("Loaded shared file.", { type: "success" });
+              if (typeof showToast === "function") showToast(dataUnchanged ? "Already up to date." : "Loaded shared file.", { type: "success" });
+              if (typeof clearGitHubError === "function") clearGitHubError();
             })
-            .catch(function (e) { if (typeof showToast === "function") showToast("Load failed: " + (e && e.message ? e.message : String(e)), { type: "error" }); })
-            .finally(function () { syncInProgress = null; updateHomeStatus(); });
+            .catch(function (e) {
+              var msg = e && e.message ? e.message : String(e);
+              if (typeof setGitHubError === "function") setGitHubError("Load failed: " + msg);
+              if (typeof showToast === "function") showToast("Load failed: " + msg, { type: "error" });
+            })
+            .finally(function () { syncInProgress = null; updateHomeStatus(); if (typeof updateModalStatus === "function") updateModalStatus(); });
         }
-        if (loadBtn && urlInput) loadBtn.addEventListener("click", function () { doLoad(urlInput.value); });
+        var githubErrorEl = document.getElementById("storageGitHubError");
+        function setGitHubError(msg) {
+          if (githubErrorEl) { githubErrorEl.textContent = msg || ""; githubErrorEl.classList.toggle("visible", !!(msg && msg.trim())); }
+        }
+        function clearGitHubError() { setGitHubError(""); }
+        if (loadBtn && urlInput) loadBtn.addEventListener("click", function () { clearGitHubError(); doLoad(urlInput.value); });
         if (refreshBtn && urlInput) refreshBtn.addEventListener("click", function () {
+          clearGitHubError();
           var url = urlInput.value.trim() || (function () { try { return localStorage.getItem(SHARED_FILE_URL_KEY) || ""; } catch (e) { return ""; } })();
           doLoad(url);
         });
@@ -10584,7 +11070,11 @@
         function pushToGitHub(token, gh, pushBtn) {
           syncInProgress = "push";
           updateHomeStatus();
-          function showPushError(msg) { safeToast("Push failed: " + msg, { type: "error" }); }
+          if (typeof clearGitHubError === "function") clearGitHubError();
+          function showPushError(msg) {
+            if (typeof setGitHubError === "function") setGitHubError("Push failed: " + msg);
+            safeToast("Push failed: " + msg, { type: "error" });
+          }
           function statusToMessage(status) {
             if (status === 401) return "Invalid or expired token. Check your Personal Access Token and try again.";
             if (status === 403) return "Access denied. Use a token with repo scope (classic) or Contents read/write (fine-grained) and ensure the token has access to this repository.";
@@ -10678,6 +11168,7 @@
                 updateHomeStatus();
                 updateModalStatus();
                 if (typeof showToast === "function") showToast("Pushed to GitHub. Others can Refresh to see changes.", { type: "success" });
+                if (typeof clearGitHubError === "function") clearGitHubError();
               });
             })
             .catch(function (e) {
@@ -10871,7 +11362,8 @@
         document.removeEventListener("keydown", homeNewBoardMenu._escapeKey);
       }
       document.addEventListener("click", async (e) => {
-        if (!e.target.closest("#homeFab")) return;
+        var trigger = e.target.closest("#homeFab, .home-empty-state-new-btn");
+        if (!trigger) return;
         const homeView = document.getElementById("homeView");
         if (!homeView?.classList.contains("active")) return;
         e.preventDefault();
@@ -10880,15 +11372,17 @@
           closeHomeNewBoardMenu();
           return;
         }
-        const fabRect = homeFabBtn.getBoundingClientRect();
-        homeNewBoardMenu.style.left = Math.max(12, fabRect.left) + "px";
-        homeNewBoardMenu.style.right = "auto";
-        homeNewBoardMenu.style.top = (fabRect.bottom + 8) + "px";
+        const triggerEl = trigger.id === "homeFab" ? homeFabBtn : trigger;
+        const rect = triggerEl ? triggerEl.getBoundingClientRect() : null;
+        const rightOffset = rect ? Math.max(12, window.innerWidth - rect.right) : 12;
+        homeNewBoardMenu.style.right = rightOffset + "px";
+        homeNewBoardMenu.style.left = "auto";
+        homeNewBoardMenu.style.top = (rect ? rect.bottom + 8 : 88) + "px";
         homeNewBoardMenu.style.bottom = "auto";
         homeNewBoardMenu.classList.add("visible");
         if (homeFabBtn) homeFabBtn.setAttribute("aria-expanded", "true");
         homeNewBoardMenu._outsideClick = (ev) => {
-          if (homeNewBoardMenu.contains(ev.target) || homeFabBtn?.contains(ev.target)) return;
+          if (homeNewBoardMenu.contains(ev.target) || (triggerEl && triggerEl.contains(ev.target))) return;
           closeHomeNewBoardMenu();
         };
         homeNewBoardMenu._escapeKey = (ev) => { if (ev.key === "Escape") closeHomeNewBoardMenu(); };
@@ -10977,7 +11471,7 @@
             importSharedSnapshot(data);
             if (typeof handleRoute === "function") { location.hash = "#/"; handleRoute(); }
             if (typeof renderHomeView === "function") renderHomeView();
-            if (typeof showToast === "function") showToast("Restored from file.", { type: "success" });
+            if (typeof showToast === "function") showToast("Boards restored from file.", { type: "success" });
           } catch (e) { if (typeof showToast === "function") showToast("Restore failed: " + (e && e.message ? e.message : String(e)), { type: "error" }); }
           fileInput.value = "";
         };
