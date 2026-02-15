@@ -144,6 +144,22 @@
           "blockers": [],
           "links": [],
           "dependsOn": null
+        },
+        {
+          "task": "my first task",
+          "phase": "ideation",
+          "phaseSecondary": null,
+          "party": "kevin c",
+          "start": "3/16",
+          "end": "3/22",
+          "startDate": "2026-03-17T02:54:08.771Z",
+          "endDate": "2026-03-23T02:54:08.771Z",
+          "star": false,
+          "overview": "",
+          "subTasks": [],
+          "blockers": [],
+          "links": [],
+          "dependsOn": null
         }
       ],
       "settings": {
