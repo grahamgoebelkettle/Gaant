@@ -133,6 +133,8 @@
     .gantt-header .gantt-cell:nth-child(4) {
       text-align: center;
     }
+    /* Week divider lines only in table body, not in date header */
+    .gantt-header .gantt-cell:nth-child(n+5) { border-right: none; }
     .gantt-row {
       display: grid;
       grid-template-columns: 200px 140px 120px 88px repeat(var(--gantt-weeks, 8), var(--gantt-week-width, 1fr));
@@ -323,6 +325,21 @@
     }
     .detach-confirm-popup.visible { opacity: 1; visibility: visible; }
     .detach-confirm-popup .detach-confirm-msg { margin-bottom: 12px; }
+    .detach-confirm-hint {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      margin: 0 0 12px 0;
+      line-height: 1.35;
+      max-width: 260px;
+    }
+    .detach-confirm-hint.hidden { display: none; }
+    .phase-confirm-hint {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      margin: 0 0 12px 0;
+      line-height: 1.35;
+      max-width: 260px;
+    }
     .detach-confirm-popup .detach-confirm-actions {
       display: flex;
       gap: 8px;
@@ -357,6 +374,16 @@
       color: #fff;
     }
     .phase-confirm-popup .phase-confirm-move:hover { background: var(--color-general-primary-hover); }
+    @media (prefers-color-scheme: dark) {
+      .phase-confirm-popup .phase-confirm-move,
+      .detach-confirm-popup .detach-confirm-detach {
+        color: #171717;
+      }
+      .phase-confirm-popup .phase-confirm-move:hover,
+      .detach-confirm-popup .detach-confirm-detach:hover {
+        color: #171717;
+      }
+    }
     .delete-confirm-cancel { background: #404040; color: #fafafa; }
     .delete-confirm-cancel:hover { background: #525252; }
     .delete-confirm-delete { background: #dc2626; color: #fff; }
@@ -419,7 +446,7 @@
       opacity: 0;
       transition: opacity 0.15s;
     }
-    .gantt-dependency-line.visible { opacity: 1; }
+    .gantt-dependency-line.visible { opacity: 1; z-index: 100001; }
     .gantt-dependency-line path {
       pointer-events: none;
       cursor: pointer;
@@ -432,8 +459,9 @@
       opacity: 0.9;
       transition: fill 0.15s, stroke 0.15s, opacity 0.15s;
     }
-    .gantt-dependency-line.visible .connector-dot {
-      pointer-events: auto;
+    .gantt-dependency-line .connector-dot {
+      visibility: hidden;
+      pointer-events: none !important;
     }
     .gantt-dependency-line .connector-dot:hover {
       opacity: 1;
@@ -470,6 +498,7 @@
     .gantt-dependency-unlink-btn.visible {
       opacity: 1;
       visibility: visible;
+      z-index: 100002;
     }
     body.shift-mode .gantt-dependency-unlink-btn.connector-unlink-always-visible {
       opacity: 1;
@@ -532,12 +561,13 @@
       left: 50%;
       transform: translateX(-50%) translateY(20px);
       padding: 10px 16px;
-      background: #f59e0b;
-      color: #fff;
+      background: #2e2e2e;
+      color: #fafafa;
       font-size: 13px;
       font-weight: 500;
       border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+      border: 1px solid #404040;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
       z-index: 10000;
       opacity: 0;
       visibility: hidden;
@@ -556,37 +586,41 @@
       visibility: visible;
       transform: translateX(-50%) translateY(0);
     }
+    .gantt-toast.error {
+      background: #3d2a2a;
+      border-color: #5c4040;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
     .gantt-toast-undo {
       margin-left: 4px;
       padding: 2px 8px;
-      background: rgba(255,255,255,0.25);
+      background: rgba(255,255,255,0.12);
       border: none;
       border-radius: 4px;
-      color: #fff;
+      color: #fafafa;
       font-size: 12px;
       font-weight: 600;
       cursor: pointer;
       white-space: nowrap;
     }
     .gantt-toast-undo:hover {
-      background: rgba(255,255,255,0.4);
+      background: rgba(255,255,255,0.2);
     }
     .gantt-drag-guide {
       position: fixed;
       left: 0;
       top: 0;
       width: 2px;
-      height: 100vh;
-      background: #d4d4d4;
+      height: 0;
+      background: #525252;
       pointer-events: none;
       z-index: 9999;
       display: none;
     }
     .gantt-drag-guide.visible { display: block !important; }
     .gantt-drag-guide.snap-zone {
-      background: #f59e0b;
-      width: 3px;
-      box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.4);
+      background: #737373;
+      width: 2px;
     }
     .gantt-bar-snap-indicator {
       position: absolute;
@@ -722,6 +756,20 @@
       container-type: size;
       z-index: 9999;
     }
+    .gantt-bar-stroke {
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .gantt-bar-inner {
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      z-index: 1;
+    }
     .gantt-bar:focus { outline: none; }
     .gantt-bar:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
     .gantt-bar.dragging { cursor: grabbing; opacity: 1; z-index: 5; }
@@ -791,6 +839,12 @@
     body.shift-mode .gantt-bar-duration-hint-hover {
       opacity: 1 !important;
     }
+    .gantt-wrapper[data-show-duration-on-bar="true"] .gantt-bar-duration-hint-hover {
+      opacity: 1;
+    }
+    .gantt-wrapper[data-show-duration-on-bar="true"] .gantt-bar.selected .gantt-bar-duration-hint-hover {
+      opacity: 0 !important;
+    }
     .gantt-bar-tooltip {
       position: fixed;
       z-index: 100000;
@@ -808,7 +862,7 @@
       opacity: 0;
       transition: opacity 0.15s;
     }
-    .gantt-bar-tooltip.visible { opacity: 1; }
+    .gantt-bar-tooltip.visible { opacity: 1; visibility: visible; }
     .gantt-bar-tooltip.has-actions { pointer-events: auto; }
     .gantt-bar-tooltip-actions { margin-top: 8px; padding-top: 8px; border-top: 1px solid #404040; display: flex; flex-direction: column; gap: 6px; }
     .gantt-bar-tooltip-move-label { font-size: 11px; font-weight: 600; color: #a3a3a3; text-transform: uppercase; letter-spacing: 0.04em; }
@@ -831,9 +885,11 @@
     .gantt-bar-tooltip-row .gantt-bar-tooltip-text { flex: 1; min-width: 0; }
     .gantt-bar-tooltip-dep-unlink-wrap { margin-left: 6px; }
     .gantt-bar-tooltip-dep-unlink {
-      background: none; border: none; padding: 0; font-size: 12px; cursor: pointer;
-      color: var(--color-general-primary); text-decoration: underline;
+      background: none; border: none; padding: 2px; font-size: 0; cursor: pointer;
+      color: var(--color-general-primary); text-decoration: none;
+      display: inline-flex; align-items: center; justify-content: center;
     }
+    .gantt-bar-tooltip-dep-unlink svg { flex-shrink: 0; }
     .gantt-bar-tooltip-dep-unlink:hover { opacity: 0.85; }
     .gantt-bar-tooltip-desc .gantt-bar-tooltip-text { max-height: 120px; overflow-y: auto; }
     .gantt-cell[contenteditable] {
@@ -1665,6 +1721,13 @@
       cursor: pointer;
     }
     .settings-save-palette-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+    .settings-party-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+    .settings-party-item { display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: var(--bg-hover); border-radius: 6px; font-size: 13px; }
+    .settings-party-item span { flex: 1; min-width: 0; }
+    .settings-party-item button { flex-shrink: 0; padding: 2px 8px; font-size: 12px; color: var(--text-tertiary); background: transparent; border: none; border-radius: 4px; cursor: pointer; font-family: inherit; }
+    .settings-party-item button:hover { color: #b91c1c; background: rgba(185,28,28,0.1); }
+    .settings-add-party-row { display: flex; gap: 8px; align-items: center; }
+    .settings-party-input { flex: 1; min-width: 0; padding: 8px 12px; font-size: 13px; border: 1px solid var(--border-strong); border-radius: 6px; font-family: inherit; }
     .settings-auto-populate-btn {
       width: 100%;
       margin-top: 8px;
@@ -2177,6 +2240,132 @@
       color: var(--bg-body);
     }
     .home-subtitle { color: var(--text-secondary); margin: 0 0 24px 0; font-size: 14px; }
+    .home-header-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .home-header-actions { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+    .gantt-auth-btn {
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      border-radius: 6px;
+      border: 1px solid var(--border-strong);
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .gantt-auth-btn:hover { background: var(--bg-hover); }
+    .gantt-auth-user { font-size: 13px; color: var(--text-secondary); margin-right: 4px; }
+    .gantt-auth-user-menu {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+    .gantt-auth-user-trigger {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      border-radius: 50%;
+      border: 1px solid var(--border-strong);
+      background: var(--bg-surface);
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.2s, color 0.2s;
+    }
+    .gantt-auth-user-trigger:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+    .gantt-auth-user-trigger svg { width: 18px; height: 18px; }
+    .gantt-auth-user-dropdown {
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      min-width: 220px;
+      padding: 8px 0;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: 8px;
+      box-shadow: var(--shadow-md);
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.15s, visibility 0.15s;
+      pointer-events: none;
+    }
+    .gantt-auth-user-menu:hover .gantt-auth-user-dropdown,
+    .gantt-auth-user-menu.open .gantt-auth-user-dropdown {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+    .gantt-auth-dropdown-item {
+      display: block;
+      width: 100%;
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 13px;
+      color: var(--text-primary);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      text-decoration: none;
+      box-sizing: border-box;
+    }
+    .gantt-auth-dropdown-item:hover {
+      background: var(--bg-hover);
+    }
+    .gantt-auth-dropdown-item.text {
+      color: var(--text-secondary);
+      cursor: default;
+      font-size: 12px;
+    }
+    .gantt-auth-dropdown-item.text:hover { background: transparent; }
+    .gantt-auth-dropdown-divider {
+      height: 1px;
+      margin: 6px 0;
+      background: var(--border-default);
+    }
+    .gantt-auth-dropdown-section-title {
+      padding: 8px 14px 4px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: var(--text-tertiary);
+    }
+    .gantt-auth-modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 10000;
+      display: none; align-items: center; justify-content: center; padding: 24px;
+    }
+    .gantt-auth-modal-overlay.visible { display: flex; }
+    .gantt-auth-modal {
+      background: var(--bg-surface); border-radius: 12px; padding: 24px; width: 100%; max-width: 360px;
+      box-shadow: var(--shadow-md); border: 1px solid var(--border-default);
+    }
+    .gantt-auth-modal h3 { margin: 0 0 16px 0; font-size: 18px; font-weight: 600; }
+    .gantt-auth-modal input[type="email"],
+    .gantt-auth-modal input[type="password"],
+    .gantt-auth-modal input[type="url"],
+    .gantt-auth-modal input[type="text"] { width: 100%; padding: 10px 12px; margin-bottom: 12px; border-radius: 6px; border: 1px solid var(--border-strong); font-size: 14px; box-sizing: border-box; }
+    .gantt-auth-modal .auth-actions { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+    .gantt-auth-modal .auth-error { font-size: 13px; color: #b91c1c; margin: 0 0 12px 0; padding: 8px 10px; background: rgba(185, 28, 28, 0.1); border-radius: 6px; border: 1px solid rgba(185, 28, 28, 0.3); display: none; }
+    .gantt-auth-modal .auth-config-section { margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border-default); }
+    .gantt-auth-modal .auth-config-section label { display: block; font-size: 12px; font-weight: 500; color: var(--text-secondary); margin-bottom: 4px; }
+    .gantt-auth-modal .auth-login-section.hidden { display: none !important; }
+    .gantt-auth-modal .auth-config-section.hidden { display: none !important; }
+    .gantt-auth-modal .gantt-auth-btn-primary { background: var(--accent-primary); color: #fff; border: none; font-weight: 600; }
+    .gantt-auth-modal .gantt-auth-btn-primary:hover { filter: brightness(1.08); }
+    .gantt-auth-modal .gantt-auth-btn-secondary { background: var(--bg-subtle); color: var(--text-primary); border: 1px solid var(--border-strong); }
+    .gantt-auth-modal .auth-remember { display: flex; align-items: center; gap: 8px; margin: 10px 0 14px 0; font-size: 13px; color: var(--text-secondary); }
+    .gantt-auth-modal .auth-remember input { width: auto; margin: 0; }
+    .gantt-auth-modal .auth-use-different { font-size: 12px; color: var(--text-tertiary); margin-top: 16px; }
+    .gantt-auth-modal .auth-use-different button { background: none; border: none; color: var(--text-secondary); cursor: pointer; text-decoration: underline; font-size: 12px; padding: 0; font-family: inherit; }
+    .gantt-auth-modal .auth-use-different button:hover { color: var(--text-primary); }
     .home-project-list {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -2447,7 +2636,23 @@
     <div class="home-sticky-header">
       <div class="home-header-row">
         <h1><span id="homePageTitle" contenteditable="true">Gantt projects</span> <span class="home-project-count-badge" id="homeProjectCountBadge" contenteditable="false">0</span></h1>
-        <button type="button" class="home-new-project-btn" id="homeFab" aria-label="New project">+ New project</button>
+        <div class="home-header-actions">
+          <div class="gantt-auth-wrap gantt-auth-user-menu" id="ganttAuthWrap" style="display: none;">
+            <button type="button" class="gantt-auth-user-trigger" id="ganttAuthUserTrigger" aria-label="Account menu" aria-expanded="false" aria-haspopup="true">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </button>
+            <div class="gantt-auth-user-dropdown" id="ganttAuthUserDropdown" role="menu">
+              <div class="gantt-auth-dropdown-section-title">Account</div>
+              <div class="gantt-auth-dropdown-item text" id="ganttAuthUserEmail" role="presentation"></div>
+              <a href="#" target="_blank" rel="noopener noreferrer" class="gantt-auth-dropdown-item" id="ganttAuthSupabaseLink" role="menuitem">Supabase dashboard</a>
+              <div class="gantt-auth-dropdown-divider"></div>
+              <div class="gantt-auth-dropdown-section-title">Session</div>
+              <button type="button" class="gantt-auth-dropdown-item" id="ganttAuthLogout" role="menuitem">Log out</button>
+            </div>
+          </div>
+          <button type="button" class="gantt-auth-btn" id="ganttAuthLogin">Log in (save to cloud)</button>
+          <button type="button" class="home-new-project-btn" id="homeFab" aria-label="New project">+ New project</button>
+        </div>
       </div>
       <p class="home-subtitle" id="homePageDescription" contenteditable="true">Create and open project schedules. Each project has its own tasks and settings.</p>
     </div>
@@ -2538,6 +2743,13 @@
               </div>
             </div>
           </div>
+          <div class="settings-section">
+            <label class="settings-checkbox-label">
+              <input type="checkbox" id="settingsShowDurationOnBar">
+              <span>Always show days on bar</span>
+            </label>
+            <small class="settings-hint">When enabled, the task duration (e.g. 7 days) is shown on every bar instead of only on hover.</small>
+          </div>
         </div>
         <div class="settings-tab-panel" id="settingsTabStyle">
           <div class="settings-section">
@@ -2591,6 +2803,15 @@
             <small class="settings-hint">When enabled, dragging a task start or end date near a sprint boundary (every 2 weeks) will snap it to that date.</small>
           </div>
           <div class="settings-section">
+            <label>Responsible parties</label>
+            <p class="settings-hint" style="margin-top: 0;">Names shown in the Responsible dropdown for tasks. Saved with the project.</p>
+            <div class="settings-party-list" id="settingsResponsiblePartiesList"></div>
+            <div class="settings-add-party-row">
+              <input type="text" id="settingsPartyInput" placeholder="Add name, press Enter" class="settings-party-input" />
+              <button type="button" class="settings-add-phase" id="settingsAddParty">+ Add</button>
+            </div>
+          </div>
+          <div class="settings-section">
             <label>Sample data</label>
             <button type="button" class="settings-auto-populate-btn" id="settingsAutoPopulate">Auto-populate 5 linked tasks</button>
             <small class="settings-hint">Replaces all tasks with 5 sample tasks (Research → Design → Review → Build → Launch) linked consecutively. Useful to explore the chart without starting from scratch.</small>
@@ -2606,6 +2827,7 @@
   <div class="task-dependency-tooltip" id="taskDependencyTooltip" role="tooltip"></div>
   <div class="detach-confirm-popup" id="detachConfirmPopup" role="dialog" aria-labelledby="detachConfirmMsg">
     <div class="detach-confirm-msg" id="detachConfirmMsg"></div>
+    <p class="detach-confirm-hint" id="detachConfirmHint">You can allow dependent tasks to have their own dates in Settings → General → Dependent tasks.</p>
     <div class="detach-confirm-actions">
       <button type="button" class="detach-confirm-cancel">Keep link</button>
       <button type="button" class="detach-confirm-detach">Detach</button>
@@ -2613,6 +2835,7 @@
   </div>
   <div class="detach-confirm-popup phase-confirm-popup" id="phaseConfirmPopup" role="dialog" aria-labelledby="phaseConfirmMsg">
     <div class="detach-confirm-msg" id="phaseConfirmMsg"></div>
+    <p class="phase-confirm-hint">You can allow dependent tasks to have their own dates in Settings → General → Dependent tasks.</p>
     <div class="detach-confirm-actions">
       <button type="button" class="phase-confirm-keep">Keep current phase</button>
       <button type="button" class="phase-confirm-move">Move to phase</button>
@@ -2637,11 +2860,13 @@
     <path id="ganttDependencyLinePathHover" d="" stroke="transparent" stroke-width="12" fill="none"/>
     <path id="ganttDependencyLinePath" d="" stroke="#a3a3a3" stroke-width="1" stroke-dasharray="4 3" fill="none"/>
     <g id="ganttDependencyLineDot1" class="connector-dot">
+      <circle cx="0" cy="0" r="12" fill="transparent" stroke="none" aria-hidden="true"/>
       <circle cx="0" cy="0" r="3" fill="white" stroke="#d4d4d4" stroke-width="1"/>
       <line x1="-2" y1="0" x2="2" y2="0" stroke="#737373" stroke-width="1" stroke-linecap="round"/>
       <line x1="0" y1="-2" x2="0" y2="2" stroke="#737373" stroke-width="1" stroke-linecap="round"/>
     </g>
     <g id="ganttDependencyLineDot2" class="connector-dot">
+      <circle cx="0" cy="0" r="12" fill="transparent" stroke="none" aria-hidden="true"/>
       <circle cx="0" cy="0" r="3" fill="white" stroke="#d4d4d4" stroke-width="1"/>
       <line x1="-2" y1="0" x2="2" y2="0" stroke="#737373" stroke-width="1" stroke-linecap="round"/>
       <line x1="0" y1="-2" x2="0" y2="2" stroke="#737373" stroke-width="1" stroke-linecap="round"/>
@@ -2671,7 +2896,7 @@
     <div class="gantt-bar-tooltip-row gantt-bar-tooltip-depends">
       <span class="gantt-bar-tooltip-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></span>
       <span class="gantt-bar-tooltip-text"></span>
-      <span class="gantt-bar-tooltip-dep-unlink-wrap" style="display:none"><button type="button" class="gantt-bar-tooltip-dep-unlink" title="Unlink">Unlink</button></span>
+      <span class="gantt-bar-tooltip-dep-unlink-wrap" style="display:none"><button type="button" class="gantt-bar-tooltip-dep-unlink" title="Unlink" aria-label="Unlink"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.84 12.25l1.72-1.71h-.02a5.004 5.004 0 0 0-.12-7.07 5.006 5.006 0 0 0-6.95 0l-1.72 1.71"/><path d="M5.17 11.75l-1.71 1.71a5.004 5.004 0 0 0 .12 7.07 5.006 5.006 0 0 0 6.95 0l1.71-1.71"/><line x1="8" y1="2" x2="8" y2="5"/><line x1="2" y1="8" x2="5" y2="8"/><line x1="16" y1="19" x2="16" y2="22"/><line x1="19" y1="16" x2="22" y2="16"/></svg></button></span>
     </div>
     <div class="gantt-bar-tooltip-row gantt-bar-tooltip-dates">
       <span class="gantt-bar-tooltip-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg></span>
@@ -2714,6 +2939,42 @@
   </div><!-- /#ganttView -->
   </div><!-- /.app-views-wrap -->
 
+  <div class="gantt-auth-modal-overlay" id="ganttAuthModalOverlay">
+    <div class="gantt-auth-modal">
+      <div class="auth-config-section" id="ganttAuthConfigSection">
+        <h3 id="ganttAuthConfigTitle">Connect to Supabase</h3>
+        <p style="font-size: 13px; color: var(--text-secondary); margin: 0 0 12px 0;">Enter your project URL and anon key from Supabase Dashboard → Settings → API.</p>
+        <label for="ganttAuthConfigUrl">Project URL</label>
+        <input type="url" id="ganttAuthConfigUrl" placeholder="https://xxxxx.supabase.co" autocomplete="off" />
+        <label for="ganttAuthConfigAnonKey">Anon key</label>
+        <input type="text" id="ganttAuthConfigAnonKey" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6..." autocomplete="off" />
+        <div class="auth-actions">
+          <button type="button" class="gantt-auth-btn" id="ganttAuthConfigSave">Save & continue</button>
+          <button type="button" class="gantt-auth-btn" id="ganttAuthCancelConfig">Cancel</button>
+        </div>
+      </div>
+      <div class="auth-login-section hidden" id="ganttAuthLoginSection">
+        <h3 id="ganttAuthModalTitle">Log in</h3>
+        <input type="email" id="ganttAuthEmail" placeholder="Email" autocomplete="email" />
+        <input type="password" id="ganttAuthPassword" placeholder="Password" autocomplete="current-password" />
+        <label class="auth-remember">
+          <input type="checkbox" id="ganttAuthRemember" checked />
+          <span>Remember me</span>
+        </label>
+        <div class="auth-actions">
+          <button type="button" class="gantt-auth-btn gantt-auth-btn-primary" id="ganttAuthSubmit">Log in</button>
+          <button type="button" class="gantt-auth-btn gantt-auth-btn-secondary" id="ganttAuthSignupSubmit">Sign up</button>
+        </div>
+        <div class="auth-use-different"><button type="button" id="ganttAuthShowConfig">Use different Supabase project</button></div>
+      </div>
+      <div class="auth-error" id="ganttAuthError" role="alert"></div>
+    </div>
+  </div>
+
+  <!-- Load config from config.js (copy config.example.js to config.js and add your Supabase URL + anon key) -->
+  <script src="config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="supabase-storage.js"></script>
   <script>
     const DEFAULT_WEEK_START = new Date(2026, 1, 2); // Feb 2, 2026
     const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
@@ -2752,16 +3013,18 @@
         .replace(/^-|-$/g, "") || "project";
     }
     function getProjectUrl(project) {
-      const slug = slugify(project?.name || "project");
-      return "#/project/" + slug;
+      const id = project?.id;
+      if (id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) return "#/project/" + id;
+      return "#/project/" + slugify(project?.name || "project");
     }
     function getProjectIdFromHash() {
       const hash = typeof location !== "undefined" ? (location.hash || "").replace(/^#\/?/, "") : "";
       const m = /^project\/(.+)$/.exec(hash);
       if (!m) return null;
       const segment = m[1];
-      if (/^(p-\d+|default)$/.test(segment)) return segment;
       const projects = loadProjectsList();
+      if (projects.some(p => p.id === segment)) return segment;
+      if (/^(p-\d+|default)$/.test(segment)) return segment;
       const bySlug = projects.find(p => slugify(p.name) === segment);
       return bySlug ? bySlug.id : null;
     }
@@ -2775,7 +3038,7 @@
       return currentProjectId ? "gantt-view-" + currentProjectId : "gantt-view-default";
     }
     const VIEW_ORDER = ["sprint", "month", "default", "project"];
-    function loadProjectsList() {
+    function loadProjectsListLocal() {
       try {
         const raw = localStorage.getItem(PROJECTS_LIST_KEY);
         if (!raw) return [];
@@ -2783,20 +3046,43 @@
         return Array.isArray(parsed) ? parsed : [];
       } catch { return []; }
     }
-    function saveProjectsList(list) {
+    function saveProjectsListLocal(list) {
       try {
         localStorage.setItem(PROJECTS_LIST_KEY, JSON.stringify(list));
       } catch (e) { console.warn("Could not save projects list:", e); }
+    }
+    function loadProjectsList() {
+      if (window.ganttStorage?.isCloudEnabled()) return window.ganttStorage.loadProjectsList() ?? [];
+      return loadProjectsListLocal();
+    }
+    function saveProjectsList(list) {
+      if (window.ganttStorage?.isCloudEnabled()) { window.ganttStorage.saveProjectsList(list); return; }
+      saveProjectsListLocal(list);
+    }
+    function isProjectNameTaken(name, excludeProjectId) {
+      if (!name || typeof name !== "string") return false;
+      const normalized = name.trim().toLowerCase();
+      if (!normalized) return false;
+      const list = loadProjectsList();
+      return list.some(p => p.id !== excludeProjectId && (p.name || "").trim().toLowerCase() === normalized);
+    }
+    function getUniqueProjectName(baseName) {
+      const base = (baseName || "Untitled project").trim() || "Untitled project";
+      if (!isProjectNameTaken(base, null)) return base;
+      let n = 2;
+      while (isProjectNameTaken(base + " " + n, null)) n++;
+      return base + " " + n;
     }
     function ensureProjectInList(id, name) {
       const list = loadProjectsList();
       const i = list.findIndex(p => p.id === id);
       if (i >= 0) {
-        if (name != null) list[i].name = name;
+        if (name != null && !isProjectNameTaken(name, id)) list[i].name = name.trim() || list[i].name;
         saveProjectsList(list);
         return;
       }
-      list.push({ id, name: name || "Untitled project", createdAt: Date.now() });
+      const finalName = getUniqueProjectName(name || "Untitled project");
+      list.push({ id, name: finalName, createdAt: Date.now() });
       saveProjectsList(list);
     }
     function duplicateProject(sourceId) {
@@ -2804,10 +3090,16 @@
       const list = loadProjectsList();
       const source = list.find(proj => proj.id === sourceId);
       const sourceName = source?.name || "Untitled project";
-      const newId = "p-" + Date.now();
-      const copyName = sourceName.trim().toLowerCase().endsWith(" copy")
+      const suggestedCopyName = sourceName.trim().toLowerCase().endsWith(" copy")
         ? sourceName + " (2)"
         : sourceName + " copy";
+      const copyName = getUniqueProjectName(suggestedCopyName);
+      if (window.ganttStorage?.isCloudEnabled()) {
+        return window.ganttStorage.duplicateBoard(sourceId, copyName).then(() => {
+          if (typeof renderHomeView === "function") renderHomeView();
+        });
+      }
+      const newId = "p-" + Date.now();
       try {
         const tasksRaw = localStorage.getItem("gantt-tasks-" + sourceId);
         const settingsRaw = localStorage.getItem("gantt-settings-" + sourceId);
@@ -2828,6 +3120,10 @@
     }
 
     function getProjectPhases(projectId) {
+      if (window.ganttStorage?.isCloudEnabled()) {
+        const s = window.ganttStorage.loadSettings(projectId);
+        if (s?.phases && Array.isArray(s.phases)) return s.phases;
+      }
       try {
         const raw = localStorage.getItem("gantt-settings-" + projectId);
         const s = raw ? JSON.parse(raw) : null;
@@ -2863,6 +3159,10 @@
     }
 
     function getProjectStrokeMode(projectId) {
+      if (window.ganttStorage?.isCloudEnabled()) {
+        const s = window.ganttStorage.loadSettings(projectId);
+        if (s) return !!s.strokeMode;
+      }
       try {
         const raw = localStorage.getItem("gantt-settings-" + projectId);
         const s = raw ? JSON.parse(raw) : null;
@@ -2952,6 +3252,10 @@
     }
 
     function loadCustomPalettes() {
+      if (window.ganttStorage?.isCloudEnabled() && currentProjectId) {
+        const raw = window.ganttStorage.loadCustomPalettes(currentProjectId);
+        if (raw != null) return Array.isArray(raw) ? raw : [];
+      }
       try {
         const raw = localStorage.getItem(getCustomPalettesKey());
         if (!raw) return [];
@@ -2960,14 +3264,36 @@
       } catch { return []; }
     }
     function saveCustomPalettes(palettes) {
+      if (window.ganttStorage?.isCloudEnabled() && currentProjectId) {
+        window.ganttStorage.saveCustomPalettes(currentProjectId, palettes);
+        return;
+      }
       try {
         localStorage.setItem(getCustomPalettesKey(), JSON.stringify(palettes));
       } catch (e) { console.warn("Could not save custom palettes:", e); }
+    }
+    function getSavedView() {
+      if (window.ganttStorage?.isCloudEnabled() && currentProjectId) {
+        const v = window.ganttStorage.loadView(currentProjectId);
+        if (v != null) return v;
+      }
+      return localStorage.getItem(getViewKey());
+    }
+    function setSavedView(view) {
+      if (window.ganttStorage?.isCloudEnabled() && currentProjectId) {
+        window.ganttStorage.saveView(currentProjectId, view);
+        return;
+      }
+      localStorage.setItem(getViewKey(), view);
     }
     const DEFAULT_PAGE_TITLE = "Project Schedule";
     const DEFAULT_PAGE_DESCRIPTION = "Drag bars to reschedule • Drag edges to change dates • Drag rows to reorder • Click a row to expand details • Click cells to edit";
 
     function loadProjectSettings() {
+      if (window.ganttStorage?.isCloudEnabled() && currentProjectId) {
+        const s = window.ganttStorage.loadSettings(currentProjectId);
+        if (s != null) return s;
+      }
       try {
         const raw = localStorage.getItem(getSettingsKey());
         if (!raw) return null;
@@ -2975,6 +3301,10 @@
       } catch { return null; }
     }
     function saveProjectSettings(settings) {
+      if (window.ganttStorage?.isCloudEnabled() && currentProjectId) {
+        window.ganttStorage.saveSettings(currentProjectId, settings);
+        return;
+      }
       try {
         localStorage.setItem(getSettingsKey(), JSON.stringify(settings));
       } catch (e) { console.warn("Could not save project settings:", e); }
@@ -2998,53 +3328,62 @@
 
     let tasks = [];
 
+    function parseTaskRow(t) {
+      const links = Array.isArray(t.links) ? t.links : (Array.isArray(t.dependencies) ? t.dependencies : []);
+      const migratedLinks = (t.jiraTicket && t.jiraTicket.trim()) ? [t.jiraTicket.trim(), ...links] : links;
+      const startDate = t.startDate ? new Date(t.startDate) : null;
+      const endDate = t.endDate ? new Date(t.endDate) : null;
+      return {
+        ...t,
+        startDate,
+        endDate,
+        start: t.start || (startDate ? formatDate(startDate) : ""),
+        end: t.end || (endDate ? formatDate(endDate) : ""),
+        overview: t.overview || "",
+        subTasks: Array.isArray(t.subTasks) ? t.subTasks : [],
+        blockers: Array.isArray(t.blockers) ? t.blockers : [],
+        links: migratedLinks,
+        dependsOn: typeof t.dependsOn === "number" ? t.dependsOn : null,
+        phaseSecondary: t.phaseSecondary && t.phaseSecondary !== t.phase ? t.phaseSecondary : null
+      };
+    }
     function loadTasks() {
+      if (window.ganttStorage?.isCloudEnabled() && currentProjectId) {
+        const raw = window.ganttStorage.loadTasks(currentProjectId);
+        if (raw != null) return Array.isArray(raw) ? raw.map(parseTaskRow) : [];
+      }
       try {
         const raw = localStorage.getItem(getCacheKey());
         if (!raw) return [];
         const parsed = JSON.parse(raw);
-        return parsed.map(t => {
-          const links = Array.isArray(t.links) ? t.links : (Array.isArray(t.dependencies) ? t.dependencies : []);
-          const migratedLinks = (t.jiraTicket && t.jiraTicket.trim()) ? [t.jiraTicket.trim(), ...links] : links;
-          const startDate = t.startDate ? new Date(t.startDate) : null;
-          const endDate = t.endDate ? new Date(t.endDate) : null;
-          return {
-            ...t,
-            startDate,
-            endDate,
-            start: t.start || (startDate ? formatDate(startDate) : ""),
-            end: t.end || (endDate ? formatDate(endDate) : ""),
-            overview: t.overview || "",
-            subTasks: Array.isArray(t.subTasks) ? t.subTasks : [],
-            blockers: Array.isArray(t.blockers) ? t.blockers : [],
-            links: migratedLinks,
-            dependsOn: typeof t.dependsOn === "number" ? t.dependsOn : null,
-            phaseSecondary: t.phaseSecondary && t.phaseSecondary !== t.phase ? t.phaseSecondary : null
-          };
-        });
+        return parsed.map(parseTaskRow);
       } catch {
         return [];
       }
     }
 
     function saveTasks() {
+      const toSave = tasks.map(t => ({
+        task: t.task,
+        phase: t.phase,
+        phaseSecondary: t.phaseSecondary || null,
+        party: t.party,
+        start: t.start,
+        end: t.end,
+        startDate: t.startDate ? t.startDate.toISOString() : null,
+        endDate: t.endDate ? t.endDate.toISOString() : null,
+        star: t.star,
+        overview: t.overview || "",
+        subTasks: t.subTasks || [],
+        blockers: t.blockers || [],
+        links: t.links || [],
+        dependsOn: typeof t.dependsOn === "number" ? t.dependsOn : null
+      }));
+      if (window.ganttStorage?.isCloudEnabled() && currentProjectId) {
+        window.ganttStorage.saveTasks(currentProjectId, toSave);
+        return;
+      }
       try {
-        const toSave = tasks.map(t => ({
-          task: t.task,
-          phase: t.phase,
-          phaseSecondary: t.phaseSecondary || null,
-          party: t.party,
-          start: t.start,
-          end: t.end,
-          startDate: t.startDate ? t.startDate.toISOString() : null,
-          endDate: t.endDate ? t.endDate.toISOString() : null,
-          star: t.star,
-          overview: t.overview || "",
-          subTasks: t.subTasks || [],
-          blockers: t.blockers || [],
-          links: t.links || [],
-          dependsOn: typeof t.dependsOn === "number" ? t.dependsOn : null
-        }));
         localStorage.setItem(getCacheKey(), JSON.stringify(toSave));
       } catch (e) {
         console.warn("Could not save tasks:", e);
@@ -3323,6 +3662,8 @@
       const el = document.getElementById("ganttToast");
       if (!el) return;
       if (toastTimer) clearTimeout(toastTimer);
+      el.classList.remove("error");
+      if (options?.type === "error") el.classList.add("error");
       el.innerHTML = message;
       if (options?.onUndo && typeof options.onUndo === "function") {
         const undoBtn = document.createElement("button");
@@ -3441,13 +3782,12 @@
       const end = maxDate || minDate || fixedStart;
       let weekStart;
       if (fixedStart) {
-        const anchor = fixedStart;
+        const anchor = new Date(fixedStart.getFullYear(), fixedStart.getMonth(), fixedStart.getDate());
         if (minDate && minDate < anchor) {
           weekStart = new Date(minDate);
           weekStart.setDate(weekStart.getDate() - weekStart.getDay());
         } else {
-          weekStart = new Date(anchor);
-          weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+          weekStart = anchor;
         }
       } else {
         const start = minDate || maxDate;
@@ -3502,17 +3842,37 @@
       const strokeMode = document.querySelector(".gantt-wrapper")?.getAttribute("data-bar-stroke-mode") === "true";
       const primary = task.phase || PHASES[0]?.id;
       const secondary = task.phaseSecondary && task.phaseSecondary !== primary ? task.phaseSecondary : null;
+      const strokeEl = barElement.querySelector(".gantt-bar-stroke");
+      const inner = barElement.querySelector(".gantt-bar-inner");
       if (secondary) {
         const c1 = getPhaseColor(primary);
         const c2 = getPhaseColor(secondary);
         if (strokeMode) {
-          barElement.style.background = "linear-gradient(to right, " + hexToRgba(c1, 0.16) + ", " + hexToRgba(c2, 0.16) + ")";
-          barElement.style.border = "1px solid " + c1;
+          barElement.style.background = "none";
+          barElement.style.border = "none";
           barElement.style.color = "var(--text-primary)";
+          if (strokeEl) {
+            strokeEl.style.border = "1px solid transparent";
+            strokeEl.style.background = "linear-gradient(transparent, transparent) padding-box, linear-gradient(to right, " + c1 + ", " + c2 + ") border-box";
+            strokeEl.style.backgroundClip = "padding-box, border-box";
+            strokeEl.style.webkitBackgroundClip = "padding-box, border-box";
+          }
+          if (inner) {
+            inner.style.inset = "1px";
+            inner.style.borderRadius = "3px";
+            inner.style.background = "linear-gradient(to right, " + hexToRgba(c1, 0.16) + ", " + hexToRgba(c2, 0.16) + ")";
+          }
         } else {
           barElement.style.background = "linear-gradient(to right, " + c1 + ", " + c2 + ")";
           barElement.style.border = "none";
           barElement.style.color = getContrastColor(c1);
+          if (strokeEl) {
+            strokeEl.style.border = "";
+            strokeEl.style.background = "";
+            strokeEl.style.backgroundClip = "";
+            strokeEl.style.webkitBackgroundClip = "";
+          }
+          if (inner) { inner.style.inset = ""; inner.style.borderRadius = ""; inner.style.background = ""; }
         }
       } else {
         const c = getPhaseColor(primary);
@@ -3520,10 +3880,24 @@
           barElement.style.background = hexToRgba(c, 0.16);
           barElement.style.border = "1px solid " + c;
           barElement.style.color = "var(--text-primary)";
+          if (strokeEl) {
+            strokeEl.style.border = "";
+            strokeEl.style.background = "";
+            strokeEl.style.backgroundClip = "";
+            strokeEl.style.webkitBackgroundClip = "";
+          }
+          if (inner) { inner.style.inset = ""; inner.style.borderRadius = ""; inner.style.background = ""; }
         } else {
           barElement.style.background = c;
           barElement.style.border = "none";
           barElement.style.color = getContrastColor(c);
+          if (strokeEl) {
+            strokeEl.style.border = "";
+            strokeEl.style.background = "";
+            strokeEl.style.backgroundClip = "";
+            strokeEl.style.webkitBackgroundClip = "";
+          }
+          if (inner) { inner.style.inset = ""; inner.style.borderRadius = ""; inner.style.background = ""; }
         }
       }
       barElement.dataset.phase = primary;
@@ -3620,10 +3994,10 @@
     }
 
     document.addEventListener("keydown", (e) => {
+      const inFormControl = e.target.closest("input, select, textarea");
       if (e.key === "z" || e.key === "y") {
         const isUndo = (e.key === "z" && e.shiftKey === false) || (e.key === "y" && e.shiftKey === true);
         const isRedo = (e.key === "z" && e.shiftKey === true) || (e.key === "y" && e.shiftKey === false);
-        const inFormControl = e.target.closest("input, select, textarea");
         if ((e.metaKey || e.ctrlKey) && !e.altKey && !inFormControl) {
           if (isUndo) {
             e.preventDefault();
@@ -3633,6 +4007,28 @@
             performRedo();
           }
         }
+        return;
+      }
+      if (selectedBarIndex !== null && !inFormControl && e.shiftKey && (e.key === "ArrowUp" || e.key === "ArrowDown")) {
+        const from = selectedBarIndex;
+        const to = e.key === "ArrowUp" ? from - 1 : from + 1;
+        if (to < 0 || to >= tasks.length) return;
+        e.preventDefault();
+        pushTasksUndo();
+        const [moved] = tasks.splice(from, 1);
+        tasks.splice(to, 0, moved);
+        tasks.forEach((t) => {
+          if (typeof t.dependsOn !== "number") return;
+          const i = t.dependsOn;
+          if (i === from) t.dependsOn = to;
+          else if (from < i && i < to) t.dependsOn = i - 1;
+          else if (i === to) t.dependsOn = to + 1;
+        });
+        if (typeof updateChartRange === "function") updateChartRange();
+        saveTasks();
+        renderTasks();
+        const newBar = document.querySelector('.gantt-bar[data-index="' + to + '"]');
+        if (newBar && typeof selectBar === "function") selectBar(newBar, to);
         return;
       }
       if (e.key !== "Escape") return;
@@ -4037,6 +4433,7 @@
       }
       const childContainer = document.getElementById("ganttChildConnectorsContainer");
       if (childContainer) childContainer.innerHTML = "";
+      grid?.querySelectorAll(".gantt-row:not(.gantt-header)").forEach(r => { r.draggable = true; });
     }
 
     function populateTooltipForBar(tooltipEl, task, index) {
@@ -4114,6 +4511,131 @@
       return set;
     }
 
+    function attachSingleLineDotHandlers(depLineDot1, depLineDot2, depLinePath, depLinePathHover, primaryIdx, dependentIdx, getCoords, primaryColor) {
+      const circle1 = depLineDot1?.querySelector?.("circle") || depLineDot1?.firstElementChild;
+      const circle2 = depLineDot2?.querySelector?.("circle") || depLineDot2?.firstElementChild;
+      const path = depLinePath;
+      const pathHit = depLinePathHover;
+      const dotR = 3;
+      const addHandlers = (circle, end, dotEl) => {
+        const onDown = (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const coords = getCoords();
+          const { x1, y1, x2, y2 } = coords;
+          const fixedX = end === "primary" ? x2 : x1;
+          const fixedY = end === "primary" ? y2 : y1;
+          const otherX = end === "primary" ? x1 : x2;
+          const otherY = end === "primary" ? y1 : y2;
+          dotEl.classList.add("connector-dot-dragging");
+          path.classList.add("connector-dragging");
+          const onMove = (e2) => {
+            e2.preventDefault();
+            const cx = e2.clientX;
+            const cy = e2.clientY;
+            dotEl.setAttribute("transform", `translate(${cx}, ${cy - (end === "primary" ? dotR : 0)})`);
+            const newD = end === "primary" ? connectorPathD(cx, cy, fixedX, fixedY) : connectorPathD(fixedX, fixedY, cx, cy);
+            path.setAttribute("d", newD);
+            if (pathHit) pathHit.setAttribute("d", newD);
+            const ganttWrapper = document.querySelector(".gantt-wrapper");
+            const prevWrapperPE = ganttWrapper?.style.pointerEvents;
+            if (ganttWrapper) ganttWrapper.style.pointerEvents = "auto";
+            const elements = document.elementsFromPoint(cx, cy);
+            if (ganttWrapper) ganttWrapper.style.pointerEvents = prevWrapperPE || "";
+            let hoveredIdx = null;
+            for (const el of elements) {
+              const row = el.closest?.(".gantt-row[data-index]");
+              if (row && !row.classList.contains("gantt-header")) {
+                hoveredIdx = parseInt(row.getAttribute("data-index"), 10);
+                break;
+              }
+              const barEl = el.closest?.(".gantt-bar");
+              if (barEl) {
+                hoveredIdx = parseInt(barEl.getAttribute("data-index"), 10);
+                break;
+              }
+            }
+            let previewColor = "#a3a3a3";
+            if (hoveredIdx !== null && !isNaN(hoveredIdx)) {
+              if (end === "primary" && hoveredIdx !== dependentIdx && !wouldCreateCycle(dependentIdx, hoveredIdx)) {
+                previewColor = getPhaseColor(tasks[hoveredIdx].phase || PHASES[0]?.id);
+              } else if (end === "dependent" && hoveredIdx !== primaryIdx && !wouldCreateCycle(hoveredIdx, primaryIdx)) {
+                previewColor = getPhaseColor(tasks[hoveredIdx].phase || PHASES[0]?.id);
+              }
+            }
+            path.setAttribute("stroke", previewColor);
+          };
+          const onUp = (e2) => {
+            e2.preventDefault();
+            e2.stopPropagation();
+            document.removeEventListener("mousemove", onMove);
+            document.removeEventListener("mouseup", onUp);
+            const ganttWrapper = document.querySelector(".gantt-wrapper");
+            const prevWrapperPE = ganttWrapper?.style.pointerEvents;
+            if (ganttWrapper) ganttWrapper.style.pointerEvents = "auto";
+            const elements = document.elementsFromPoint(e2.clientX, e2.clientY);
+            if (ganttWrapper) ganttWrapper.style.pointerEvents = prevWrapperPE || "";
+            let newIdx = null;
+            for (const el of elements) {
+              const row = el.closest?.(".gantt-row[data-index]");
+              if (row && !row.classList.contains("gantt-header")) {
+                newIdx = parseInt(row.getAttribute("data-index"), 10);
+                break;
+              }
+              const bar = el.closest?.(".gantt-bar");
+              if (bar) {
+                newIdx = parseInt(bar.getAttribute("data-index"), 10);
+                break;
+              }
+            }
+            dotEl.classList.remove("connector-dot-dragging");
+            path.classList.remove("connector-dragging");
+            let didUpdate = false;
+            let toastMessage = "";
+            if (newIdx !== null && !isNaN(newIdx)) {
+              if (end === "primary" && newIdx !== dependentIdx && !wouldCreateCycle(dependentIdx, newIdx)) {
+                pushTasksUndo();
+                tasks[dependentIdx].dependsOn = newIdx;
+                propagateDependencyChanges(newIdx);
+                didUpdate = true;
+                const childTask = tasks[dependentIdx];
+                const newParentTask = tasks[newIdx];
+                const childName = (childTask.star ? "★ " : "") + (childTask.task || "Task");
+                const parentName = (newParentTask.star ? "★ " : "") + (newParentTask.task || "Task");
+                toastMessage = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> "${childName}" → "${parentName}"`;
+              } else if (end === "dependent" && newIdx !== primaryIdx && !wouldCreateCycle(newIdx, primaryIdx)) {
+                pushTasksUndo();
+                tasks[dependentIdx].dependsOn = null;
+                tasks[newIdx].dependsOn = primaryIdx;
+                propagateDependencyChanges(primaryIdx);
+                didUpdate = true;
+                const newChildTask = tasks[newIdx];
+                const parentTask = tasks[primaryIdx];
+                const childName = (newChildTask.star ? "★ " : "") + (newChildTask.task || "Task");
+                const parentName = (parentTask.star ? "★ " : "") + (parentTask.task || "Task");
+                toastMessage = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> "${childName}" → "${parentName}"`;
+              }
+            }
+            if (didUpdate) {
+              saveTasks();
+              renderTasks();
+              if (toastMessage) showToast(toastMessage, { onUndo: performUndo });
+            } else if (path && primaryColor) {
+              path.setAttribute("stroke", primaryColor);
+            }
+          };
+          document.addEventListener("mousemove", onMove);
+          document.addEventListener("mouseup", onUp, { once: true });
+          onMove(e);
+        };
+        circle.addEventListener("mousedown", onDown);
+        return () => circle.removeEventListener("mousedown", onDown);
+      };
+      const off1 = circle1 ? addHandlers(circle1, "primary", depLineDot1) : () => {};
+      const off2 = circle2 ? addHandlers(circle2, "dependent", depLineDot2) : () => {};
+      return () => { off1(); off2(); };
+    }
+
     function selectBar(bar, index) {
       if (selectedBarIndex === index && selectedBarElement === bar) {
         deselectBar();
@@ -4128,6 +4650,7 @@
       selectedBarIndex = index;
       selectedBarElement = bar;
       bar.classList.add("selected");
+      grid?.querySelectorAll(".gantt-row:not(.gantt-header)").forEach(r => { r.draggable = false; });
       const related = getRelatedBarIndices(index);
       document.querySelectorAll(".gantt-bar").forEach((b) => {
         const idx = b.getAttribute("data-index");
@@ -4169,11 +4692,6 @@
             depLineEl.setAttribute("width", window.innerWidth);
             depLineEl.setAttribute("height", window.innerHeight);
             depLineEl.classList.add("visible");
-            if (unlinkBtn) {
-              unlinkBtn.style.left = x1 + "px";
-              unlinkBtn.style.top = y2 + "px";
-              unlinkBtn.style.backgroundColor = primaryColor;
-            }
           };
           updateLine();
           const getCoords = () => {
@@ -4182,61 +4700,16 @@
             return { x1: pr.left + pr.width / 2, y1: pr.bottom, x2: dr.left, y2: dr.top + dr.height / 2 };
           };
           const singleLineDotCleanup = attachSingleLineDotHandlers(depLineDot1, depLineDot2, depLinePath, depLinePathHover, t.dependsOn, index, getCoords, primaryColor);
-          let unlinkActivateTid = null;
-          const activateUnlinkUnderCursor = (dotEl) => {
-            if (unlinkActivateTid) clearTimeout(unlinkActivateTid);
-            unlinkActivateTid = null;
-            if (!unlinkBtn) return;
-            const r = dotEl.getBoundingClientRect();
-            unlinkBtn.style.left = (r.left + r.width / 2) + "px";
-            unlinkBtn.style.top = (r.top + r.height / 2) + "px";
-            unlinkBtn.style.pointerEvents = "auto";
-          };
-          const deactivateUnlinkAfterDelay = () => {
-            if (unlinkActivateTid) clearTimeout(unlinkActivateTid);
-            unlinkActivateTid = setTimeout(() => {
-              unlinkActivateTid = null;
-              if (unlinkBtn) unlinkBtn.style.pointerEvents = "none";
-            }, 250);
-          };
-          const onDot1Enter = () => activateUnlinkUnderCursor(depLineDot1);
-          const onDot2Enter = () => activateUnlinkUnderCursor(depLineDot2);
-          const onUnlinkEnter = () => { if (unlinkActivateTid) clearTimeout(unlinkActivateTid); unlinkActivateTid = null; if (unlinkBtn) unlinkBtn.style.pointerEvents = "auto"; };
-          if (depLineDot1) { depLineDot1.addEventListener("mouseenter", onDot1Enter); depLineDot1.addEventListener("mouseleave", deactivateUnlinkAfterDelay); }
-          if (depLineDot2) { depLineDot2.addEventListener("mouseenter", onDot2Enter); depLineDot2.addEventListener("mouseleave", deactivateUnlinkAfterDelay); }
-          if (unlinkBtn) {
-            unlinkBtn.addEventListener("mouseenter", onUnlinkEnter);
-            unlinkBtn.addEventListener("mouseleave", deactivateUnlinkAfterDelay);
-            unlinkBtn.classList.add("visible");
-            unlinkBtn.style.pointerEvents = "none";
-            unlinkBtn._unlinkHandler = () => {
-              const parentTask = tasks[t.dependsOn];
-              const childName = (t.star ? "★ " : "") + (t.task || "Task");
-              const parentName = (parentTask.star ? "★ " : "") + (parentTask.task || "Task");
-              pushTasksUndo();
-              t.dependsOn = null;
-              deselectBar();
-              saveTasks();
-              renderTasks();
-              showToast(`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.84 12.25l1.72-1.71h-.02a5.004 5.004 0 0 0-.12-7.07 5.006 5.006 0 0 0-6.95 0l-1.72 1.71"/><path d="M5.17 11.75l-1.71 1.71a5.004 5.004 0 0 0 .12 7.07 5.006 5.006 0 0 0 6.95 0l1.71-1.71"/><line x1="8" y1="2" x2="8" y2="5"/><line x1="2" y1="8" x2="5" y2="8"/><line x1="16" y1="19" x2="16" y2="22"/><line x1="19" y1="16" x2="22" y2="16"/></svg> "${childName}" unlinked from "${parentName}"`, { onUndo: performUndo });
-            };
-            unlinkBtn.addEventListener("click", unlinkBtn._unlinkHandler);
-          }
           const wrapper = document.querySelector(".gantt-wrapper");
           wrapper?.addEventListener("scroll", updateLine, true);
           window.addEventListener("scroll", updateLine, true);
           window.addEventListener("resize", updateLine);
           selectedBarDepLineCleanup = () => {
-            if (unlinkActivateTid) clearTimeout(unlinkActivateTid);
-            if (depLineDot1) { depLineDot1.removeEventListener("mouseenter", onDot1Enter); depLineDot1.removeEventListener("mouseleave", deactivateUnlinkAfterDelay); }
-            if (depLineDot2) { depLineDot2.removeEventListener("mouseenter", onDot2Enter); depLineDot2.removeEventListener("mouseleave", deactivateUnlinkAfterDelay); }
-            if (unlinkBtn) { unlinkBtn.removeEventListener("mouseenter", onUnlinkEnter); unlinkBtn.removeEventListener("mouseleave", deactivateUnlinkAfterDelay); }
             singleLineDotCleanup();
             wrapper?.removeEventListener("scroll", updateLine, true);
             window.removeEventListener("scroll", updateLine, true);
             window.removeEventListener("resize", updateLine);
             if (unlinkBtn) {
-              unlinkBtn.style.pointerEvents = "";
               unlinkBtn.classList.remove("visible");
               if (unlinkBtn._unlinkHandler) {
                 unlinkBtn.removeEventListener("click", unlinkBtn._unlinkHandler);
@@ -4269,7 +4742,9 @@
             const parentName = (parentTask.star ? "★ " : "") + (parentTask.task || "Task");
             const taskName = (t.star ? "★ " : "") + (t.task || "Task");
             const msg = `"${taskName.trim() || "This task"}" is linked to "${parentName}". Unlink before moving to ${phaseName}?`;
-            const unlink = await showDetachConfirm(phaseDropdown, msg);
+            const connectorEl = document.getElementById("ganttDependencyLinePath");
+            const anchor = (connectorEl && connectorEl.getAttribute("d")) ? connectorEl : phaseDropdown;
+            const unlink = await showDetachConfirm(anchor, msg, { showSettingsHint: true });
             if (!unlink) {
               phaseDropdown._updateLabel(t.phase || PHASES[0]?.id, t.phaseSecondary || null);
               return;
@@ -4323,7 +4798,7 @@
       tooltipEl.classList.add("has-actions", "visible");
       const rect = bar.getBoundingClientRect();
       tooltipEl.style.left = rect.left + rect.width / 2 + "px";
-      tooltipEl.style.transform = "translate(-50%, calc(-100% - 16px))";
+      tooltipEl.style.transform = "translate(-50%, calc(-100% - 8px))";
       tooltipEl.style.top = rect.top + "px";
       selectedBarClickOutside = (e) => {
         if (bar.contains(e.target) || tooltipEl.contains(e.target)) return;
@@ -4376,22 +4851,27 @@
             path.setAttribute("stroke-width", "1");
             path.setAttribute("stroke-dasharray", "4 3");
             path.setAttribute("fill", "none");
+            path.style.pointerEvents = "none";
             
             const dot1 = document.createElementNS("http://www.w3.org/2000/svg", "g");
+            dot1.setAttribute("class", "connector-dot");
             const dot1Circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
             dot1Circle.setAttribute("r", "3");
             dot1Circle.setAttribute("fill", "white");
             dot1Circle.setAttribute("stroke", "#d4d4d4");
             dot1Circle.setAttribute("stroke-width", "1");
             dot1.appendChild(dot1Circle);
+            dot1.style.pointerEvents = "none";
             
             const dot2 = document.createElementNS("http://www.w3.org/2000/svg", "g");
+            dot2.setAttribute("class", "connector-dot");
             const dot2Circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
             dot2Circle.setAttribute("r", "3");
             dot2Circle.setAttribute("fill", "white");
             dot2Circle.setAttribute("stroke", "#d4d4d4");
             dot2Circle.setAttribute("stroke-width", "1");
             dot2.appendChild(dot2Circle);
+            dot2.style.pointerEvents = "none";
             
             svg.appendChild(pathHover);
             svg.appendChild(path);
@@ -4746,12 +5226,38 @@
       return wrap;
     }
 
+    function updateGanttDragGuide(leftPx) {
+      const guideEl = document.getElementById("ganttDragGuide");
+      if (!guideEl) return;
+      const headerRow = document.getElementById("ganttHeaderRow");
+      const wrapper = document.getElementById("ganttWrapper");
+      guideEl.style.left = leftPx + "px";
+      if (headerRow && wrapper) {
+        const hRect = headerRow.getBoundingClientRect();
+        const wRect = wrapper.getBoundingClientRect();
+        const tableTop = hRect.bottom;
+        const tableHeight = Math.max(0, wRect.bottom - tableTop);
+        guideEl.style.top = tableTop + "px";
+        guideEl.style.height = tableHeight + "px";
+      } else {
+        guideEl.style.top = "0";
+        guideEl.style.height = "100vh";
+      }
+      guideEl.classList.add("visible");
+    }
+
     function createBar(task, dateCell, timelineCell, index) {
       const bar = document.createElement("div");
       bar.className = "gantt-bar";
       bar.dataset.index = index;
       bar.dataset.phase = task.phase || PHASES[0]?.id;
       bar.title = "Drag to move • Drag edges to resize • Click to select";
+      const barStroke = document.createElement("div");
+      barStroke.className = "gantt-bar-stroke";
+      const barInner = document.createElement("div");
+      barInner.className = "gantt-bar-inner";
+      bar.appendChild(barStroke);
+      bar.appendChild(barInner);
       setBarPhaseStyle(bar, task);
       const startOffset = Math.max(0, dateToOffset(task.startDate));
       let endOffset = dateToOffset(task.endDate);
@@ -4789,13 +5295,8 @@
         let moved = false;
         let lastShownBoundary = null;
         const updateGuide = () => {
-          const guideEl = document.getElementById("ganttDragGuide");
-          if (!guideEl) return;
           const r = bar.getBoundingClientRect();
-          guideEl.style.left = r.left + "px";
-          guideEl.style.top = "0";
-          guideEl.style.height = "100vh";
-          guideEl.classList.add("visible");
+          updateGanttDragGuide(r.left);
         };
         const hideGuide = () => {
           const guideEl = document.getElementById("ganttDragGuide");
@@ -4901,12 +5402,7 @@
           if (dragStarted) bar.classList.remove("dragging");
           document.removeEventListener("mousemove", onMove);
           document.removeEventListener("mouseup", onUp);
-          if (!dragStarted) {
-            selectBar(bar, index);
-            return;
-          }
-          if (!moved) {
-            selectBar(bar, index);
+          if (!dragStarted || !moved) {
             return;
           }
           if (wouldSnapToSprint(task.startDate)) {
@@ -4952,6 +5448,11 @@
         };
         document.addEventListener("mousemove", onMove);
         document.addEventListener("mouseup", onUp);
+      });
+      bar.addEventListener("click", (e) => {
+        if (e.target.closest(".resize-handle") || e.target.closest(".resize-handle-left")) return;
+        e.stopPropagation();
+        if (typeof selectBar === "function") selectBar(bar, index);
       });
       resizeHandleLeft.addEventListener("mousedown", (e) => {
         e.preventDefault();
@@ -5095,24 +5596,8 @@
         };
         updateDurationHint();
         const updateGuide = () => {
-          const guideEl = document.getElementById("ganttDragGuide");
-          if (!guideEl) return;
-            const r = bar.getBoundingClientRect();
-            const headerSticky = document.querySelector(".gantt-header-sticky");
-            const wrapper = document.querySelector(".gantt-wrapper");
-            guideEl.style.left = (r.left + r.width) + "px";
-            if (headerSticky && wrapper) {
-              const hr = headerSticky.getBoundingClientRect();
-              const wr = wrapper.getBoundingClientRect();
-              const taskTop = hr.bottom;
-              const taskHeight = Math.max(0, wr.bottom - taskTop);
-              guideEl.style.top = taskTop + "px";
-              guideEl.style.height = taskHeight + "px";
-            } else {
-              guideEl.style.top = "0";
-              guideEl.style.height = "100vh";
-            }
-            guideEl.classList.add("visible");
+          const r = bar.getBoundingClientRect();
+          updateGanttDragGuide(r.left + r.width);
         };
         const hideGuide = () => {
           const guideEl = document.getElementById("ganttDragGuide");
@@ -5261,6 +5746,15 @@
       const minStart = Math.min(...phaseTasks.map(t => t.startDate.getTime()));
       const maxEnd = Math.max(...phaseTasks.map(t => t.endDate.getTime()));
       return Math.max(1, Math.floor((maxEnd - minStart) / WEEK_MS) + 1);
+    }
+
+    function getPhaseDateRange(phaseIndex, baseDate) {
+      if (phaseIndex < 0 || phaseIndex >= PHASES.length) return null;
+      const startWeekOffset = getPhaseStartWeekOffset(phaseIndex);
+      const spanWeeks = getPhaseWeekSpan(PHASES[phaseIndex].id);
+      const startDate = new Date(baseDate.getTime() + startWeekOffset * WEEK_MS);
+      const endDate = new Date(baseDate.getTime() + (startWeekOffset + spanWeeks) * WEEK_MS - DAY_MS);
+      return { startDate, endDate };
     }
 
     function renderPhaseHeaders() {
@@ -5424,7 +5918,10 @@
       partyCell.className = "gantt-cell gantt-party-cell";
 
       function createPartyDropdown(t) {
-        const opts = [...new Set(["Unassigned", ...tasks.map(x => x.party).filter(Boolean)])].sort();
+        const s = loadProjectSettings() || {};
+        const savedParties = Array.isArray(s.responsibleParties) ? s.responsibleParties : [];
+        const fromTasks = tasks.map(x => x.party).filter(Boolean);
+        const opts = [...new Set([...savedParties, "Unassigned", ...fromTasks])].sort();
         const wrap = document.createElement("div");
         wrap.className = "gantt-party-dropdown";
         const trigger = document.createElement("button");
@@ -5809,30 +6306,30 @@
       saveTasks();
     }
 
-    function showDetachConfirm(anchorEl, message) {
+    function showDetachConfirm(anchorEl, message, options) {
+      const { showSettingsHint = false } = options || {};
       return new Promise((resolve) => {
         const popup = document.getElementById("detachConfirmPopup");
         const msgEl = document.getElementById("detachConfirmMsg");
-        const cancelBtn = popup.querySelector(".detach-confirm-cancel");
-        const detachBtn = popup.querySelector(".detach-confirm-detach");
+        const hintEl = document.getElementById("detachConfirmHint");
+        const cancelBtn = popup?.querySelector(".detach-confirm-cancel");
+        const detachBtn = popup?.querySelector(".detach-confirm-detach");
         if (!popup || !msgEl) return resolve(false);
         msgEl.textContent = message;
-        const rect = anchorEl.getBoundingClientRect();
-        popup.style.left = rect.left + rect.width / 2 + "px";
-        const popupHeight = 80;
-        const spaceBelow = window.innerHeight - rect.bottom;
-        if (spaceBelow < popupHeight + 8 && rect.top > popupHeight + 8) {
-          popup.style.top = rect.top - 8 + "px";
-          popup.style.transform = "translate(-50%, -100%)";
-        } else {
-          popup.style.top = rect.bottom + 8 + "px";
-          popup.style.transform = "translateX(-50%)";
+        if (hintEl) {
+          hintEl.classList.toggle("hidden", !showSettingsHint);
         }
+        const rect = anchorEl.getBoundingClientRect();
+        const midX = rect.left + rect.width / 2;
+        const midY = rect.top + rect.height / 2;
+        popup.style.left = midX + "px";
+        popup.style.transform = "translate(-50%, -50%)";
+        popup.style.top = midY + "px";
         popup.classList.add("visible");
         const finish = (result) => {
           popup.classList.remove("visible");
-          cancelBtn.removeEventListener("click", onCancel);
-          detachBtn.removeEventListener("click", onDetach);
+          cancelBtn?.removeEventListener("click", onCancel);
+          detachBtn?.removeEventListener("click", onDetach);
           document.removeEventListener("click", onClickOutside);
           document.removeEventListener("keydown", onEscape);
           resolve(result);
@@ -5843,8 +6340,8 @@
           if (!popup.contains(e.target) && !anchorEl.contains(e.target)) finish(false);
         };
         const onEscape = (e) => { if (e.key === "Escape") finish(false); };
-        cancelBtn.addEventListener("click", onCancel);
-        detachBtn.addEventListener("click", onDetach);
+        cancelBtn?.addEventListener("click", onCancel);
+        detachBtn?.addEventListener("click", onDetach);
         document.addEventListener("keydown", onEscape);
         requestAnimationFrame(() => document.addEventListener("click", onClickOutside));
       });
@@ -5901,16 +6398,11 @@
         msgEl.textContent = message;
         moveBtn.textContent = moveLabel || "Move to phase";
         const rect = anchorEl.getBoundingClientRect();
-        popup.style.left = rect.left + rect.width / 2 + "px";
-        const popupHeight = 80;
-        const spaceBelow = window.innerHeight - rect.bottom;
-        if (spaceBelow < popupHeight + 8 && rect.top > popupHeight + 8) {
-          popup.style.top = rect.top - 8 + "px";
-          popup.style.transform = "translate(-50%, -100%)";
-        } else {
-          popup.style.top = rect.bottom + 8 + "px";
-          popup.style.transform = "translateX(-50%)";
-        }
+        const midX = rect.left + rect.width / 2;
+        const midY = rect.top + rect.height / 2;
+        popup.style.left = midX + "px";
+        popup.style.top = midY + "px";
+        popup.style.transform = "translate(-50%, -50%)";
         popup.classList.add("visible");
         const finish = (result) => {
           popup.classList.remove("visible");
@@ -5973,9 +6465,10 @@
         if (Math.abs(actualStart - expectedStartTime) > 60 * 60 * 1000) {
           const primaryName = (primary.star ? "★ " : "") + (primary.task || "Task");
           const bar = document.querySelector('.gantt-bar[data-index="' + taskIndex + '"]');
-          const anchor = bar || document.body;
+          const connectorEl = document.getElementById("ganttDependencyLinePath");
+          const anchor = (connectorEl && connectorEl.getAttribute("d")) ? connectorEl : (bar || document.body);
           const message = "This task depends on \"" + primaryName + "\". Changing the start date would break the link.";
-          const detach = await showDetachConfirm(anchor, message);
+          const detach = await showDetachConfirm(anchor, message, { showSettingsHint: true });
           if (detach) {
             const childName = (task.star ? "★ " : "") + (task.task || "Task");
             const parentName = (primary.star ? "★ " : "") + (primary.task || "Task");
@@ -5999,7 +6492,8 @@
           const phaseInfo = PHASES.find(p => p.id === phaseForPosition);
           const phaseName = phaseInfo?.name || phaseForPosition;
           const bar = document.querySelector('.gantt-bar[data-index="' + taskIndex + '"]');
-          const anchor = bar || document.body;
+          const connectorEl = document.getElementById("ganttDependencyLinePath");
+          const anchor = (connectorEl && connectorEl.getAttribute("d")) ? connectorEl : (bar || document.body);
           const message = "This task is now in the \"" + phaseName + "\" region. Move it to this phase or keep it linked to the current one?";
           const moveLabel = "Move to " + phaseName;
           const movePhase = await showPhaseConfirm(anchor, message, moveLabel);
@@ -6071,7 +6565,23 @@
         wrapper.setAttribute("data-row-appearance", mode);
         if (s?.strokeMode) wrapper.setAttribute("data-bar-stroke-mode", "true");
         else wrapper.removeAttribute("data-bar-stroke-mode");
+        if (s?.showDurationOnBar) wrapper.setAttribute("data-show-duration-on-bar", "true");
+        else wrapper.removeAttribute("data-show-duration-on-bar");
       }
+    }
+    function applySettingsPreviewFromForm() {
+      const wrapper = document.querySelector(".gantt-wrapper");
+      if (!wrapper) return;
+      const rowAppearanceEl = document.getElementById("settingsRowAppearance");
+      const mode = rowAppearanceEl?.value === "compact" || rowAppearanceEl?.value === "fill" ? rowAppearanceEl.value : "default";
+      wrapper.setAttribute("data-row-appearance", mode);
+      const barStyleSelected = document.querySelector("#settingsBarStyle .settings-segmented-option.selected");
+      const strokeMode = barStyleSelected?.dataset.value === "stroke";
+      if (strokeMode) wrapper.setAttribute("data-bar-stroke-mode", "true");
+      else wrapper.removeAttribute("data-bar-stroke-mode");
+      const showDurationEl = document.getElementById("settingsShowDurationOnBar");
+      if (showDurationEl?.checked) wrapper.setAttribute("data-show-duration-on-bar", "true");
+      else wrapper.removeAttribute("data-show-duration-on-bar");
     }
     function getDefaultPhasesWithSprints() {
       return DEFAULT_PHASES.map(p => ({ ...p, sprints: 2 }));
@@ -6148,6 +6658,8 @@
       if (moveTasksEl) moveTasksEl.checked = !!s?.moveTasksWhenSprintExtended;
       const indepEl = document.getElementById("settingsIndependentDependencies");
       if (indepEl) indepEl.checked = !!s?.allowIndependentDependencies;
+      const showDurationEl = document.getElementById("settingsShowDurationOnBar");
+      if (showDurationEl) showDurationEl.checked = !!s?.showDurationOnBar;
       const phaseDurationEl = document.getElementById("settingsPhaseDurationMode");
       const phaseMode = (s?.phaseDurationMode === "dynamic") ? "dynamic" : "fixed";
       if (phaseDurationEl) phaseDurationEl.value = phaseMode;
@@ -6221,6 +6733,44 @@
           btn.disabled = phaseList.children.length < 2;
         });
       };
+      const partyListEl = document.getElementById("settingsResponsiblePartiesList");
+      const partyInputEl = document.getElementById("settingsPartyInput");
+      const addPartyBtn = document.getElementById("settingsAddParty");
+      if (partyListEl) {
+        partyListEl.innerHTML = "";
+        const savedParties = Array.isArray(s.responsibleParties) ? s.responsibleParties : [];
+        savedParties.forEach((name) => {
+          const item = document.createElement("div");
+          item.className = "settings-party-item";
+          const span = document.createElement("span");
+          span.textContent = name;
+          const removeBtn = document.createElement("button");
+          removeBtn.type = "button";
+          removeBtn.textContent = "Remove";
+          removeBtn.addEventListener("click", () => item.remove());
+          item.appendChild(span);
+          item.appendChild(removeBtn);
+          partyListEl.appendChild(item);
+        });
+      }
+      function addResponsibleParty() {
+        const name = (partyInputEl && partyInputEl.value || "").trim();
+        if (!name || !partyListEl) return;
+        partyInputEl.value = "";
+        const item = document.createElement("div");
+        item.className = "settings-party-item";
+        const span = document.createElement("span");
+        span.textContent = name;
+        const removeBtn = document.createElement("button");
+        removeBtn.type = "button";
+        removeBtn.textContent = "Remove";
+        removeBtn.addEventListener("click", () => item.remove());
+        item.appendChild(span);
+        item.appendChild(removeBtn);
+        partyListEl.appendChild(item);
+      }
+      if (addPartyBtn) addPartyBtn.onclick = addResponsibleParty;
+      if (partyInputEl) partyInputEl.onkeydown = (e) => { if (e.key === "Enter") { e.preventDefault(); addResponsibleParty(); } };
       const customPalettes = loadCustomPalettes();
       const allPalettes = [...COLOR_PALETTES, ...customPalettes];
       const rowAppearanceEl = document.getElementById("settingsRowAppearance");
@@ -6367,6 +6917,7 @@
       document.getElementById("fabPhaseMenu")?.classList.remove("visible");
     }
     function closeSettingsModal() {
+      applyRowAppearance();
       document.getElementById("settingsOverlay").classList.remove("open");
       if (currentProjectId) {
         const addFab = document.getElementById("addTaskFab");
@@ -6407,6 +6958,7 @@
       const snapToSprint = !!document.getElementById("settingsSnapToSprint")?.checked;
       const moveTasksWhenSprintExtended = !!document.getElementById("settingsMoveTasksWhenSprintExtended")?.checked;
       const allowIndependentDependencies = !!document.getElementById("settingsIndependentDependencies")?.checked;
+      const showDurationOnBar = !!document.getElementById("settingsShowDurationOnBar")?.checked;
       const s = loadProjectSettings() || {};
       if (phaseDurationMode === "fixed" && moveTasksWhenSprintExtended && PHASES.length === phases.length) {
         const base = getProjectStartDate() || WEEK_START;
@@ -6444,7 +6996,13 @@
         });
         if (anyShifted) saveTasks();
       }
-      saveProjectSettings({ ...s, title, description: desc, phases, paletteIndex, dependencyGapDays, rowAppearance, strokeMode, projectStartDate, projectEndDate, phaseDurationMode, snapToSprint, moveTasksWhenSprintExtended, allowIndependentDependencies });
+      const partyListContainer = document.getElementById("settingsResponsiblePartiesList");
+      let responsibleParties = [];
+      if (partyListContainer) {
+        const spans = partyListContainer.querySelectorAll(".settings-party-item span");
+        responsibleParties = [...spans].map(function(sp) { return (sp.textContent || "").trim(); }).filter(Boolean);
+      }
+      saveProjectSettings({ ...s, title, description: desc, phases, paletteIndex, dependencyGapDays, rowAppearance, strokeMode, showDurationOnBar, projectStartDate, projectEndDate, phaseDurationMode, snapToSprint, moveTasksWhenSprintExtended, allowIndependentDependencies, responsibleParties });
       if (currentProjectId) ensureProjectInList(currentProjectId, title);
       applyRowAppearance();
       PHASES = phases.map(p => ({ ...p, sprints: p.sprints ?? 2 }));
@@ -6462,6 +7020,10 @@
     }
 
     function getProjectDescription(projectId) {
+      if (window.ganttStorage?.isCloudEnabled()) {
+        const s = window.ganttStorage.loadSettings(projectId);
+        if (s && typeof s.description === "string") return s.description.trim();
+      }
       try {
         const raw = localStorage.getItem("gantt-settings-" + projectId);
         if (!raw) return "";
@@ -6469,7 +7031,15 @@
         return (s.description && typeof s.description === "string") ? s.description.trim() : "";
       } catch { return ""; }
     }
-    function saveProjectTitleDescription(projectId, title, description) {
+    async function saveProjectTitleDescription(projectId, title, description) {
+      if (window.ganttStorage?.isCloudEnabled()) {
+        await window.ganttStorage.ensureBoardDataLoaded(projectId);
+        const s = window.ganttStorage.loadSettings(projectId) || {};
+        s.title = title != null ? String(title).trim() : "";
+        s.description = description != null ? String(description).trim() : "";
+        window.ganttStorage.saveSettings(projectId, s);
+        return;
+      }
       try {
         const raw = localStorage.getItem("gantt-settings-" + projectId);
         const s = raw ? JSON.parse(raw) : {};
@@ -6479,6 +7049,10 @@
       } catch (e) { console.warn("Could not save project title/description:", e); }
     }
     function getProjectTaskCount(projectId) {
+      if (window.ganttStorage?.isCloudEnabled()) {
+        const arr = window.ganttStorage.loadTasks(projectId);
+        if (Array.isArray(arr)) return arr.length;
+      }
       try {
         const raw = localStorage.getItem("gantt-tasks-" + projectId);
         if (!raw) return 0;
@@ -6487,6 +7061,21 @@
       } catch { return 0; }
     }
     function getProjectCurrentTaskCount(projectId) {
+      if (window.ganttStorage?.isCloudEnabled()) {
+        const arr = window.ganttStorage.loadTasks(projectId);
+        if (!Array.isArray(arr)) return 0;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const todayMs = today.getTime();
+        return arr.filter((t) => {
+          if (!t.startDate || !t.endDate) return false;
+          const start = new Date(t.startDate);
+          const end = new Date(t.endDate);
+          start.setHours(0, 0, 0, 0);
+          end.setHours(0, 0, 0, 0);
+          return todayMs >= start.getTime() && todayMs <= end.getTime();
+        }).length;
+      }
       try {
         const raw = localStorage.getItem("gantt-tasks-" + projectId);
         if (!raw) return 0;
@@ -6708,13 +7297,17 @@
           doneBtn.type = "button";
           doneBtn.className = "home-project-done-btn";
           doneBtn.textContent = "Done";
-          doneBtn.addEventListener("click", (e) => {
+          doneBtn.addEventListener("click", async (e) => {
             e.preventDefault();
             e.stopPropagation();
             const nameVal = card.querySelector(".home-project-name-input").value.trim() || "Untitled project";
             const descVal = card.querySelector(".home-project-desc-input").value.trim();
+            if (isProjectNameTaken(nameVal, p.id)) {
+              if (typeof showToast === "function") showToast("Duplicate project name. Each project must have a unique name—please choose a different name.", { type: "error" });
+              return;
+            }
             ensureProjectInList(p.id, nameVal);
-            saveProjectTitleDescription(p.id, nameVal, descVal);
+            await saveProjectTitleDescription(p.id, nameVal, descVal);
             homeEditProjectId = null;
             renderHomeView();
           });
@@ -6725,11 +7318,10 @@
           duplicateBtn.className = "home-project-action-btn home-project-duplicate-btn";
           duplicateBtn.title = "Duplicate project";
           duplicateBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
-          duplicateBtn.addEventListener("click", (e) => {
+          duplicateBtn.addEventListener("click", async (e) => {
             e.preventDefault();
             e.stopPropagation();
-            duplicateProject(p.id);
-            renderHomeView();
+            await duplicateProject(p.id);
           });
           footerActions.appendChild(duplicateBtn);
         }
@@ -6738,12 +7330,18 @@
         deleteBtn.className = "home-project-delete-btn";
         deleteBtn.title = "Delete this project";
         deleteBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>';
-        deleteBtn.addEventListener("click", (e) => {
+        deleteBtn.addEventListener("click", async (e) => {
           e.preventDefault();
           e.stopPropagation();
           if (!confirm("Delete this project? Tasks and settings will be removed. This cannot be undone.")) return;
           pushProjectsListUndo();
           if (p.id === homeEditProjectId) homeEditProjectId = null;
+          if (window.ganttStorage?.isCloudEnabled()) {
+            await window.ganttStorage.deleteBoard(p.id);
+            if (currentProjectId === p.id) { currentProjectId = null; location.hash = "#/"; }
+            renderHomeView();
+            return;
+          }
           const list = loadProjectsList().filter(proj => proj.id !== p.id);
           saveProjectsList(list);
           try {
@@ -6781,7 +7379,7 @@
         emptyEl.classList.add("hidden");
       }
     }
-    function handleRoute() {
+    async function handleRoute() {
       const id = getProjectIdFromHash();
       const homeView = document.getElementById("homeView");
       const ganttView = document.getElementById("ganttView");
@@ -6817,6 +7415,7 @@
         });
         return;
       }
+      if (window.ganttStorage?.isCloudEnabled()) await window.ganttStorage.ensureBoardDataLoaded(id);
       const sameProject = currentProjectId === id;
       currentProjectId = id;
       ensureProjectInList(id);
@@ -6837,20 +7436,28 @@
         return;
       }
       const baseDate = getProjectStartDate() || WEEK_START;
-      const DAY_MS = 24 * 60 * 60 * 1000;
-      const phase = (id) => PHASES.some(p => p.id === id) ? id : (PHASES[0]?.id || "discovery");
-      const sampleTasks = [
-        { task: "Research", phase: phase("discovery"), party: "Unassigned", star: false, overview: "", subTasks: [], blockers: [], links: [], dependsOn: null,
-          startDate: new Date(baseDate), endDate: new Date(baseDate.getTime() + 6 * DAY_MS) },
-        { task: "Design", phase: phase("ideation"), party: "Unassigned", star: false, overview: "", subTasks: [], blockers: [], links: [], dependsOn: 0,
-          startDate: new Date(baseDate.getTime() + 7 * DAY_MS), endDate: new Date(baseDate.getTime() + 13 * DAY_MS) },
-        { task: "Review", phase: phase("review"), party: "Unassigned", star: false, overview: "", subTasks: [], blockers: [], links: [], dependsOn: 1,
-          startDate: new Date(baseDate.getTime() + 14 * DAY_MS), endDate: new Date(baseDate.getTime() + 20 * DAY_MS) },
-        { task: "Build", phase: phase("development"), party: "Unassigned", star: false, overview: "", subTasks: [], blockers: [], links: [], dependsOn: 2,
-          startDate: new Date(baseDate.getTime() + 21 * DAY_MS), endDate: new Date(baseDate.getTime() + 27 * DAY_MS) },
-        { task: "Launch", phase: phase("delivery"), party: "Unassigned", star: false, overview: "", subTasks: [], blockers: [], links: [], dependsOn: 3,
-          startDate: new Date(baseDate.getTime() + 28 * DAY_MS), endDate: new Date(baseDate.getTime() + 34 * DAY_MS) }
-      ];
+      const sampleTaskNames = ["Research", "Design", "Review", "Build", "Launch"];
+      const n = Math.min(sampleTaskNames.length, Math.max(1, PHASES.length));
+      const sampleTasks = [];
+      for (let i = 0; i < n; i++) {
+        const phaseIdx = Math.min(i, PHASES.length - 1);
+        const range = getPhaseDateRange(phaseIdx, baseDate);
+        const startDate = range ? range.startDate : new Date(baseDate);
+        const endDate = range ? range.endDate : new Date(baseDate.getTime() + 13 * (24 * 60 * 60 * 1000));
+        sampleTasks.push({
+          task: sampleTaskNames[i],
+          phase: PHASES[phaseIdx].id,
+          party: "Unassigned",
+          star: false,
+          overview: "",
+          subTasks: [],
+          blockers: [],
+          links: [],
+          dependsOn: i === 0 ? null : i - 1,
+          startDate,
+          endDate
+        });
+      }
       sampleTasks.forEach(t => {
         t.start = formatDate(t.startDate);
         t.end = formatDate(t.endDate);
@@ -6914,7 +7521,10 @@
         opt.parentElement.querySelectorAll(".settings-segmented-option").forEach(o => o.classList.remove("selected"));
         opt.classList.add("selected");
         updatePaletteSwatchPreviews();
+        applySettingsPreviewFromForm();
       });
+      document.getElementById("settingsRowAppearance")?.addEventListener("change", applySettingsPreviewFromForm);
+      document.getElementById("settingsShowDurationOnBar")?.addEventListener("change", applySettingsPreviewFromForm);
       (function initDependentTasksDropdown() {
         const wrap = document.getElementById("settingsDependentWrap");
         const trigger = document.getElementById("settingsDependentTrigger");
@@ -6952,20 +7562,28 @@
       });
       document.getElementById("settingsAutoPopulate")?.addEventListener("click", () => {
         const baseDate = getProjectStartDate() || WEEK_START;
-        const DAY_MS = 24 * 60 * 60 * 1000;
-        const phase = (id) => PHASES.some(p => p.id === id) ? id : (PHASES[0]?.id || "discovery");
-        const sampleTasks = [
-          { task: "Research", phase: phase("discovery"), party: "Unassigned", star: false, overview: "", subTasks: [], blockers: [], links: [], dependsOn: null,
-            startDate: new Date(baseDate), endDate: new Date(baseDate.getTime() + 6 * DAY_MS) },
-          { task: "Design", phase: phase("ideation"), party: "Unassigned", star: false, overview: "", subTasks: [], blockers: [], links: [], dependsOn: 0,
-            startDate: new Date(baseDate.getTime() + 7 * DAY_MS), endDate: new Date(baseDate.getTime() + 13 * DAY_MS) },
-          { task: "Review", phase: phase("review"), party: "Unassigned", star: false, overview: "", subTasks: [], blockers: [], links: [], dependsOn: 1,
-            startDate: new Date(baseDate.getTime() + 14 * DAY_MS), endDate: new Date(baseDate.getTime() + 20 * DAY_MS) },
-          { task: "Build", phase: phase("development"), party: "Unassigned", star: false, overview: "", subTasks: [], blockers: [], links: [], dependsOn: 2,
-            startDate: new Date(baseDate.getTime() + 21 * DAY_MS), endDate: new Date(baseDate.getTime() + 27 * DAY_MS) },
-          { task: "Launch", phase: phase("delivery"), party: "Unassigned", star: false, overview: "", subTasks: [], blockers: [], links: [], dependsOn: 3,
-            startDate: new Date(baseDate.getTime() + 28 * DAY_MS), endDate: new Date(baseDate.getTime() + 34 * DAY_MS) }
-        ];
+        const sampleTaskNames = ["Research", "Design", "Review", "Build", "Launch"];
+        const n = Math.min(sampleTaskNames.length, Math.max(1, PHASES.length));
+        const sampleTasks = [];
+        for (let i = 0; i < n; i++) {
+          const phaseIdx = Math.min(i, PHASES.length - 1);
+          const range = getPhaseDateRange(phaseIdx, baseDate);
+          const startDate = range ? range.startDate : new Date(baseDate);
+          const endDate = range ? range.endDate : new Date(baseDate.getTime() + 13 * (24 * 60 * 60 * 1000));
+          sampleTasks.push({
+            task: sampleTaskNames[i],
+            phase: PHASES[phaseIdx].id,
+            party: "Unassigned",
+            star: false,
+            overview: "",
+            subTasks: [],
+            blockers: [],
+            links: [],
+            dependsOn: i === 0 ? null : i - 1,
+            startDate,
+            endDate
+          });
+        }
         sampleTasks.forEach(t => {
           t.start = formatDate(t.startDate);
           t.end = formatDate(t.endDate);
@@ -7007,7 +7625,7 @@
       if (emptyPopulateBtn) emptyPopulateBtn.onclick = runSamplePopulate;
       const viewSelect = document.getElementById("viewMode");
       if (viewSelect) {
-        const saved = localStorage.getItem(getViewKey());
+        const saved = getSavedView();
         if (saved && VIEW_ORDER.includes(saved)) viewSelect.value = saved;
       }
       document.addEventListener("keydown", (e) => {
@@ -7044,131 +7662,6 @@
       const singleLineEl = document.getElementById("ganttDependencyLine");
       let connectorDrag = null;
       let connectorUpdateTid = null;
-
-      function attachSingleLineDotHandlers(depLineDot1, depLineDot2, depLinePath, depLinePathHover, primaryIdx, dependentIdx, getCoords, primaryColor) {
-        const circle1 = depLineDot1?.querySelector?.("circle") || depLineDot1?.firstElementChild;
-        const circle2 = depLineDot2?.querySelector?.("circle") || depLineDot2?.firstElementChild;
-        const path = depLinePath;
-        const pathHit = depLinePathHover;
-        const dotR = 3;
-        const addHandlers = (circle, end, dotEl) => {
-          const onDown = (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            const coords = getCoords();
-            const { x1, y1, x2, y2 } = coords;
-            const fixedX = end === "primary" ? x2 : x1;
-            const fixedY = end === "primary" ? y2 : y1;
-            const otherX = end === "primary" ? x1 : x2;
-            const otherY = end === "primary" ? y1 : y2;
-            dotEl.classList.add("connector-dot-dragging");
-            path.classList.add("connector-dragging");
-            const onMove = (e2) => {
-              e2.preventDefault();
-              const cx = e2.clientX;
-              const cy = e2.clientY;
-              dotEl.setAttribute("transform", `translate(${cx}, ${cy - (end === "primary" ? dotR : 0)})`);
-              const newD = end === "primary" ? connectorPathD(cx, cy, fixedX, fixedY) : connectorPathD(fixedX, fixedY, cx, cy);
-              path.setAttribute("d", newD);
-              if (pathHit) pathHit.setAttribute("d", newD);
-              const ganttWrapper = document.querySelector(".gantt-wrapper");
-              const prevWrapperPE = ganttWrapper?.style.pointerEvents;
-              if (ganttWrapper) ganttWrapper.style.pointerEvents = "auto";
-              const elements = document.elementsFromPoint(cx, cy);
-              if (ganttWrapper) ganttWrapper.style.pointerEvents = prevWrapperPE || "";
-              let hoveredIdx = null;
-              for (const el of elements) {
-                const row = el.closest?.(".gantt-row[data-index]");
-                if (row && !row.classList.contains("gantt-header")) {
-                  hoveredIdx = parseInt(row.getAttribute("data-index"), 10);
-                  break;
-                }
-                const barEl = el.closest?.(".gantt-bar");
-                if (barEl) {
-                  hoveredIdx = parseInt(barEl.getAttribute("data-index"), 10);
-                  break;
-                }
-              }
-              let previewColor = "#a3a3a3";
-              if (hoveredIdx !== null && !isNaN(hoveredIdx)) {
-                if (end === "primary" && hoveredIdx !== dependentIdx && !wouldCreateCycle(dependentIdx, hoveredIdx)) {
-                  previewColor = getPhaseColor(tasks[hoveredIdx].phase || PHASES[0]?.id);
-                } else if (end === "dependent" && hoveredIdx !== primaryIdx && !wouldCreateCycle(hoveredIdx, primaryIdx)) {
-                  previewColor = getPhaseColor(tasks[hoveredIdx].phase || PHASES[0]?.id);
-                }
-              }
-              path.setAttribute("stroke", previewColor);
-            };
-            const onUp = (e2) => {
-              e2.preventDefault();
-              e2.stopPropagation();
-              document.removeEventListener("mousemove", onMove);
-              document.removeEventListener("mouseup", onUp);
-              const ganttWrapper = document.querySelector(".gantt-wrapper");
-              const prevWrapperPE = ganttWrapper?.style.pointerEvents;
-              if (ganttWrapper) ganttWrapper.style.pointerEvents = "auto";
-              const elements = document.elementsFromPoint(e2.clientX, e2.clientY);
-              if (ganttWrapper) ganttWrapper.style.pointerEvents = prevWrapperPE || "";
-              let newIdx = null;
-              for (const el of elements) {
-                const row = el.closest?.(".gantt-row[data-index]");
-                if (row && !row.classList.contains("gantt-header")) {
-                  newIdx = parseInt(row.getAttribute("data-index"), 10);
-                  break;
-                }
-                const bar = el.closest?.(".gantt-bar");
-                if (bar) {
-                  newIdx = parseInt(bar.getAttribute("data-index"), 10);
-                  break;
-                }
-              }
-              dotEl.classList.remove("connector-dot-dragging");
-              path.classList.remove("connector-dragging");
-              let didUpdate = false;
-              let toastMessage = "";
-              if (newIdx !== null && !isNaN(newIdx)) {
-                if (end === "primary" && newIdx !== dependentIdx && !wouldCreateCycle(dependentIdx, newIdx)) {
-                  pushTasksUndo();
-                  tasks[dependentIdx].dependsOn = newIdx;
-                  propagateDependencyChanges(newIdx);
-                  didUpdate = true;
-                  const childTask = tasks[dependentIdx];
-                  const newParentTask = tasks[newIdx];
-                  const childName = (childTask.star ? "★ " : "") + (childTask.task || "Task");
-                  const parentName = (newParentTask.star ? "★ " : "") + (newParentTask.task || "Task");
-                  toastMessage = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> "${childName}" → "${parentName}"`;
-                } else if (end === "dependent" && newIdx !== primaryIdx && !wouldCreateCycle(newIdx, primaryIdx)) {
-                  pushTasksUndo();
-                  tasks[dependentIdx].dependsOn = null;
-                  tasks[newIdx].dependsOn = primaryIdx;
-                  propagateDependencyChanges(primaryIdx);
-                  didUpdate = true;
-                  const newChildTask = tasks[newIdx];
-                  const parentTask = tasks[primaryIdx];
-                  const childName = (newChildTask.star ? "★ " : "") + (newChildTask.task || "Task");
-                  const parentName = (parentTask.star ? "★ " : "") + (parentTask.task || "Task");
-                  toastMessage = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> "${childName}" → "${parentName}"`;
-                }
-              }
-              if (didUpdate) {
-                saveTasks();
-                renderTasks();
-                if (toastMessage) showToast(toastMessage, { onUndo: performUndo });
-              } else if (path && primaryColor) {
-                path.setAttribute("stroke", primaryColor);
-              }
-            };
-            document.addEventListener("mousemove", onMove);
-            document.addEventListener("mouseup", onUp, { once: true });
-            onMove(e);
-          };
-          circle.addEventListener("mousedown", onDown);
-          return () => circle.removeEventListener("mousedown", onDown);
-        };
-        const off1 = circle1 ? addHandlers(circle1, "primary", depLineDot1) : () => {};
-        const off2 = circle2 ? addHandlers(circle2, "dependent", depLineDot2) : () => {};
-        return () => { off1(); off2(); };
-      }
 
       function updateAllConnectors() {
         if (!allLinesEl || !grid) return;
@@ -7788,9 +8281,10 @@
         document.body.classList.remove("shift-mode");
         grid?.querySelectorAll(".gantt-row:not(.gantt-header)").forEach(r => { r.draggable = true; });
         if (singleLineEl) singleLineEl.style.visibility = "";
+        shiftModeUnlinkButtons.forEach(btn => btn.remove());
+        shiftModeUnlinkButtons.length = 0;
         if (allLinesEl) {
           allLinesEl.classList.remove("visible");
-          allLinesEl.innerHTML = "";
         }
         if (document._allConnectorsCleanup) {
           document._allConnectorsCleanup();
@@ -7846,12 +8340,247 @@
         }
       } catch (e) { console.warn("Legacy migration skipped:", e); }
     }
-    function bootstrap() {
+    function initAuthUI() {
+      if (!window.ganttStorage) return;
+      const loginBtn = document.getElementById("ganttAuthLogin");
+      const wrap = document.getElementById("ganttAuthWrap");
+      const userEmailEl = document.getElementById("ganttAuthUserEmail");
+      const userTrigger = document.getElementById("ganttAuthUserTrigger");
+      const userDropdown = document.getElementById("ganttAuthUserDropdown");
+      const supabaseLink = document.getElementById("ganttAuthSupabaseLink");
+      const logoutBtn = document.getElementById("ganttAuthLogout");
+      const overlay = document.getElementById("ganttAuthModalOverlay");
+      const configSection = document.getElementById("ganttAuthConfigSection");
+      const loginSection = document.getElementById("ganttAuthLoginSection");
+      const configUrlInput = document.getElementById("ganttAuthConfigUrl");
+      const configAnonInput = document.getElementById("ganttAuthConfigAnonKey");
+      const configSaveBtn = document.getElementById("ganttAuthConfigSave");
+      const cancelConfigBtn = document.getElementById("ganttAuthCancelConfig");
+      const showConfigLink = document.getElementById("ganttAuthShowConfig");
+      const emailInput = document.getElementById("ganttAuthEmail");
+      const passwordInput = document.getElementById("ganttAuthPassword");
+      const rememberCheckbox = document.getElementById("ganttAuthRemember");
+      const submitBtn = document.getElementById("ganttAuthSubmit");
+      const signupSubmitBtn = document.getElementById("ganttAuthSignupSubmit");
+      const errorEl = document.getElementById("ganttAuthError");
+      const GANTT_AUTH_REMEMBER_EMAIL_KEY = "gantt-auth-remember-email";
+
+      function authErrorMessage(err) {
+        if (!err) return "Something went wrong.";
+        const msg = typeof err === "string" ? err : (err && err.message ? err.message : String(err));
+        if (/aborted|cancelled|canceled|timeout/i.test(msg)) return "Request was cancelled or took too long. Please try again.";
+        return msg;
+      }
+
+      function showAuthError(msg) {
+        if (!errorEl) return;
+        errorEl.textContent = authErrorMessage(msg);
+        errorEl.style.display = "block";
+      }
+
+      function clearAuthError() {
+        if (errorEl) { errorEl.textContent = ""; errorEl.style.display = "none"; }
+      }
+
+      function setAuthLoading(which) {
+        var isLogin = which === "login";
+        var isSignup = which === "signup";
+        var busy = isLogin || isSignup;
+        if (submitBtn) {
+          submitBtn.disabled = busy;
+          submitBtn.textContent = isLogin ? "Logging in…" : "Log in";
+        }
+        if (signupSubmitBtn) {
+          signupSubmitBtn.disabled = busy;
+          signupSubmitBtn.textContent = isSignup ? "Signing up…" : "Sign up";
+        }
+      }
+
+      function withTimeout(promise, ms, message) {
+        return Promise.race([
+          promise,
+          new Promise((_, reject) => setTimeout(() => reject(new Error(message)), ms))
+        ]);
+      }
+
+      function showModalView(view) {
+        const isConfig = view === "config";
+        if (configSection) configSection.classList.toggle("hidden", !isConfig);
+        if (loginSection) loginSection.classList.toggle("hidden", isConfig);
+        clearAuthError();
+      }
+
+      function fillRememberedEmail() {
+        try {
+          const saved = localStorage.getItem(GANTT_AUTH_REMEMBER_EMAIL_KEY);
+          if (saved && emailInput) emailInput.value = saved;
+        } catch (e) {}
+      }
+
+      function openModal() {
+        overlay?.classList.add("visible");
+        if (window.ganttStorage.isCloudEnabled()) {
+          showModalView("login");
+          fillRememberedEmail();
+          emailInput?.focus();
+        } else {
+          showModalView("config");
+          const saved = window.ganttStorage.getSavedConfig();
+          if (configUrlInput) configUrlInput.value = saved?.url || "";
+          if (configAnonInput) configAnonInput.value = saved?.anonKey || "";
+          configUrlInput?.focus();
+        }
+      }
+
+      function updateAuthUI(session) {
+        const show = !!session;
+        if (wrap) wrap.style.display = show ? "" : "none";
+        if (loginBtn) loginBtn.style.display = show ? "none" : "";
+        if (userEmailEl) userEmailEl.textContent = show ? (session.user?.email || "Signed in") : "";
+        if (supabaseLink && window.ganttStorage) {
+          const config = window.ganttStorage.getSavedConfig();
+          if (config && config.url) {
+            const m = config.url.match(/^https:\/\/([^.]+)\.supabase\.co/);
+            supabaseLink.href = m ? "https://supabase.com/dashboard/project/" + m[1] : "https://supabase.com/dashboard";
+          } else supabaseLink.href = "https://supabase.com/dashboard";
+        }
+        wrap?.classList.remove("open");
+      }
+      window.ganttStorage.onAuthChange(updateAuthUI);
+
+      if (loginBtn) loginBtn.addEventListener("click", openModal);
+      if (userTrigger && wrap) {
+        userTrigger.addEventListener("click", (e) => {
+          e.stopPropagation();
+          wrap.classList.toggle("open");
+          userTrigger.setAttribute("aria-expanded", wrap.classList.contains("open"));
+        });
+      }
+      document.addEventListener("click", () => wrap?.classList.remove("open"));
+      if (userDropdown) userDropdown.addEventListener("click", (e) => e.stopPropagation());
+      if (supabaseLink) supabaseLink.addEventListener("click", () => wrap?.classList.remove("open"));
+      if (logoutBtn) logoutBtn.addEventListener("click", () => { wrap?.classList.remove("open"); window.ganttStorage.signOut(); });
+      if (overlay) overlay.addEventListener("click", (e) => { if (e.target === overlay) overlay.classList.remove("visible"); });
+      if (cancelConfigBtn) cancelConfigBtn.addEventListener("click", () => overlay?.classList.remove("visible"));
+
+      if (configSaveBtn) configSaveBtn.addEventListener("click", () => {
+        try {
+          errorEl.style.display = "none";
+          errorEl.textContent = "";
+          const url = (configUrlInput && configUrlInput.value || "").trim();
+          const anonKey = (configAnonInput && configAnonInput.value || "").trim();
+          const result = window.ganttStorage.saveConfig({ url, anonKey });
+          if (result && result.error) {
+            errorEl.textContent = (result.error.message || "Invalid config");
+            errorEl.style.display = "block";
+            return;
+          }
+          if (!result || !result.ok) return;
+          showModalView("login");
+          fillRememberedEmail();
+          emailInput?.focus();
+        } catch (err) {
+          if (errorEl) {
+            errorEl.textContent = (err && err.message) || String(err);
+            errorEl.style.display = "block";
+          }
+        }
+      });
+
+      if (showConfigLink) showConfigLink.addEventListener("click", () => {
+        const saved = window.ganttStorage.getSavedConfig();
+        if (configUrlInput) configUrlInput.value = saved?.url || "";
+        if (configAnonInput) configAnonInput.value = saved?.anonKey || "";
+        showModalView("config");
+        configUrlInput?.focus();
+      });
+
+      if (submitBtn) submitBtn.addEventListener("click", async () => {
+        const email = emailInput?.value?.trim();
+        const password = passwordInput?.value;
+        clearAuthError();
+        if (!email || !password) { showAuthError("Enter email and password."); return; }
+        setAuthLoading("login");
+        try {
+          const result = await withTimeout(
+            window.ganttStorage.signIn(email, password),
+            45000,
+            "Request took too long. Check your connection and Supabase project URL (Dashboard → Settings → API), then try again."
+          );
+          if (result && result.error) { showAuthError(result.error); return; }
+          try {
+            if (rememberCheckbox?.checked) localStorage.setItem(GANTT_AUTH_REMEMBER_EMAIL_KEY, email);
+            else localStorage.removeItem(GANTT_AUTH_REMEMBER_EMAIL_KEY);
+          } catch (e) {}
+          overlay.classList.remove("visible");
+          if (typeof renderHomeView === "function") renderHomeView();
+          if (window.ganttStorage?.refreshAuthUI) await window.ganttStorage.refreshAuthUI();
+        } catch (err) {
+          var msg = err && err.message ? err.message : "Network or server error. Check your connection and try again.";
+          if (typeof console !== "undefined" && console.warn) console.warn("[Login]", msg);
+          showAuthError(msg);
+        } finally {
+          setAuthLoading(false);
+        }
+      });
+
+      if (signupSubmitBtn) signupSubmitBtn.addEventListener("click", async () => {
+        const email = emailInput?.value?.trim();
+        const password = passwordInput?.value;
+        clearAuthError();
+        if (!email || !password) { showAuthError("Enter email and password."); return; }
+        setAuthLoading("signup");
+        try {
+          const result = await withTimeout(
+            window.ganttStorage.signUp(email, password),
+            45000,
+            "Request took too long. Check your connection and Supabase project URL (Dashboard → Settings → API), then try again."
+          );
+          if (result && result.error) { showAuthError(result.error); return; }
+          overlay.classList.remove("visible");
+          if (typeof renderHomeView === "function") renderHomeView();
+          if (window.ganttStorage?.refreshAuthUI) await window.ganttStorage.refreshAuthUI();
+        } catch (err) {
+          showAuthError(err && err.message ? err.message : "Network or server error. Check your connection and try again.");
+        } finally {
+          setAuthLoading(false);
+        }
+      });
+    }
+
+    async function bootstrap() {
       migrateLegacySingleProject();
-      window.addEventListener("hashchange", handleRoute);
-      function createNewProject() {
+      initAuthUI();
+      if (window.ganttStorage?.isCloudEnabled()) {
+        const session = await window.ganttStorage.getSession();
+        if (session) await window.ganttStorage.ensureBoardsListLoaded();
+      }
+      window.addEventListener("hashchange", () => handleRoute());
+      async function createNewProject() {
+        if (window.ganttStorage?.isCloudEnabled()) {
+          const name = getUniqueProjectName("Untitled project");
+          let newId;
+          try {
+            newId = await window.ganttStorage.createBoard(name);
+          } catch (err) {
+            if (typeof showToast === "function") showToast("Could not create project. Try again or log out and back in.", { type: "error" });
+            return;
+          }
+          if (newId) {
+            ensureProjectInList(newId, name);
+            homeEditProjectId = newId;
+            renderHomeView();
+            requestAnimationFrame(() => {
+              const newCard = document.querySelector(".home-project-card.edit-mode");
+              if (newCard) newCard.scrollIntoView({ behavior: "smooth", block: "nearest" });
+            });
+          } else {
+            if (typeof showToast === "function") showToast("Could not create project. Check connection or try logging out and back in.", { type: "error" });
+          }
+          return;
+        }
         const newId = "p-" + Date.now();
-        ensureProjectInList(newId, "Untitled project");
+        ensureProjectInList(newId, getUniqueProjectName("Untitled project"));
         homeEditProjectId = newId;
         renderHomeView();
         requestAnimationFrame(() => {
@@ -7859,19 +8588,23 @@
           if (newCard) newCard.scrollIntoView({ behavior: "smooth", block: "nearest" });
         });
       }
-      document.addEventListener("click", (e) => {
+      document.addEventListener("click", async (e) => {
         if (!e.target.closest("#homeFab") && !e.target.closest(".home-new-project-btn")) return;
         const homeView = document.getElementById("homeView");
         if (!homeView?.classList.contains("active")) return;
         e.preventDefault();
         e.stopPropagation();
-        createNewProject();
+        try {
+          await createNewProject();
+        } catch (err) {
+          if (typeof showToast === "function") showToast("Could not create project.", { type: "error" });
+        }
       });
       (function initViewCycling() {
         const viewSelect = document.getElementById("viewMode");
         if (!viewSelect) return;
         const applyView = () => {
-          localStorage.setItem(getViewKey(), viewSelect.value);
+          setSavedView(viewSelect.value);
           if (typeof updateWeekWidth === "function") updateWeekWidth();
           if (typeof renderPhaseHeaders === "function") renderPhaseHeaders();
         };
@@ -7894,7 +8627,7 @@
           }
         });
       })();
-      handleRoute();
+      await handleRoute();
     }
     if (document.readyState === "loading") {
       document.addEventListener("DOMContentLoaded", bootstrap);
