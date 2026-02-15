@@ -241,9 +241,9 @@
           "phaseSecondary": null,
           "party": "Unassigned",
           "start": "2/14",
-          "end": "2/20",
+          "end": "3/5",
           "startDate": "2026-02-14T07:00:00.000Z",
-          "endDate": "2026-02-20T07:00:00.000Z",
+          "endDate": "2026-03-06T03:30:02.304Z",
           "star": false,
           "overview": "",
           "subTasks": [],
@@ -254,7 +254,11 @@
       ],
       "settings": {
         "title": "maybe plz",
-        "description": "ok ya"
+        "description": "ok ya",
+        "scrollPosition": {
+          "scrollTop": 0,
+          "scrollLeft": 238
+        }
       },
       "view": "default",
       "custom_palettes": []
