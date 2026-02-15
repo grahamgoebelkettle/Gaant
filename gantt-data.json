@@ -24,6 +24,11 @@
       "id": "p-1771137300485",
       "name": "this is brand new!",
       "createdAt": 1771137300485
+    },
+    {
+      "id": "p-1771137767559",
+      "name": "this is brand new! copy",
+      "createdAt": 1771137767559
     }
   ],
   "boards": {
@@ -292,6 +297,84 @@
       ],
       "settings": {
         "title": "this is brand new!",
+        "description": "another one",
+        "scrollPosition": {
+          "scrollTop": 0,
+          "scrollLeft": 683
+        }
+      },
+      "view": "default",
+      "custom_palettes": []
+    },
+    "p-1771137767559": {
+      "tasks": [
+        {
+          "task": "my first task",
+          "phase": "discovery",
+          "phaseSecondary": null,
+          "party": "Unassigned",
+          "start": "2/14",
+          "end": "2/20",
+          "startDate": "2026-02-14T07:00:00.000Z",
+          "endDate": "2026-02-20T07:00:00.000Z",
+          "star": false,
+          "overview": "",
+          "subTasks": [],
+          "blockers": [],
+          "links": [],
+          "dependsOn": null
+        },
+        {
+          "task": "my first task",
+          "phase": "ideation",
+          "phaseSecondary": null,
+          "party": "Unassigned",
+          "start": "3/13",
+          "end": "3/19",
+          "startDate": "2026-03-13T19:03:11.481Z",
+          "endDate": "2026-03-19T19:03:11.481Z",
+          "star": false,
+          "overview": "",
+          "subTasks": [],
+          "blockers": [],
+          "links": [],
+          "dependsOn": null
+        },
+        {
+          "task": "my first task",
+          "phase": "development",
+          "phaseSecondary": null,
+          "party": "Unassigned",
+          "start": "4/10",
+          "end": "4/16",
+          "startDate": "2026-04-11T04:00:52.992Z",
+          "endDate": "2026-04-17T04:00:52.992Z",
+          "star": false,
+          "overview": "",
+          "subTasks": [],
+          "blockers": [],
+          "links": [],
+          "dependsOn": null
+        },
+        {
+          "task": "my first task",
+          "phase": "review",
+          "phaseSecondary": "delivery",
+          "party": "Unassigned",
+          "start": "5/9",
+          "end": "6/10",
+          "startDate": "2026-05-09T15:06:32.640Z",
+          "endDate": "2026-06-10T19:09:48.672Z",
+          "star": false,
+          "overview": "",
+          "subTasks": [],
+          "blockers": [],
+          "links": [],
+          "dependsOn": null
+        }
+      ],
+      "settings": {
+        "title": "this is brand new! copy",
         "description": "another one",
         "scrollPosition": {
           "scrollTop": 0,
