@@ -24,16 +24,16 @@
           "phase": "ideation",
           "phaseSecondary": null,
           "party": "Unassigned",
-          "start": "2/8",
-          "end": "2/25",
-          "startDate": "2026-02-08T07:00:00.000Z",
-          "endDate": "2026-02-26T05:59:59.481Z",
+          "start": "4/30",
+          "end": "5/18",
+          "startDate": "2026-04-30T13:30:12.672Z",
+          "endDate": "2026-05-18T12:30:12.153Z",
           "star": false,
-          "overview": "",
+          "overview": "initial green task",
           "subTasks": [],
           "blockers": [],
           "links": [],
-          "dependsOn": null
+          "dependsOn": 1
         },
         {
           "task": "my first task",
