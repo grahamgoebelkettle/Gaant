@@ -2,12 +2,12 @@
   "projects": [
     {
       "id": "p-sample",
-      "name": "Sample project",
+      "name": "One",
       "createdAt": 1739548800000
     },
     {
       "id": "p-1771131136904",
-      "name": "Sample project copy",
+      "name": "Two",
       "createdAt": 1771131136904
     },
     {
@@ -47,8 +47,8 @@
         }
       ],
       "settings": {
-        "title": "Sample project",
-        "description": ""
+        "title": "One",
+        "description": "Drag bars to reschedule • Drag edges to change dates • Drag rows to reorder • Click a row to expand details • Click cells to edit"
       },
       "view": "default",
       "custom_palettes": []
@@ -73,7 +73,7 @@
         }
       ],
       "settings": {
-        "title": "Sample project copy",
+        "title": "Two",
         "description": "Drag bars to reschedule • Drag edges to change dates • Drag rows to reorder • Click a row to expand details • Click cells to edit",
         "phases": [
           {
