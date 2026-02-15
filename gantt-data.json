@@ -32,7 +32,7 @@
     },
     {
       "id": "p-1771140518298",
-      "name": "two million!!!",
+      "name": "three billion!!!",
       "createdAt": 1771140518298
     }
   ],
@@ -369,13 +369,13 @@
       "tasks": [
         {
           "task": "my first task",
-          "phase": "discovery",
-          "phaseSecondary": null,
+          "phase": "review",
+          "phaseSecondary": "delivery",
           "party": "Unassigned",
-          "start": "2/20",
-          "end": "2/26",
-          "startDate": "2026-02-20T17:36:54.221Z",
-          "endDate": "2026-02-26T17:36:54.221Z",
+          "start": "5/14",
+          "end": "6/16",
+          "startDate": "2026-05-14T18:53:50.640Z",
+          "endDate": "2026-06-16T16:23:45.081Z",
           "star": false,
           "overview": "",
           "subTasks": [],
@@ -385,7 +385,7 @@
         }
       ],
       "settings": {
-        "title": "two million!!!",
+        "title": "three billion!!!",
         "description": "Drag bars to reschedule • Drag edges to change dates • Drag rows to reorder • Click a row to expand details • Click cells to edit",
         "phases": [
           {
@@ -433,7 +433,7 @@
         "responsibleParties": [],
         "scrollPosition": {
           "scrollTop": 0,
-          "scrollLeft": 46
+          "scrollLeft": 924
         }
       },
       "view": "default",
