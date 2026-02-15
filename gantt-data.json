@@ -224,7 +224,24 @@
       "custom_palettes": []
     },
     "p-1771137300485": {
-      "tasks": [],
+      "tasks": [
+        {
+          "task": "my first task",
+          "phase": "discovery",
+          "phaseSecondary": null,
+          "party": "Unassigned",
+          "start": "2/14",
+          "end": "2/20",
+          "startDate": "2026-02-14T07:00:00.000Z",
+          "endDate": "2026-02-20T07:00:00.000Z",
+          "star": false,
+          "overview": "",
+          "subTasks": [],
+          "blockers": [],
+          "links": [],
+          "dependsOn": null
+        }
+      ],
       "settings": {
         "title": "this is brand new!",
         "description": "another one"
