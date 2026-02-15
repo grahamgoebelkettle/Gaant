@@ -3106,7 +3106,7 @@
     const SHARED_FILE_URL_KEY = "gantt-shared-file-url";
     const GITHUB_TOKEN_KEY = "gantt-github-token";
     const SHARED_FILE_POLL_MS = 15000;
-    const EXAMPLE_SHARED_FILE_URL = "https://raw.githubusercontent.com/grahamgoebelkettle/Gaant/refs/heads/main/gantt-data.json";
+    const EXAMPLE_SHARED_FILE_URL = "https://raw.githubusercontent.com/grahamgoebelkettle/Gaant/main/gantt-data.json";
     function getCustomPalettesKey() {
       return "gantt-custom-palettes-" + (currentProjectId || "default");
     }
@@ -8821,7 +8821,7 @@
         function getSharedFileStatus(url) {
           var u = (url && url.trim()) || "";
           if (!u) return { type: "none", label: "Not set" };
-          var m = u.match(/raw\.githubusercontent\.com\/([^/]+)\/([^/]+)\/refs\/heads\/([^/]+)\/(.+)/);
+          var m = u.match(/raw\.githubusercontent\.com\/([^/]+)\/([^/]+)\/(?:refs\/heads\/)?([^/]+)\/(.+)/);
           if (m) return { type: "github", label: m[1] + "/" + m[2] };
           return { type: "custom", label: "Custom URL" };
         }
@@ -8870,6 +8870,8 @@
         }
         function sharedJsonUrl(u) {
           var base = (u && u.trim()) || "";
+          var gh = parseGitHubRawUrl(base);
+          if (gh) base = "https://raw.githubusercontent.com/" + gh.owner + "/" + gh.repo + "/" + gh.branch + "/" + gh.path;
           var sep = base.indexOf("?") >= 0 ? "&" : "?";
           return base + sep + "_=" + Date.now() + "&r=" + Math.random().toString(36).slice(2);
         }
@@ -8878,7 +8880,24 @@
           if (!url || typeof url !== "string") return null;
           var u = url.trim();
           var m = u.match(/raw\.githubusercontent\.com\/([^/]+)\/([^/]+)\/refs\/heads\/([^/]+)\/(.+)/);
+          if (m) return { owner: m[1], repo: m[2], branch: m[3], path: m[4] };
+          m = u.match(/raw\.githubusercontent\.com\/([^/]+)\/([^/]+)\/([^/]+)\/(.+)/);
           return m ? { owner: m[1], repo: m[2], branch: m[3], path: m[4] } : null;
+        }
+        var sharedFetchFailCount = 0;
+        function fetchViaGitHubRestApi(gh) {
+          var pathEnc = gh.path.split("/").map(function (p) { return encodeURIComponent(p); }).join("/");
+          var apiUrl = "https://api.github.com/repos/" + encodeURIComponent(gh.owner) + "/" + encodeURIComponent(gh.repo) + "/contents/" + pathEnc + "?ref=" + encodeURIComponent(gh.branch);
+          return fetch(apiUrl, {
+            cache: "no-store",
+            credentials: "omit",
+            headers: { "Accept": "application/vnd.github.raw", "Cache-Control": "no-cache", "Pragma": "no-cache" }
+          }).then(function (r) {
+            if (!r.ok) throw new Error(r.status + " " + r.statusText);
+            return r.text().then(function (text) {
+              try { return JSON.parse(text); } catch (e) { throw new Error("Invalid JSON"); }
+            });
+          });
         }
         function fetchViaGitHubGraphQL(gh, token) {
           var expr = gh.branch + ":" + gh.path;
@@ -8886,12 +8905,23 @@
           var authHeader = /^ghp_/.test(token) ? "token " + token : "Bearer " + token;
           return fetch("https://api.github.com/graphql", {
             method: "POST",
-            headers: { "Content-Type": "application/json", "Authorization": authHeader },
+            cache: "no-store",
+            credentials: "omit",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": authHeader,
+              "Cache-Control": "no-cache",
+              "Pragma": "no-cache"
+            },
             body: JSON.stringify({ query: query, variables: { owner: gh.owner, name: gh.repo, expr: expr } })
-          }).then(function (r) { return r.json(); });
+          }).then(function (r) {
+            if (!r.ok) throw new Error(r.status + " " + r.statusText);
+            return r.json();
+          });
         }
         function fetchSharedUpdates() {
           if (document.visibilityState !== "visible" || !isSynced()) return;
+          if (window.ganttStorage && window.ganttStorage.isCloudEnabled && window.ganttStorage.isCloudEnabled()) return;
           var url;
           try { url = localStorage.getItem(SHARED_FILE_URL_KEY); } catch (e) { return; }
           if (!url || !url.trim()) return;
@@ -8902,12 +8932,17 @@
           var fetchPromise;
           if (gh && token) {
             fetchPromise = fetchViaGitHubGraphQL(gh, token).then(function (res) {
-              if (res.errors && res.errors.length) return null;
+              if (res.errors && res.errors.length) throw new Error(res.errors[0].message || "GraphQL error");
               var obj = res.data && res.data.repository && res.data.repository.object;
               if (!obj || !obj.text) return null;
               if (obj.oid === lastFetchedOid) return { skip: true };
               lastFetchedOid = obj.oid;
               try { return JSON.parse(obj.text); } catch (e) { return null; }
+            });
+          } else if (gh) {
+            fetchPromise = fetchViaGitHubRestApi(gh).then(function (data) {
+              if (data && data.projects) lastFetchedOid = null;
+              return data;
             });
           } else {
             fetchPromise = fetch(sharedJsonUrl(url), sharedJsonFetchOptions())
@@ -8919,6 +8954,7 @@
           }
           fetchPromise
             .then(function (data) {
+              sharedFetchFailCount = 0;
               if (!data || data.skip) return;
               if (!data.projects || !Array.isArray(data.projects)) return;
               var current = exportSharedSnapshot();
@@ -8935,7 +8971,12 @@
               }
               if (typeof showToast === "function") showToast("Data updated from shared file.", { type: "success" });
             })
-            .catch(function () {});
+            .catch(function (err) {
+              sharedFetchFailCount++;
+              var msg = err && (err.message || String(err));
+              if (typeof console !== "undefined" && console.warn) console.warn("[GitHub sync]", msg);
+              if (sharedFetchFailCount >= 2 && typeof showToast === "function") showToast("Sync failed: " + (msg || "Unknown error") + ". Check URL, token, and network.", { type: "error" });
+            });
         }
         window.__fetchSharedUpdates = fetchSharedUpdates;
         setInterval(fetchSharedUpdates, SHARED_FILE_POLL_MS);
@@ -8956,6 +8997,11 @@
               if (!obj || !obj.text) throw new Error("File not found");
               lastFetchedOid = obj.oid;
               return JSON.parse(obj.text);
+            });
+          } else if (gh) {
+            loadPromise = fetchViaGitHubRestApi(gh).then(function (data) {
+              if (!data) throw new Error("File not found or inaccessible (is the repo public?)");
+              return data;
             });
           } else {
             loadPromise = fetch(sharedJsonUrl(u), sharedJsonFetchOptions())
@@ -9056,7 +9102,7 @@
                 if (!r.ok) throw new Error(readErrorFromBody(text, r.status));
                 try {
                   if (token && token.trim()) localStorage.setItem(GITHUB_TOKEN_KEY, token.trim());
-                  var rawUrl = "https://raw.githubusercontent.com/" + gh.owner + "/" + gh.repo + "/refs/heads/" + gh.branch + "/" + gh.path;
+                  var rawUrl = "https://raw.githubusercontent.com/" + gh.owner + "/" + gh.repo + "/" + gh.branch + "/" + gh.path;
                   localStorage.setItem(SHARED_FILE_URL_KEY, rawUrl);
                 } catch (e) {}
                 updateHomeStatus();
