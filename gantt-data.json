@@ -36,7 +36,7 @@
           "dependsOn": 1
         },
         {
-          "task": "first",
+          "task": "Seconda",
           "phase": "development",
           "phaseSecondary": null,
           "party": "Unassigned",
