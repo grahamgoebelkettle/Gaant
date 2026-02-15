@@ -632,6 +632,36 @@
       height: 14px;
       flex-shrink: 0;
     }
+    .gantt-toast-message-wrap {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      min-width: 0;
+    }
+    .gantt-toast-message-wrap .gantt-toast-icon {
+      flex-shrink: 0;
+      line-height: 0;
+    }
+    .gantt-toast-message-wrap .gantt-toast-icon svg {
+      width: 14px;
+      height: 14px;
+      vertical-align: top;
+    }
+    .gantt-toast-message {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+    .gantt-toast-message .gantt-toast-line1 {
+      display: block;
+    }
+    .gantt-toast-hint {
+      display: block;
+      font-size: 12px;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 0.92);
+    }
     .gantt-toast.visible {
       opacity: 1;
       visibility: visible;
@@ -656,6 +686,71 @@
     }
     .gantt-toast-undo:hover {
       background: rgba(255,255,255,0.2);
+    }
+    .gantt-toast-link {
+      margin-left: 6px;
+      padding: 2px 0;
+      background: none;
+      border: none;
+      border-radius: 0;
+      color: #93c5fd;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: underline;
+      white-space: nowrap;
+    }
+    .gantt-toast-link:hover {
+      color: #bfdbfe;
+    }
+    .gantt-toast-btn-secondary {
+      margin-left: 8px;
+      padding: 6px 12px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 6px;
+      color: #fafafa;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: inherit;
+    }
+    .gantt-toast-btn-secondary:hover {
+      background: rgba(255,255,255,0.14);
+      border-color: rgba(255,255,255,0.35);
+      color: #fff;
+    }
+    .gantt-toast-btn-secondary svg {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+    }
+    .gantt-toast-dismiss {
+      margin-left: auto;
+      padding: 2px 6px;
+      background: transparent;
+      border: none;
+      border-radius: 4px;
+      color: #a3a3a3;
+      font-size: 16px;
+      line-height: 1;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .gantt-toast-dismiss:hover {
+      color: #fafafa;
+      background: rgba(255,255,255,0.1);
+    }
+    .gantt-toast-dismiss.gantt-toast-dismiss-label {
+      font-size: 13px;
+      font-weight: 500;
+      padding: 6px 12px;
+      font-family: inherit;
     }
     .gantt-drag-guide {
       position: fixed;
@@ -5023,11 +5118,83 @@
         });
         el.appendChild(undoBtn);
       }
+      if (options?.action && typeof options.action === "object" && options.action.label && typeof options.action.onClick === "function") {
+        const actionBtn = document.createElement("button");
+        actionBtn.type = "button";
+        actionBtn.className = options.action.secondary ? "gantt-toast-btn-secondary" : "gantt-toast-link";
+        if (options.action.icon) {
+          actionBtn.innerHTML = options.action.icon + " " + (options.action.label || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        } else {
+          actionBtn.textContent = options.action.label;
+        }
+        actionBtn.addEventListener("click", () => {
+          if (toastTimer) clearTimeout(toastTimer);
+          toastTimer = null;
+          el.classList.remove("visible");
+          options.action.onClick();
+        });
+        el.appendChild(actionBtn);
+      }
+      if (options?.persistent) {
+        const dismissBtn = document.createElement("button");
+        dismissBtn.type = "button";
+        dismissBtn.className = "gantt-toast-dismiss" + (options.dismissLabel ? " gantt-toast-dismiss-label" : "");
+        dismissBtn.setAttribute("aria-label", options.dismissLabel || "Dismiss");
+        dismissBtn.textContent = options.dismissLabel || "×";
+        dismissBtn.addEventListener("click", () => {
+          el.classList.remove("visible");
+          if (typeof options?.onDismiss === "function") options.onDismiss();
+        });
+        el.appendChild(dismissBtn);
+      }
       el.classList.add("visible");
-      toastTimer = setTimeout(() => {
-        el.classList.remove("visible");
-        toastTimer = null;
-      }, 2500);
+      if (!options?.persistent) {
+        toastTimer = setTimeout(() => {
+          el.classList.remove("visible");
+          toastTimer = null;
+        }, 2500);
+      }
+    }
+    function openSettingsToTasksTab() {
+      if (typeof openSettingsModal !== "function") return;
+      openSettingsModal();
+      var tabsBoard = document.getElementById("settingsTabsBoard");
+      var tasksTab = tabsBoard ? tabsBoard.querySelector('.settings-tab[data-tab="tasks"]') : null;
+      var tasksPanel = document.getElementById("settingsTabTasks");
+      if (tasksTab) {
+        document.querySelectorAll(".settings-tab").forEach(function (t) { t.classList.remove("active"); });
+        document.querySelectorAll(".settings-tab-panel").forEach(function (p) { p.classList.remove("active"); });
+        tasksTab.classList.add("active");
+        if (tasksPanel) tasksPanel.classList.add("active");
+        if (typeof updateAutoPopulateSectionVisibility === "function") updateAutoPopulateSectionVisibility();
+      }
+    }
+    var LINK_ICON_SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>';
+    function showLinkedTasksToast() {
+      const s = loadProjectSettings() || {};
+      if (s.linkedTasksToastSeen) return;
+      const line1 = 'Linked tasks move with the parent by default.';
+      const line2 = 'You can allow independent dates in Settings.';
+      const msg = '<div class="gantt-toast-message-wrap"><span class="gantt-toast-icon">' + LINK_ICON_SVG + '</span><div class="gantt-toast-message"><span class="gantt-toast-line1">' + line1 + '</span><span class="gantt-toast-hint">' + line2 + '</span></div></div>';
+      const el = document.getElementById("ganttToast");
+      if (!el || typeof showToast !== "function") return;
+      const projectId = currentProjectId;
+      function markSeen() {
+        const settings = loadProjectSettings() || {};
+        if (projectId && !settings.linkedTasksToastSeen) {
+          saveProjectSettings({ ...settings, linkedTasksToastSeen: true });
+        }
+      }
+      showToast(msg, {
+        persistent: true,
+        dismissLabel: "Got it",
+        action: {
+          label: 'Settings',
+          secondary: true,
+          onClick: function () { markSeen(); if (typeof openSettingsToTasksTab === "function") openSettingsToTasksTab(); }
+        },
+        onDismiss: markSeen
+      });
     }
 
     function dateToOffset(date) {
@@ -5787,6 +5954,7 @@
           const parentName = (parentTask.star ? "★ " : "") + (parentTask.task || "Task");
           propagateDependencyChanges(task.dependsOn);
           showToast(`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> "${taskName}" → "${parentName}"`, { onUndo: performUndo });
+          if (typeof showLinkedTasksToast === "function") setTimeout(showLinkedTasksToast, 2700);
         } else if (wasLinked && tasks[oldParentIdx]) {
           const oldParentTask = tasks[oldParentIdx];
           const oldParentName = (oldParentTask.star ? "★ " : "") + (oldParentTask.task || "Task");
@@ -6079,6 +6247,7 @@
               saveTasks();
               renderTasks();
               if (toastMessage) showToast(toastMessage, { onUndo: performUndo });
+              if (typeof showLinkedTasksToast === "function") setTimeout(showLinkedTasksToast, 2700);
             } else if (path && primaryColor) {
               path.setAttribute("stroke", primaryColor);
             }
@@ -9484,6 +9653,7 @@
       tasks = loadTasks();
       addedPlaceholderThisSession = false;
       tasks.forEach((_, i) => { if (tasks.some(t => t.dependsOn === i)) propagateDependencyChanges(i); });
+      if (tasks.some(function (t) { return t.dependsOn != null; }) && typeof showLinkedTasksToast === "function") showLinkedTasksToast();
       updateEmptyState();
       const emptyConfigureBtn = document.getElementById("ganttEmptyConfigure");
       if (emptyConfigureBtn) emptyConfigureBtn.onclick = openSettingsModal;
@@ -9783,6 +9953,7 @@
                   saveTasks();
                   renderTasks();
                   if (toastMessage) showToast(toastMessage, { onUndo: performUndo });
+                  if (typeof showLinkedTasksToast === "function") setTimeout(showLinkedTasksToast, 2700);
                 }
                 circle.classList.remove("connector-dot-dragging");
                 path.classList.remove("connector-dragging");
@@ -9960,6 +10131,7 @@
                 saveTasks();
                 renderTasks();
                 showToast(`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> "${childName}" → "${parentName}"`, { onUndo: performUndo });
+                if (typeof showLinkedTasksToast === "function") setTimeout(showLinkedTasksToast, 2700);
               }
             };
             document.addEventListener("mousemove", onMove);
@@ -10087,6 +10259,7 @@
                 saveTasks();
                 renderTasks();
                 showToast(`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> "${childName}" → "${parentName}"`, { onUndo: performUndo });
+                if (typeof showLinkedTasksToast === "function") setTimeout(showLinkedTasksToast, 2700);
               }
             };
             document.addEventListener("mousemove", onMove);
