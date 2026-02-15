@@ -22,7 +22,7 @@
     },
     {
       "id": "p-1771132173996",
-      "name": "May seventh",
+      "name": "May 9",
       "createdAt": 1771132185399
     }
   ],
@@ -239,7 +239,7 @@
         }
       ],
       "settings": {
-        "title": "May seventh",
+        "title": "May 9",
         "description": "Drag bars to reschedule • Drag edges to change dates • Drag rows to reorder • Click a row to expand details • Click cells to edit"
       },
       "view": "default",
