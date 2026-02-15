@@ -4,14 +4,181 @@
       "id": "p-sample",
       "name": "Sample project",
       "createdAt": 1739548800000
+    },
+    {
+      "id": "p-1771131136904",
+      "name": "Sample project copy",
+      "createdAt": 1771131136904
+    },
+    {
+      "id": "p-1771131140680",
+      "name": "Sample project copy (2)",
+      "createdAt": 1771131140680
     }
   ],
   "boards": {
     "p-sample": {
-      "tasks": [],
+      "tasks": [
+        {
+          "task": "my first task",
+          "phase": "discovery",
+          "phaseSecondary": null,
+          "party": "Unassigned",
+          "start": "2/14",
+          "end": "2/20",
+          "startDate": "2026-02-14T07:00:00.000Z",
+          "endDate": "2026-02-20T07:00:00.000Z",
+          "star": false,
+          "overview": "",
+          "subTasks": [],
+          "blockers": [],
+          "links": [],
+          "dependsOn": null
+        }
+      ],
       "settings": {
         "title": "Sample project",
         "description": ""
+      },
+      "view": "default",
+      "custom_palettes": []
+    },
+    "p-1771131136904": {
+      "tasks": [
+        {
+          "task": "my first task",
+          "phase": "discovery",
+          "phaseSecondary": null,
+          "party": "Unassigned",
+          "start": "2/14",
+          "end": "2/20",
+          "startDate": "2026-02-14T07:00:00.000Z",
+          "endDate": "2026-02-20T07:00:00.000Z",
+          "star": false,
+          "overview": "",
+          "subTasks": [],
+          "blockers": [],
+          "links": [],
+          "dependsOn": null
+        }
+      ],
+      "settings": {
+        "title": "Sample project copy",
+        "description": "Drag bars to reschedule • Drag edges to change dates • Drag rows to reorder • Click a row to expand details • Click cells to edit",
+        "phases": [
+          {
+            "id": "discovery",
+            "name": "Discovery",
+            "color": "#22c55e",
+            "sprints": 2
+          },
+          {
+            "id": "ideation",
+            "name": "Ideation",
+            "color": "#16a34a",
+            "sprints": 2
+          },
+          {
+            "id": "development",
+            "name": "Development",
+            "color": "#15803d",
+            "sprints": 2
+          },
+          {
+            "id": "review",
+            "name": "Review",
+            "color": "#166534",
+            "sprints": 2
+          },
+          {
+            "id": "delivery",
+            "name": "Delivery",
+            "color": "#14532d",
+            "sprints": 2
+          }
+        ],
+        "paletteIndex": 4,
+        "dependencyGapDays": 0,
+        "rowAppearance": "fill",
+        "strokeMode": true,
+        "showDurationOnBar": false,
+        "projectStartDate": null,
+        "projectEndDate": null,
+        "phaseDurationMode": "fixed",
+        "snapToSprint": false,
+        "moveTasksWhenSprintExtended": false,
+        "allowIndependentDependencies": false,
+        "responsibleParties": []
+      },
+      "view": "default",
+      "custom_palettes": []
+    },
+    "p-1771131140680": {
+      "tasks": [
+        {
+          "task": "my first task",
+          "phase": "ideation",
+          "phaseSecondary": null,
+          "party": "Unassigned",
+          "start": "3/16",
+          "end": "3/22",
+          "startDate": "2026-03-17T02:54:08.771Z",
+          "endDate": "2026-03-23T02:54:08.771Z",
+          "star": false,
+          "overview": "",
+          "subTasks": [],
+          "blockers": [],
+          "links": [],
+          "dependsOn": null
+        }
+      ],
+      "settings": {
+        "title": "Sample project copy (2)",
+        "description": "Drag bars to reschedule • Drag edges to change dates • Drag rows to reorder • Click a row to expand details • Click cells to edit",
+        "phases": [
+          {
+            "id": "discovery",
+            "name": "Discovery",
+            "color": "#eab308",
+            "sprints": 2
+          },
+          {
+            "id": "ideation",
+            "name": "Ideation",
+            "color": "#0d9488",
+            "sprints": 2
+          },
+          {
+            "id": "development",
+            "name": "Development",
+            "color": "#0284c7",
+            "sprints": 2
+          },
+          {
+            "id": "review",
+            "name": "Review",
+            "color": "#14b8a6",
+            "sprints": 2
+          },
+          {
+            "id": "delivery",
+            "name": "Delivery",
+            "color": "#6366f1",
+            "sprints": 2
+          }
+        ],
+        "paletteIndex": 0,
+        "dependencyGapDays": 0,
+        "rowAppearance": "default",
+        "strokeMode": false,
+        "showDurationOnBar": false,
+        "projectStartDate": "2026-02-14",
+        "projectEndDate": null,
+        "phaseDurationMode": "fixed",
+        "snapToSprint": false,
+        "moveTasksWhenSprintExtended": false,
+        "allowIndependentDependencies": false,
+        "responsibleParties": []
       },
       "view": "default",
       "custom_palettes": []
