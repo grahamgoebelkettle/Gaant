@@ -157,7 +157,11 @@
         "snapToSprint": false,
         "moveTasksWhenSprintExtended": false,
         "allowIndependentDependencies": false,
-        "responsibleParties": []
+        "responsibleParties": [],
+        "scrollPosition": {
+          "scrollTop": 0,
+          "scrollLeft": 0
+        }
       },
       "view": "default",
       "custom_palettes": []
