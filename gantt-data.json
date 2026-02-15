@@ -1,63 +1,27 @@
 {
   "projects": [
     {
-      "id": "p-sample",
-      "name": "One",
-      "createdAt": 1739548800000
-    },
-    {
       "id": "p-1771131136904",
-      "name": "Two",
+      "name": "1111",
       "createdAt": 1771131136904
     },
     {
       "id": "p-1771131140680",
-      "name": "333",
+      "name": "222",
       "createdAt": 1771131140680
     },
     {
       "id": "p-1771131853990",
-      "name": "Four",
+      "name": "May fourth",
       "createdAt": 1771131853990
     },
     {
-      "id": "p-1771132173996",
-      "name": "Five",
-      "createdAt": 1771132185399
-    },
-    {
-      "id": "p-1771134178737",
+      "id": "p-1771133455408",
       "name": "Untitled project",
-      "createdAt": 1771134178737
+      "createdAt": 1771133455408
     }
   ],
   "boards": {
-    "p-sample": {
-      "tasks": [
-        {
-          "task": "my first task",
-          "phase": "ideation",
-          "phaseSecondary": null,
-          "party": "Unassigned",
-          "start": "3/15",
-          "end": "3/21",
-          "startDate": "2026-03-15T20:27:47.760Z",
-          "endDate": "2026-03-21T20:27:47.760Z",
-          "star": false,
-          "overview": "",
-          "subTasks": [],
-          "blockers": [],
-          "links": [],
-          "dependsOn": null
-        }
-      ],
-      "settings": {
-        "title": "One",
-        "description": "Drag bars to reschedule • Drag edges to change dates • Drag rows to reorder • Click a row to expand details • Click cells to edit"
-      },
-      "view": "default",
-      "custom_palettes": []
-    },
     "p-1771131136904": {
       "tasks": [
         {
@@ -78,8 +42,8 @@
         }
       ],
       "settings": {
-        "title": "Two",
-        "description": "Drag bars to reschedule • Drag edges to change dates • Drag rows to reorder • Click a row to expand details • Click cells to edit",
+        "title": "1111",
+        "description": "new description",
         "phases": [
           {
             "id": "discovery",
@@ -114,7 +78,7 @@
         ],
         "paletteIndex": 4,
         "dependencyGapDays": 0,
-        "rowAppearance": "fill",
+        "rowAppearance": "compact",
         "strokeMode": true,
         "showDurationOnBar": false,
         "projectStartDate": null,
@@ -148,7 +112,7 @@
         }
       ],
       "settings": {
-        "title": "333",
+        "title": "222",
         "description": "Drag bars to reschedule • Drag edges to change dates • Drag rows to reorder • Click a row to expand details • Click cells to edit",
         "phases": [
           {
@@ -218,47 +182,17 @@
         }
       ],
       "settings": {
-        "title": "Four",
+        "title": "May fourth",
         "description": "Drag bars to reschedule • Drag edges to change dates • Drag rows to reorder • Click a row to expand details • Click cells to edit"
       },
       "view": "default",
       "custom_palettes": []
     },
-    "p-1771132173996": {
+    "p-1771133455408": {
       "tasks": [
         {
           "task": "my first task",
-          "phase": "ideation",
-          "phaseSecondary": null,
-          "party": "Unassigned",
-          "start": "3/13",
-          "end": "3/19",
-          "startDate": "2026-03-13T14:36:34.585Z",
-          "endDate": "2026-03-19T14:36:34.585Z",
-          "star": false,
-          "overview": "",
-          "subTasks": [],
-          "blockers": [],
-          "links": [],
-          "dependsOn": null
-        }
-      ],
-      "settings": {
-        "title": "Five",
-        "description": "Drag bars to reschedule • Drag edges to change dates • Drag rows to reorder • Click a row to expand details • Click cells to edit",
-        "scrollPosition": {
-          "scrollTop": 0,
-          "scrollLeft": 0
-        }
-      },
-      "view": "default",
-      "custom_palettes": []
-    },
-    "p-1771134178737": {
-      "tasks": [
-        {
-          "task": "my first task",
-          "phase": "ideation",
+          "phase": "discovery",
           "phaseSecondary": null,
           "party": "Unassigned",
           "start": "2/14",
@@ -275,51 +209,11 @@
       ],
       "settings": {
         "title": "Untitled project",
-        "description": "Drag bars to reschedule • Drag edges to change dates • Drag rows to reorder • Click a row to expand details • Click cells to edit",
-        "phases": [
-          {
-            "id": "discovery",
-            "name": "Discovery",
-            "color": "#64748b",
-            "sprints": 2
-          },
-          {
-            "id": "ideation",
-            "name": "Ideation",
-            "color": "#475569",
-            "sprints": 2
-          },
-          {
-            "id": "development",
-            "name": "Development",
-            "color": "#334155",
-            "sprints": 2
-          },
-          {
-            "id": "review",
-            "name": "Review",
-            "color": "#1e293b",
-            "sprints": 2
-          },
-          {
-            "id": "delivery",
-            "name": "Delivery",
-            "color": "#0f172a",
-            "sprints": 2
-          }
-        ],
-        "paletteIndex": 5,
-        "dependencyGapDays": 0,
-        "rowAppearance": "default",
-        "strokeMode": false,
-        "showDurationOnBar": false,
-        "projectStartDate": null,
-        "projectEndDate": null,
-        "phaseDurationMode": "fixed",
-        "snapToSprint": false,
-        "moveTasksWhenSprintExtended": false,
-        "allowIndependentDependencies": false,
-        "responsibleParties": []
+        "description": "",
+        "scrollPosition": {
+          "scrollTop": 0,
+          "scrollLeft": 0
+        }
       },
       "view": "default",
       "custom_palettes": []
