@@ -59,7 +59,8 @@
       line-height: 1.5;
       display: flex;
       flex-direction: column;
-      min-height: 100vh;
+      height: 100vh;
+      overflow: hidden;
     }
     h1 {
       font-size: 24px;
@@ -420,11 +421,28 @@
     }
     .gantt-dependency-line.visible { opacity: 1; }
     .gantt-dependency-line path {
-      pointer-events: stroke;
+      pointer-events: none;
       cursor: pointer;
       transition: opacity 0.15s;
     }
     .gantt-dependency-line path:hover { opacity: 1; }
+    .gantt-dependency-line .connector-dot {
+      pointer-events: none;
+      cursor: grab;
+      opacity: 0.9;
+      transition: fill 0.15s, stroke 0.15s, opacity 0.15s;
+    }
+    .gantt-dependency-line.visible .connector-dot {
+      pointer-events: auto;
+    }
+    .gantt-dependency-line .connector-dot:hover {
+      opacity: 1;
+      stroke: #171717;
+    }
+    .gantt-dependency-line .connector-dot.connector-dot-dragging {
+      opacity: 1;
+      cursor: grabbing;
+    }
     .gantt-all-dependency-lines .connector-path:hover { opacity: 1; }
     .gantt-dependency-unlink-btn {
       position: fixed;
@@ -450,6 +468,10 @@
       overflow: hidden;
     }
     .gantt-dependency-unlink-btn.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+    body.shift-mode .gantt-dependency-unlink-btn.connector-unlink-always-visible {
       opacity: 1;
       visibility: visible;
       pointer-events: auto;
@@ -534,6 +556,21 @@
       visibility: visible;
       transform: translateX(-50%) translateY(0);
     }
+    .gantt-toast-undo {
+      margin-left: 4px;
+      padding: 2px 8px;
+      background: rgba(255,255,255,0.25);
+      border: none;
+      border-radius: 4px;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .gantt-toast-undo:hover {
+      background: rgba(255,255,255,0.4);
+    }
     .gantt-drag-guide {
       position: fixed;
       left: 0;
@@ -575,7 +612,9 @@
       height: 12px;
       color: inherit;
     }
+    .gantt-all-dependency-lines { pointer-events: none; }
     .gantt-all-dependency-lines.visible { pointer-events: auto; }
+    #ganttChildConnectorsContainer { pointer-events: none; }
     body.shift-mode .gantt-all-dependency-lines.visible { z-index: 50; }
     .gantt-all-dependency-lines .connector-path { opacity: 0.5; stroke-dasharray: 4 3; }
     .gantt-all-dependency-lines .connector-path-wrap:hover .connector-path { opacity: 1; }
@@ -790,6 +829,12 @@
       opacity: 0.8;
     }
     .gantt-bar-tooltip-row .gantt-bar-tooltip-text { flex: 1; min-width: 0; }
+    .gantt-bar-tooltip-dep-unlink-wrap { margin-left: 6px; }
+    .gantt-bar-tooltip-dep-unlink {
+      background: none; border: none; padding: 0; font-size: 12px; cursor: pointer;
+      color: var(--color-general-primary); text-decoration: underline;
+    }
+    .gantt-bar-tooltip-dep-unlink:hover { opacity: 0.85; }
     .gantt-bar-tooltip-desc .gantt-bar-tooltip-text { max-height: 120px; overflow-y: auto; }
     .gantt-cell[contenteditable] {
       outline: none;
@@ -800,8 +845,7 @@
       background: var(--row-bg-default);
       box-shadow: inset 0 0 0 2px var(--color-general-primary);
     }
-    .add-task-fab,
-    .home-fab {
+    .add-task-fab {
       position: fixed;
       bottom: 24px;
       right: 24px;
@@ -822,24 +866,96 @@
       background: var(--color-general-primary);
       color: var(--bg-body);
     }
-    .add-task-fab:hover,
-    .home-fab:hover {
+    .add-task-fab:hover {
       transform: scale(1.05);
       box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
     }
-    .add-task-fab:active,
-    .home-fab:active {
+    .add-task-fab:active {
       transform: scale(0.98);
     }
+    .fab-phase-menu {
+      position: fixed;
+      z-index: 10001;
+      padding: 8px 0;
+      background: #171717;
+      color: #fafafa;
+      font-size: 13px;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+      min-width: 160px;
+      max-width: 240px;
+      pointer-events: auto;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.15s, visibility 0.15s;
+    }
+    .fab-phase-menu.visible { opacity: 1; visibility: visible; }
+    .fab-phase-menu-title {
+      padding: 8px 14px 6px;
+      font-weight: 600;
+      font-size: 12px;
+      color: #a3a3a3;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .fab-phase-menu-list { display: flex; flex-direction: column; gap: 2px; }
+    .fab-phase-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 14px;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: #fafafa;
+      font-size: 13px;
+      font-family: inherit;
+      text-align: left;
+      width: 100%;
+    }
+    .fab-phase-menu-item:hover { background: #404040; }
+    .fab-phase-menu-item .phase-swatch {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
     @media (prefers-color-scheme: dark) {
-      .add-task-fab,
-      .home-fab {
+      .add-task-fab {
         background: #ffffff;
         color: #171717;
       }
-      .add-task-fab:hover,
-      .home-fab:hover {
+      .add-task-fab:hover {
         background: #f0f0f0;
+      }
+    }
+    .home-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+    .home-new-project-btn {
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      background: var(--color-general-primary);
+      color: var(--bg-body);
+      transition: opacity 0.2s;
+    }
+    .home-new-project-btn:hover {
+      opacity: 0.9;
+    }
+    @media (prefers-color-scheme: dark) {
+      .home-new-project-btn {
+        background: #ffffff;
+        color: #171717;
       }
     }
     .week-label { 
@@ -1119,11 +1235,14 @@
       bottom: 0;
       width: 400px;
       max-width: 100%;
+      height: 100%;
+      max-height: 100vh;
       background: var(--bg-surface);
       box-shadow: -4px 0 24px rgba(0,0,0,0.3);
       z-index: 100011;
       display: flex;
       flex-direction: column;
+      min-height: 0;
       transform: translateX(100%);
       transition: transform 0.25s ease;
     }
@@ -1136,6 +1255,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      flex-shrink: 0;
     }
     .settings-drawer-header h2 { margin: 0; font-size: 18px; font-weight: 600; color: var(--text-primary); }
     .settings-drawer-close {
@@ -1159,6 +1279,7 @@
       gap: 0;
       padding: 0 24px;
       border-bottom: 1px solid var(--border-default);
+      flex-shrink: 0;
     }
     .settings-tab {
       padding: 12px 20px;
@@ -1179,7 +1300,14 @@
     }
     .settings-tab-panel { display: none; }
     .settings-tab-panel.active { display: block; }
-    .settings-drawer-body { padding: 24px; flex: 1; overflow-y: auto; }
+    .settings-drawer-body {
+      padding: 24px;
+      flex: 1 1 0;
+      min-height: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+    }
     .settings-section { margin-bottom: 24px; }
     .settings-section:last-child { margin-bottom: 0; }
     .settings-section label {
@@ -1561,6 +1689,15 @@
       display: flex;
       justify-content: flex-end;
       gap: 8px;
+      flex-shrink: 0;
+    }
+    @media (max-width: 480px) {
+      .settings-drawer { width: 100%; }
+      .settings-drawer-body { padding: 16px; }
+      .settings-drawer-header,
+      .settings-drawer-footer { padding-left: 16px; padding-right: 16px; }
+      .settings-tabs { padding: 0 16px; }
+      .settings-tab { padding: 12px 14px; font-size: 13px; }
     }
     .settings-save-btn {
       padding: 8px 20px;
@@ -1605,10 +1742,6 @@
     }
     .chart-controls select:focus { outline: none; border-color: var(--color-general-primary); }
     .gantt-header-sticky {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: var(--bg-body);
       flex-shrink: 0;
       display: flex;
       flex-direction: column;
@@ -1998,8 +2131,38 @@
       pointer-events: auto;
       z-index: 1;
     }
-    #homeView.active { padding: 24px; }
+    #homeView.active ~ #ganttView #ganttDependencyLine,
+    #homeView.active ~ #ganttView #ganttChildConnectorsContainer,
+    #homeView.active ~ #ganttView .gantt-dependency-unlink-btn {
+      display: none !important;
+    }
+    #homeView.active {
+      padding: 24px;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+    .home-sticky-header {
+      flex-shrink: 0;
+      margin-bottom: 16px;
+    }
     #homeView h1 { margin-bottom: 8px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    #homePageTitle {
+      cursor: text;
+      border-radius: 4px;
+      padding: 2px 4px;
+      margin: -2px -4px;
+    }
+    #homePageDescription {
+      cursor: text;
+      border-radius: 4px;
+      padding: 2px 4px;
+      margin: -2px -4px;
+    }
+    #homePageTitle:focus,
+    #homePageDescription:focus {
+      outline: none;
+      box-shadow: inset 0 0 0 2px var(--color-general-primary);
+    }
     .home-project-count-badge {
       display: inline-flex;
       align-items: center;
@@ -2281,10 +2444,14 @@
 <body>
   <div class="app-views-wrap">
   <div id="homeView" class="app-view">
-    <h1>Gantt projects <span class="home-project-count-badge" id="homeProjectCountBadge">0</span></h1>
-    <p class="home-subtitle">Create and open project schedules. Each project has its own tasks and settings.</p>
+    <div class="home-sticky-header">
+      <div class="home-header-row">
+        <h1><span id="homePageTitle" contenteditable="true">Gantt projects</span> <span class="home-project-count-badge" id="homeProjectCountBadge" contenteditable="false">0</span></h1>
+        <button type="button" class="home-new-project-btn" id="homeFab" aria-label="New project">+ New project</button>
+      </div>
+      <p class="home-subtitle" id="homePageDescription" contenteditable="true">Create and open project schedules. Each project has its own tasks and settings.</p>
+    </div>
     <div class="home-project-list" id="homeProjectList"></div>
-    <button type="button" class="home-fab" id="homeFab" aria-label="New project">+</button>
   </div>
 
   <div id="ganttView" class="app-view">
@@ -2335,6 +2502,11 @@
             <small class="settings-hint">When set, the timeline stays fixed at this date; changing task dates won't shift it.</small>
           </div>
           <div class="settings-section">
+            <label>Project end date</label>
+            <input type="date" id="settingsProjectEndDate">
+            <small class="settings-hint">When set, the timeline is capped at this date; the chart won't extend beyond it.</small>
+          </div>
+          <div class="settings-section">
             <label>Dependent tasks</label>
             <select id="settingsDependencyGap" aria-hidden="true" style="position:absolute;opacity:0;pointer-events:none;height:0;width:0;">
               <option value="0">0 days (start when previous ends)</option>
@@ -2365,20 +2537,6 @@
                 </div>
               </div>
             </div>
-          </div>
-          <div class="settings-section">
-            <label class="settings-checkbox-label">
-              <input type="checkbox" id="settingsSnapToSprint">
-              <span>Snap to sprint</span>
-            </label>
-            <small class="settings-hint">When enabled, dragging a task start or end date near a sprint boundary (every 2 weeks) will snap it to that date.</small>
-          </div>
-          <div class="settings-section">
-            <label class="settings-checkbox-label">
-              <input type="checkbox" id="settingsMoveTasksWhenSprintExtended">
-              <span>Move tasks when a sprint is extended</span>
-            </label>
-            <small class="settings-hint">When enabled (fixed phases only), increasing a phase's sprint count will shift later tasks so they stay after the extended phase.</small>
           </div>
         </div>
         <div class="settings-tab-panel" id="settingsTabStyle">
@@ -2419,6 +2577,20 @@
             <button type="button" class="settings-add-phase" id="settingsAddPhase">+ Add phase</button>
           </div>
           <div class="settings-section">
+            <label class="settings-checkbox-label">
+              <input type="checkbox" id="settingsMoveTasksWhenSprintExtended">
+              <span>Move tasks when a sprint is extended</span>
+            </label>
+            <small class="settings-hint">When enabled (fixed phases only), increasing a phase's sprint count will shift later tasks so they stay after the extended phase.</small>
+          </div>
+          <div class="settings-section settings-snap-to-sprint-wrap" id="settingsSnapToSprintWrap">
+            <label class="settings-checkbox-label">
+              <input type="checkbox" id="settingsSnapToSprint">
+              <span>Snap to sprint</span>
+            </label>
+            <small class="settings-hint">When enabled, dragging a task start or end date near a sprint boundary (every 2 weeks) will snap it to that date.</small>
+          </div>
+          <div class="settings-section">
             <label>Sample data</label>
             <button type="button" class="settings-auto-populate-btn" id="settingsAutoPopulate">Auto-populate 5 linked tasks</button>
             <small class="settings-hint">Replaces all tasks with 5 sample tasks (Research → Design → Review → Build → Launch) linked consecutively. Useful to explore the chart without starting from scratch.</small>
@@ -2457,14 +2629,22 @@
     <div class="phase-select-menu-title">Move to phase</div>
     <div class="phase-select-menu-list" id="phaseSelectMenuList"></div>
   </div>
+  <div class="fab-phase-menu" id="fabPhaseMenu" role="menu" aria-label="Start in phase">
+    <div class="fab-phase-menu-title">Start in phase</div>
+    <div class="fab-phase-menu-list" id="fabPhaseMenuList"></div>
+  </div>
   <svg class="gantt-dependency-line" id="ganttDependencyLine" aria-hidden="true">
     <path id="ganttDependencyLinePathHover" d="" stroke="transparent" stroke-width="12" fill="none"/>
     <path id="ganttDependencyLinePath" d="" stroke="#a3a3a3" stroke-width="1" stroke-dasharray="4 3" fill="none"/>
-    <g id="ganttDependencyLineDot1">
+    <g id="ganttDependencyLineDot1" class="connector-dot">
       <circle cx="0" cy="0" r="3" fill="white" stroke="#d4d4d4" stroke-width="1"/>
+      <line x1="-2" y1="0" x2="2" y2="0" stroke="#737373" stroke-width="1" stroke-linecap="round"/>
+      <line x1="0" y1="-2" x2="0" y2="2" stroke="#737373" stroke-width="1" stroke-linecap="round"/>
     </g>
-    <g id="ganttDependencyLineDot2">
+    <g id="ganttDependencyLineDot2" class="connector-dot">
       <circle cx="0" cy="0" r="3" fill="white" stroke="#d4d4d4" stroke-width="1"/>
+      <line x1="-2" y1="0" x2="2" y2="0" stroke="#737373" stroke-width="1" stroke-linecap="round"/>
+      <line x1="0" y1="-2" x2="0" y2="2" stroke="#737373" stroke-width="1" stroke-linecap="round"/>
     </g>
   </svg>
   <button class="gantt-dependency-unlink-btn" id="ganttDependencyUnlinkBtn" type="button" title="Unlink tasks">
@@ -2491,6 +2671,7 @@
     <div class="gantt-bar-tooltip-row gantt-bar-tooltip-depends">
       <span class="gantt-bar-tooltip-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></span>
       <span class="gantt-bar-tooltip-text"></span>
+      <span class="gantt-bar-tooltip-dep-unlink-wrap" style="display:none"><button type="button" class="gantt-bar-tooltip-dep-unlink" title="Unlink">Unlink</button></span>
     </div>
     <div class="gantt-bar-tooltip-row gantt-bar-tooltip-dates">
       <span class="gantt-bar-tooltip-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg></span>
@@ -2563,10 +2744,26 @@
     let currentProjectId = null;
     let homeEditProjectId = null;
 
+    function slugify(text) {
+      return String(text || "")
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "") || "project";
+    }
+    function getProjectUrl(project) {
+      const slug = slugify(project?.name || "project");
+      return "#/project/" + slug;
+    }
     function getProjectIdFromHash() {
       const hash = typeof location !== "undefined" ? (location.hash || "").replace(/^#\/?/, "") : "";
-      const m = /^project\/([a-zA-Z0-9_-]+)$/.exec(hash);
-      return m ? m[1] : null;
+      const m = /^project\/(.+)$/.exec(hash);
+      if (!m) return null;
+      const segment = m[1];
+      if (/^(p-\d+|default)$/.test(segment)) return segment;
+      const projects = loadProjectsList();
+      const bySlug = projects.find(p => slugify(p.name) === segment);
+      return bySlug ? bySlug.id : null;
     }
     function getCacheKey() {
       return currentProjectId ? "gantt-tasks-" + currentProjectId : "gantt-tasks-default";
@@ -3013,6 +3210,15 @@
       const d = new Date(parseInt(parts[1], 10), parseInt(parts[2], 10) - 1, parseInt(parts[3], 10));
       return isNaN(d.getTime()) ? null : d;
     }
+    function getProjectEndDate() {
+      const s = loadProjectSettings();
+      const raw = s?.projectEndDate;
+      if (!raw || typeof raw !== "string") return null;
+      const parts = raw.trim().match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+      if (!parts) return null;
+      const d = new Date(parseInt(parts[1], 10), parseInt(parts[2], 10) - 1, parseInt(parts[3], 10));
+      return isNaN(d.getTime()) ? null : d;
+    }
     let lastBarChangeOriginalDurationMs = null;
     let lastBarChangeTaskIndex = null;
     let lastBarChangeOriginalStartDate = null;
@@ -3113,11 +3319,24 @@
     }
 
     let toastTimer = null;
-    function showToast(message) {
+    function showToast(message, options) {
       const el = document.getElementById("ganttToast");
       if (!el) return;
       if (toastTimer) clearTimeout(toastTimer);
       el.innerHTML = message;
+      if (options?.onUndo && typeof options.onUndo === "function") {
+        const undoBtn = document.createElement("button");
+        undoBtn.type = "button";
+        undoBtn.className = "gantt-toast-undo";
+        undoBtn.textContent = "Undo";
+        undoBtn.addEventListener("click", () => {
+          if (toastTimer) clearTimeout(toastTimer);
+          toastTimer = null;
+          el.classList.remove("visible");
+          options.onUndo();
+        });
+        el.appendChild(undoBtn);
+      }
       el.classList.add("visible");
       toastTimer = setTimeout(() => {
         el.classList.remove("visible");
@@ -3241,6 +3460,11 @@
       } else {
         const weeksNeeded = Math.floor((end - weekStart) / WEEK_MS) + 1;
         WEEKS = Math.max(8, weeksNeeded);
+      }
+      const fixedEnd = getProjectEndDate();
+      if (fixedEnd) {
+        const weeksToFixedEnd = Math.ceil((fixedEnd.getTime() - WEEK_START.getTime()) / WEEK_MS);
+        if (weeksToFixedEnd > 0 && weeksToFixedEnd < WEEKS) WEEKS = Math.max(8, weeksToFixedEnd);
       }
     }
 
@@ -3700,17 +3924,18 @@
         const v = dependsOnSelect.value;
         const oldParentIdx = task.dependsOn;
         const wasLinked = oldParentIdx !== null;
+        pushTasksUndo();
         task.dependsOn = v === "" ? null : parseInt(v, 10);
         const taskName = (task.star ? "★ " : "") + (task.task || "Task");
         if (task.dependsOn !== null) {
           const parentTask = tasks[task.dependsOn];
           const parentName = (parentTask.star ? "★ " : "") + (parentTask.task || "Task");
           propagateDependencyChanges(task.dependsOn);
-          showToast(`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> "${taskName}" → "${parentName}"`);
+          showToast(`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> "${taskName}" → "${parentName}"`, { onUndo: performUndo });
         } else if (wasLinked && tasks[oldParentIdx]) {
           const oldParentTask = tasks[oldParentIdx];
           const oldParentName = (oldParentTask.star ? "★ " : "") + (oldParentTask.task || "Task");
-          showToast(`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.84 12.25l1.72-1.71h-.02a5.004 5.004 0 0 0-.12-7.07 5.006 5.006 0 0 0-6.95 0l-1.72 1.71"/><path d="M5.17 11.75l-1.71 1.71a5.004 5.004 0 0 0 .12 7.07 5.006 5.006 0 0 0 6.95 0l1.71-1.71"/><line x1="8" y1="2" x2="8" y2="5"/><line x1="2" y1="8" x2="5" y2="8"/><line x1="16" y1="19" x2="16" y2="22"/><line x1="19" y1="16" x2="22" y2="16"/></svg> "${taskName}" unlinked from "${oldParentName}"`);
+          showToast(`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.84 12.25l1.72-1.71h-.02a5.004 5.004 0 0 0-.12-7.07 5.006 5.006 0 0 0-6.95 0l-1.72 1.71"/><path d="M5.17 11.75l-1.71 1.71a5.004 5.004 0 0 0 .12 7.07 5.006 5.006 0 0 0 6.95 0l1.71-1.71"/><line x1="8" y1="2" x2="8" y2="5"/><line x1="2" y1="8" x2="5" y2="8"/><line x1="16" y1="19" x2="16" y2="22"/><line x1="19" y1="16" x2="22" y2="16"/></svg> "${taskName}" unlinked from "${oldParentName}"`, { onUndo: performUndo });
         }
         if (typeof updateChartRange === "function") updateChartRange();
         saveTasks();
@@ -3801,6 +4026,11 @@
       }
       const depLineEl = document.getElementById("ganttDependencyLine");
       if (depLineEl) depLineEl.classList.remove("visible");
+      const mainUnlinkBtn = document.getElementById("ganttDependencyUnlinkBtn");
+      if (mainUnlinkBtn) {
+        mainUnlinkBtn.classList.remove("visible");
+        mainUnlinkBtn.style.pointerEvents = "none";
+      }
       if (selectedBarDepLineCleanup) {
         selectedBarDepLineCleanup();
         selectedBarDepLineCleanup = null;
@@ -3825,15 +4055,36 @@
       }
       const depRow = tooltipEl.querySelector(".gantt-bar-tooltip-depends");
       const depText = depRow?.querySelector(".gantt-bar-tooltip-text");
+      const depUnlinkWrap = depRow?.querySelector(".gantt-bar-tooltip-dep-unlink-wrap");
+      const depUnlinkBtn = depUnlinkWrap?.querySelector(".gantt-bar-tooltip-dep-unlink");
       if (depRow && depText) {
         if (typeof task.dependsOn === "number" && tasks[task.dependsOn]) {
           const primary = tasks[task.dependsOn];
           depText.textContent = "Depends on: " + ((primary.star ? "★ " : "") + (primary.task || "Task"));
           depRow.style.display = "";
           depRow.style.color = getPhaseColor(primary.phase || PHASES[0]?.id);
+          if (depUnlinkWrap) depUnlinkWrap.style.display = "";
+          if (depUnlinkBtn) {
+            depUnlinkBtn.onclick = (e) => {
+              e.stopPropagation();
+              const t = tasks[index];
+              const p = t && typeof t.dependsOn === "number" ? tasks[t.dependsOn] : null;
+              if (!t || !p) return;
+              pushTasksUndo();
+              t.dependsOn = null;
+              saveTasks();
+              renderTasks();
+              deselectBar();
+              const parentName = (p.star ? "★ " : "") + (p.task || "Task");
+              const childName = (t.star ? "★ " : "") + (t.task || "Task");
+              showToast(`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.84 12.25l1.72-1.71h-.02a5.004 5.004 0 0 0-.12-7.07 5.006 5.006 0 0 0-6.95 0l-1.72 1.71"/><path d="M5.17 11.75l-1.71 1.71a5.004 5.004 0 0 0 .12 7.07 5.006 5.006 0 0 0 6.95 0l1.71-1.71"/><line x1="8" y1="2" x2="8" y2="5"/><line x1="2" y1="8" x2="5" y2="8"/><line x1="16" y1="19" x2="16" y2="22"/><line x1="19" y1="16" x2="22" y2="16"/></svg> "${childName}" unlinked from "${parentName}"`, { onUndo: performUndo });
+            };
+          }
         } else {
           depRow.style.display = "none";
           depRow.style.color = "";
+          if (depUnlinkWrap) depUnlinkWrap.style.display = "none";
+          if (depUnlinkBtn) depUnlinkBtn.onclick = null;
         }
       }
       if (descText) descText.textContent = (task.overview || "").trim() || "—";
@@ -3925,49 +4176,67 @@
             }
           };
           updateLine();
+          const getCoords = () => {
+            const pr = primaryBar.getBoundingClientRect();
+            const dr = bar.getBoundingClientRect();
+            return { x1: pr.left + pr.width / 2, y1: pr.bottom, x2: dr.left, y2: dr.top + dr.height / 2 };
+          };
+          const singleLineDotCleanup = attachSingleLineDotHandlers(depLineDot1, depLineDot2, depLinePath, depLinePathHover, t.dependsOn, index, getCoords, primaryColor);
+          let unlinkActivateTid = null;
+          const activateUnlinkUnderCursor = (dotEl) => {
+            if (unlinkActivateTid) clearTimeout(unlinkActivateTid);
+            unlinkActivateTid = null;
+            if (!unlinkBtn) return;
+            const r = dotEl.getBoundingClientRect();
+            unlinkBtn.style.left = (r.left + r.width / 2) + "px";
+            unlinkBtn.style.top = (r.top + r.height / 2) + "px";
+            unlinkBtn.style.pointerEvents = "auto";
+          };
+          const deactivateUnlinkAfterDelay = () => {
+            if (unlinkActivateTid) clearTimeout(unlinkActivateTid);
+            unlinkActivateTid = setTimeout(() => {
+              unlinkActivateTid = null;
+              if (unlinkBtn) unlinkBtn.style.pointerEvents = "none";
+            }, 250);
+          };
+          const onDot1Enter = () => activateUnlinkUnderCursor(depLineDot1);
+          const onDot2Enter = () => activateUnlinkUnderCursor(depLineDot2);
+          const onUnlinkEnter = () => { if (unlinkActivateTid) clearTimeout(unlinkActivateTid); unlinkActivateTid = null; if (unlinkBtn) unlinkBtn.style.pointerEvents = "auto"; };
+          if (depLineDot1) { depLineDot1.addEventListener("mouseenter", onDot1Enter); depLineDot1.addEventListener("mouseleave", deactivateUnlinkAfterDelay); }
+          if (depLineDot2) { depLineDot2.addEventListener("mouseenter", onDot2Enter); depLineDot2.addEventListener("mouseleave", deactivateUnlinkAfterDelay); }
           if (unlinkBtn) {
+            unlinkBtn.addEventListener("mouseenter", onUnlinkEnter);
+            unlinkBtn.addEventListener("mouseleave", deactivateUnlinkAfterDelay);
             unlinkBtn.classList.add("visible");
+            unlinkBtn.style.pointerEvents = "none";
             unlinkBtn._unlinkHandler = () => {
               const parentTask = tasks[t.dependsOn];
               const childName = (t.star ? "★ " : "") + (t.task || "Task");
               const parentName = (parentTask.star ? "★ " : "") + (parentTask.task || "Task");
+              pushTasksUndo();
               t.dependsOn = null;
               deselectBar();
               saveTasks();
               renderTasks();
-              showToast(`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.84 12.25l1.72-1.71h-.02a5.004 5.004 0 0 0-.12-7.07 5.006 5.006 0 0 0-6.95 0l-1.72 1.71"/><path d="M5.17 11.75l-1.71 1.71a5.004 5.004 0 0 0 .12 7.07 5.006 5.006 0 0 0 6.95 0l1.71-1.71"/><line x1="8" y1="2" x2="8" y2="5"/><line x1="2" y1="8" x2="5" y2="8"/><line x1="16" y1="19" x2="16" y2="22"/><line x1="19" y1="16" x2="22" y2="16"/></svg> "${childName}" unlinked from "${parentName}"`);
+              showToast(`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.84 12.25l1.72-1.71h-.02a5.004 5.004 0 0 0-.12-7.07 5.006 5.006 0 0 0-6.95 0l-1.72 1.71"/><path d="M5.17 11.75l-1.71 1.71a5.004 5.004 0 0 0 .12 7.07 5.006 5.006 0 0 0 6.95 0l1.71-1.71"/><line x1="8" y1="2" x2="8" y2="5"/><line x1="2" y1="8" x2="5" y2="8"/><line x1="16" y1="19" x2="16" y2="22"/><line x1="19" y1="16" x2="22" y2="16"/></svg> "${childName}" unlinked from "${parentName}"`, { onUndo: performUndo });
             };
             unlinkBtn.addEventListener("click", unlinkBtn._unlinkHandler);
-          }
-          let unlinkBtnHoverTimer = null;
-          const showUnlinkBtn = () => {
-            if (unlinkBtnHoverTimer) clearTimeout(unlinkBtnHoverTimer);
-            if (unlinkBtn) unlinkBtn.classList.add("visible");
-          };
-          const hideUnlinkBtn = () => {
-            unlinkBtnHoverTimer = setTimeout(() => {
-              if (unlinkBtn && selectedBarElement !== bar) unlinkBtn.classList.remove("visible");
-            }, 200);
-          };
-          depLineEl.addEventListener("mouseenter", showUnlinkBtn);
-          depLineEl.addEventListener("mouseleave", hideUnlinkBtn);
-          if (unlinkBtn) {
-            unlinkBtn.addEventListener("mouseenter", showUnlinkBtn);
-            unlinkBtn.addEventListener("mouseleave", hideUnlinkBtn);
           }
           const wrapper = document.querySelector(".gantt-wrapper");
           wrapper?.addEventListener("scroll", updateLine, true);
           window.addEventListener("scroll", updateLine, true);
           window.addEventListener("resize", updateLine);
           selectedBarDepLineCleanup = () => {
+            if (unlinkActivateTid) clearTimeout(unlinkActivateTid);
+            if (depLineDot1) { depLineDot1.removeEventListener("mouseenter", onDot1Enter); depLineDot1.removeEventListener("mouseleave", deactivateUnlinkAfterDelay); }
+            if (depLineDot2) { depLineDot2.removeEventListener("mouseenter", onDot2Enter); depLineDot2.removeEventListener("mouseleave", deactivateUnlinkAfterDelay); }
+            if (unlinkBtn) { unlinkBtn.removeEventListener("mouseenter", onUnlinkEnter); unlinkBtn.removeEventListener("mouseleave", deactivateUnlinkAfterDelay); }
+            singleLineDotCleanup();
             wrapper?.removeEventListener("scroll", updateLine, true);
             window.removeEventListener("scroll", updateLine, true);
             window.removeEventListener("resize", updateLine);
-            depLineEl.removeEventListener("mouseenter", showUnlinkBtn);
-            depLineEl.removeEventListener("mouseleave", hideUnlinkBtn);
             if (unlinkBtn) {
-              unlinkBtn.removeEventListener("mouseenter", showUnlinkBtn);
-              unlinkBtn.removeEventListener("mouseleave", hideUnlinkBtn);
+              unlinkBtn.style.pointerEvents = "";
               unlinkBtn.classList.remove("visible");
               if (unlinkBtn._unlinkHandler) {
                 unlinkBtn.removeEventListener("click", unlinkBtn._unlinkHandler);
@@ -4100,8 +4369,7 @@
             pathHover.setAttribute("stroke", "transparent");
             pathHover.setAttribute("stroke-width", "12");
             pathHover.setAttribute("fill", "none");
-            pathHover.style.pointerEvents = "stroke";
-            pathHover.style.cursor = "pointer";
+            pathHover.style.pointerEvents = "none";
             
             const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
             path.setAttribute("stroke", childColor);
@@ -4177,11 +4445,12 @@
             const unlinkHandler = () => {
               const childName = (childTask.star ? "★ " : "") + (childTask.task || "Task");
               const parentName = (t.star ? "★ " : "") + (t.task || "Task");
+              pushTasksUndo();
               childTask.dependsOn = null;
               deselectBar();
               saveTasks();
               renderTasks();
-              showToast(`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.84 12.25l1.72-1.71h-.02a5.004 5.004 0 0 0-.12-7.07 5.006 5.006 0 0 0-6.95 0l-1.72 1.71"/><path d="M5.17 11.75l-1.71 1.71a5.004 5.004 0 0 0 .12 7.07 5.006 5.006 0 0 0 6.95 0l1.71-1.71"/><line x1="8" y1="2" x2="8" y2="5"/><line x1="2" y1="8" x2="5" y2="8"/><line x1="16" y1="19" x2="16" y2="22"/><line x1="19" y1="16" x2="22" y2="16"/></svg> "${childName}" unlinked from "${parentName}"`);
+              showToast(`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.84 12.25l1.72-1.71h-.02a5.004 5.004 0 0 0-.12-7.07 5.006 5.006 0 0 0-6.95 0l-1.72 1.71"/><path d="M5.17 11.75l-1.71 1.71a5.004 5.004 0 0 0 .12 7.07 5.006 5.006 0 0 0 6.95 0l1.71-1.71"/><line x1="8" y1="2" x2="8" y2="5"/><line x1="2" y1="8" x2="5" y2="8"/><line x1="16" y1="19" x2="16" y2="22"/><line x1="19" y1="16" x2="22" y2="16"/></svg> "${childName}" unlinked from "${parentName}"`, { onUndo: performUndo });
             };
             unlinkBtn.addEventListener("click", unlinkHandler);
             
@@ -4804,118 +5073,6 @@
         document.addEventListener("mouseup", onUp);
       });
       bar.appendChild(resizeHandleLeft);
-      const depLineEl = document.getElementById("ganttDependencyLine");
-      const depLinePath = document.getElementById("ganttDependencyLinePath");
-      const depLinePathHover = document.getElementById("ganttDependencyLinePathHover");
-      const depLineDot1 = document.getElementById("ganttDependencyLineDot1");
-      const depLineDot2 = document.getElementById("ganttDependencyLineDot2");
-      let depLineTimer = null;
-      bar.addEventListener("mouseenter", () => {
-        if (selectedBarElement) return;
-        const t = tasks[index];
-        if (typeof t?.dependsOn === "number" && tasks[t.dependsOn]) {
-          const primaryBar = grid?.querySelector('.gantt-bar[data-index="' + t.dependsOn + '"]');
-          if (primaryBar && depLineEl && depLinePath) {
-            depLineTimer = setTimeout(() => {
-              depLineTimer = null;
-              const primaryColor = getPhaseColor(tasks[t.dependsOn].phase || PHASES[0]?.id);
-              const unlinkBtn = document.getElementById("ganttDependencyUnlinkBtn");
-              const updateLine = () => {
-                const pr = primaryBar.getBoundingClientRect();
-                const dr = bar.getBoundingClientRect();
-                const x1 = pr.left + pr.width / 2;
-                const y1 = pr.bottom;
-                const x2 = dr.left;
-                const y2 = dr.top + dr.height / 2;
-                const pathD = connectorPathD(x1, y1, x2, y2);
-                depLinePath.setAttribute("d", pathD);
-                depLinePath.setAttribute("stroke", primaryColor);
-                if (depLinePathHover) depLinePathHover.setAttribute("d", pathD);
-                const dotR = 3;
-                if (depLineDot1) { depLineDot1.setAttribute("transform", `translate(${x1}, ${y1 - dotR})`); }
-                if (depLineDot2) { depLineDot2.setAttribute("transform", `translate(${x2}, ${y2})`); }
-                depLineEl.setAttribute("viewBox", "0 0 " + window.innerWidth + " " + window.innerHeight);
-                depLineEl.setAttribute("width", window.innerWidth);
-                depLineEl.setAttribute("height", window.innerHeight);
-                depLineEl.classList.add("visible");
-                if (unlinkBtn) {
-                  unlinkBtn.style.left = x1 + "px";
-                  unlinkBtn.style.top = y2 + "px";
-                  unlinkBtn.style.backgroundColor = primaryColor;
-                }
-              };
-              updateLine();
-              if (unlinkBtn) {
-                unlinkBtn._unlinkHandler = () => {
-                  const childName = (t.star ? "★ " : "") + (t.task || "Task");
-                  const parentTask = tasks[t.dependsOn];
-                  const parentName = (parentTask.star ? "★ " : "") + (parentTask.task || "Task");
-                  t.dependsOn = null;
-                  depLineEl.classList.remove("visible");
-                  unlinkBtn.classList.remove("visible");
-                  if (bar._depLineCleanup) {
-                    bar._depLineCleanup();
-                    bar._depLineCleanup = null;
-                  }
-                  saveTasks();
-                  renderTasks();
-                  showToast(`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.84 12.25l1.72-1.71h-.02a5.004 5.004 0 0 0-.12-7.07 5.006 5.006 0 0 0-6.95 0l-1.72 1.71"/><path d="M5.17 11.75l-1.71 1.71a5.004 5.004 0 0 0 .12 7.07 5.006 5.006 0 0 0 6.95 0l1.71-1.71"/><line x1="8" y1="2" x2="8" y2="5"/><line x1="2" y1="8" x2="5" y2="8"/><line x1="16" y1="19" x2="16" y2="22"/><line x1="19" y1="16" x2="22" y2="16"/></svg> "${childName}" unlinked from "${parentName}"`);
-                };
-                unlinkBtn.addEventListener("click", unlinkBtn._unlinkHandler);
-              }
-              let unlinkBtnHoverTimer = null;
-              const showUnlinkBtn = () => {
-                if (unlinkBtnHoverTimer) clearTimeout(unlinkBtnHoverTimer);
-                if (unlinkBtn) unlinkBtn.classList.add("visible");
-              };
-              const hideUnlinkBtn = () => {
-                unlinkBtnHoverTimer = setTimeout(() => {
-                  if (unlinkBtn) unlinkBtn.classList.remove("visible");
-                }, 200);
-              };
-              depLineEl.addEventListener("mouseenter", showUnlinkBtn);
-              depLineEl.addEventListener("mouseleave", hideUnlinkBtn);
-              if (unlinkBtn) {
-                unlinkBtn.addEventListener("mouseenter", showUnlinkBtn);
-                unlinkBtn.addEventListener("mouseleave", hideUnlinkBtn);
-              }
-              const wrapper = document.querySelector(".gantt-wrapper");
-              wrapper?.addEventListener("scroll", updateLine, true);
-              window.addEventListener("scroll", updateLine, true);
-              window.addEventListener("resize", updateLine);
-              bar._depLineCleanup = () => {
-                wrapper?.removeEventListener("scroll", updateLine, true);
-                window.removeEventListener("scroll", updateLine, true);
-                window.removeEventListener("resize", updateLine);
-                depLineEl.removeEventListener("mouseenter", showUnlinkBtn);
-                depLineEl.removeEventListener("mouseleave", hideUnlinkBtn);
-                if (unlinkBtn) {
-                  unlinkBtn.removeEventListener("mouseenter", showUnlinkBtn);
-                  unlinkBtn.removeEventListener("mouseleave", hideUnlinkBtn);
-                  unlinkBtn.classList.remove("visible");
-                  if (unlinkBtn._unlinkHandler) {
-                    unlinkBtn.removeEventListener("click", unlinkBtn._unlinkHandler);
-                    unlinkBtn._unlinkHandler = null;
-                  }
-                }
-              };
-            }, 1200);
-          }
-        }
-      });
-      bar.addEventListener("mouseleave", () => {
-        if (depLineTimer) {
-          clearTimeout(depLineTimer);
-          depLineTimer = null;
-        }
-        if (selectedBarElement === bar) return;
-        if (selectedBarElement) return;
-        if (depLineEl) depLineEl.classList.remove("visible");
-        if (bar._depLineCleanup) {
-          bar._depLineCleanup();
-          bar._depLineCleanup = null;
-        }
-      });
       resizeHandle.addEventListener("mousedown", (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -5225,7 +5382,7 @@
         }
         if (typeof updateChartRange === "function") updateChartRange();
         saveTasks();
-        showToast(`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> Task deleted`);
+        showToast(`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> Task deleted`, { onUndo: performUndo });
       });
       const duplicateBtn = document.createElement("button");
       duplicateBtn.className = "gantt-duplicate-btn";
@@ -5255,6 +5412,7 @@
           tasks.splice(idx + 1, 0, copy);
           if (typeof updateChartRange === "function") updateChartRange();
           saveTasks();
+          showToast(`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Task duplicated`, { onUndo: performUndo });
         }
       });
       taskActions.appendChild(duplicateBtn);
@@ -5490,15 +5648,37 @@
     }
 
     const addBtn = document.createElement("button");
+    addBtn.id = "addTaskFab";
     addBtn.className = "add-task-fab";
     addBtn.textContent = "+";
     addBtn.setAttribute("aria-label", "Add task");
-    addBtn.onclick = () => {
+    addBtn.setAttribute("aria-haspopup", "menu");
+    addBtn.setAttribute("aria-expanded", "false");
+    const fabPhaseMenu = document.getElementById("fabPhaseMenu");
+    const fabPhaseMenuList = document.getElementById("fabPhaseMenuList");
+    function closeFabPhaseMenu() {
+      if (!fabPhaseMenu) return;
+      fabPhaseMenu.classList.remove("visible");
+      addBtn.setAttribute("aria-expanded", "false");
+      document.removeEventListener("click", fabPhaseMenu._outsideClick);
+      document.removeEventListener("keydown", fabPhaseMenu._escapeKey);
+    }
+    function addTaskInPhase(phaseId) {
+      closeFabPhaseMenu();
       pushTasksUndo();
-      const now = new Date();
-      const startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      const endDate = new Date(startDate.getTime() + 6 * 24 * 60 * 60 * 1000); // one week
-      const newTask = { task: "New task", phase: PHASES[0]?.id || "", party: "Unassigned", start: "", end: "", startDate, endDate, star: false, overview: "", subTasks: [], blockers: [], links: [], dependsOn: null };
+      const resolvedPhaseId = phaseId || PHASES[0]?.id || "";
+      let startDate, endDate;
+      const phaseIdx = PHASES.findIndex(p => p.id === resolvedPhaseId);
+      if (resolvedPhaseId && phaseIdx >= 0 && typeof getPhaseStartWeekOffset === "function" && typeof offsetToDate === "function") {
+        const startWeekOffset = getPhaseStartWeekOffset(phaseIdx);
+        startDate = offsetToDate(startWeekOffset);
+        endDate = new Date(startDate.getTime() + 6 * 24 * 60 * 60 * 1000); // one week from phase start
+      } else {
+        const now = new Date();
+        startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        endDate = new Date(startDate.getTime() + 6 * 24 * 60 * 60 * 1000);
+      }
+      const newTask = { task: "New task", phase: resolvedPhaseId, party: "Unassigned", start: "", end: "", startDate, endDate, star: false, overview: "", subTasks: [], blockers: [], links: [], dependsOn: null };
       newTask.start = formatDate(newTask.startDate);
       newTask.end = formatDate(newTask.endDate);
       tasks.push(newTask);
@@ -5511,6 +5691,45 @@
           if (lastRow) lastRow.scrollIntoView({ behavior: "smooth", block: "end" });
         });
       });
+    }
+    addBtn.onclick = (e) => {
+      e.stopPropagation();
+      if (fabPhaseMenu.classList.contains("visible")) {
+        closeFabPhaseMenu();
+        return;
+      }
+      const phases = PHASES.length ? PHASES : [{ id: "", name: "Default", color: "#737373" }];
+      fabPhaseMenuList.innerHTML = "";
+      phases.forEach((p) => {
+        const item = document.createElement("button");
+        item.type = "button";
+        item.className = "fab-phase-menu-item";
+        item.setAttribute("role", "menuitem");
+        const swatch = document.createElement("span");
+        swatch.className = "phase-swatch";
+        swatch.style.background = p.color || "#737373";
+        item.appendChild(swatch);
+        item.appendChild(document.createTextNode(p.name || p.id || "Default"));
+        item.dataset.phaseId = p.id;
+        item.addEventListener("click", (ev) => { ev.stopPropagation(); addTaskInPhase(p.id); });
+        fabPhaseMenuList.appendChild(item);
+      });
+      const fabRect = addBtn.getBoundingClientRect();
+      fabPhaseMenu.style.left = Math.max(12, fabRect.left + fabRect.width - 200) + "px";
+      fabPhaseMenu.style.right = "auto";
+      fabPhaseMenu.style.bottom = (window.innerHeight - fabRect.top + 8) + "px";
+      fabPhaseMenu.style.top = "auto";
+      fabPhaseMenu.classList.add("visible");
+      addBtn.setAttribute("aria-expanded", "true");
+      fabPhaseMenu._outsideClick = (e) => {
+        if (fabPhaseMenu.contains(e.target) || addBtn.contains(e.target)) return;
+        closeFabPhaseMenu();
+      };
+      fabPhaseMenu._escapeKey = (e) => { if (e.key === "Escape") closeFabPhaseMenu(); };
+      setTimeout(() => {
+        document.addEventListener("click", fabPhaseMenu._outsideClick);
+        document.addEventListener("keydown", fabPhaseMenu._escapeKey);
+      }, 0);
     };
 
     function ensureOneEmptyTaskWhenEmpty() {
@@ -5760,8 +5979,9 @@
           if (detach) {
             const childName = (task.star ? "★ " : "") + (task.task || "Task");
             const parentName = (primary.star ? "★ " : "") + (primary.task || "Task");
+            pushTasksUndo();
             task.dependsOn = null;
-            showToast(`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.84 12.25l1.72-1.71h-.02a5.004 5.004 0 0 0-.12-7.07 5.006 5.006 0 0 0-6.95 0l-1.72 1.71"/><path d="M5.17 11.75l-1.71 1.71a5.004 5.004 0 0 0 .12 7.07 5.006 5.006 0 0 0 6.95 0l1.71-1.71"/><line x1="8" y1="2" x2="8" y2="5"/><line x1="2" y1="8" x2="5" y2="8"/><line x1="16" y1="19" x2="16" y2="22"/><line x1="19" y1="16" x2="22" y2="16"/></svg> "${childName}" unlinked from "${parentName}"`);
+            showToast(`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.84 12.25l1.72-1.71h-.02a5.004 5.004 0 0 0-.12-7.07 5.006 5.006 0 0 0-6.95 0l-1.72 1.71"/><path d="M5.17 11.75l-1.71 1.71a5.004 5.004 0 0 0 .12 7.07 5.006 5.006 0 0 0 6.95 0l1.71-1.71"/><line x1="8" y1="2" x2="8" y2="5"/><line x1="2" y1="8" x2="5" y2="8"/><line x1="16" y1="19" x2="16" y2="22"/><line x1="19" y1="16" x2="22" y2="16"/></svg> "${childName}" unlinked from "${parentName}"`, { onUndo: performUndo });
           } else {
             const durationOverride = (lastBarChangeTaskIndex === taskIndex && lastBarChangeOriginalDurationMs != null)
               ? { taskIndex, durationMs: lastBarChangeOriginalDurationMs }
@@ -5920,6 +6140,8 @@
       if (dependentTrigger && gapEl?.selectedOptions?.[0]) dependentTrigger.textContent = gapEl.selectedOptions[0].textContent;
       const psEl = document.getElementById("settingsProjectStartDate");
       if (psEl) psEl.value = s.projectStartDate || "";
+      const peEl = document.getElementById("settingsProjectEndDate");
+      if (peEl) peEl.value = s.projectEndDate || "";
       const snapEl = document.getElementById("settingsSnapToSprint");
       if (snapEl) snapEl.checked = s == null ? true : !!s.snapToSprint;
       const moveTasksEl = document.getElementById("settingsMoveTasksWhenSprintExtended");
@@ -5931,6 +6153,8 @@
       if (phaseDurationEl) phaseDurationEl.value = phaseMode;
       const phaseList = document.getElementById("settingsPhaseList");
       if (phaseList) phaseList.dataset.phaseMode = phaseMode;
+      const snapWrap = document.getElementById("settingsSnapToSprintWrap");
+      if (snapWrap) snapWrap.style.display = phaseMode === "fixed" ? "" : "none";
       phaseList.innerHTML = "";
       const renderPhaseItem = (p, i) => {
         const item = document.createElement("div");
@@ -6138,9 +6362,16 @@
         opt.classList.add("selected");
       };
       document.getElementById("settingsOverlay").classList.add("open");
+      const addFab = document.getElementById("addTaskFab");
+      if (addFab) addFab.style.display = "none";
+      document.getElementById("fabPhaseMenu")?.classList.remove("visible");
     }
     function closeSettingsModal() {
       document.getElementById("settingsOverlay").classList.remove("open");
+      if (currentProjectId) {
+        const addFab = document.getElementById("addTaskFab");
+        if (addFab) addFab.style.display = "";
+      }
     }
     function saveSettingsFromModal() {
       const title = document.getElementById("settingsTitle").value.trim() || DEFAULT_PAGE_TITLE;
@@ -6170,6 +6401,8 @@
       const strokeMode = barStyleSelected?.dataset.value === "stroke";
       const projectStartDateRaw = document.getElementById("settingsProjectStartDate")?.value?.trim();
       const projectStartDate = projectStartDateRaw || null;
+      const projectEndDateRaw = document.getElementById("settingsProjectEndDate")?.value?.trim();
+      const projectEndDate = projectEndDateRaw || null;
       const phaseDurationMode = document.getElementById("settingsPhaseDurationMode")?.value === "fixed" ? "fixed" : "dynamic";
       const snapToSprint = !!document.getElementById("settingsSnapToSprint")?.checked;
       const moveTasksWhenSprintExtended = !!document.getElementById("settingsMoveTasksWhenSprintExtended")?.checked;
@@ -6211,7 +6444,7 @@
         });
         if (anyShifted) saveTasks();
       }
-      saveProjectSettings({ ...s, title, description: desc, phases, paletteIndex, dependencyGapDays, rowAppearance, strokeMode, projectStartDate, phaseDurationMode, snapToSprint, moveTasksWhenSprintExtended, allowIndependentDependencies });
+      saveProjectSettings({ ...s, title, description: desc, phases, paletteIndex, dependencyGapDays, rowAppearance, strokeMode, projectStartDate, projectEndDate, phaseDurationMode, snapToSprint, moveTasksWhenSprintExtended, allowIndependentDependencies });
       if (currentProjectId) ensureProjectInList(currentProjectId, title);
       applyRowAppearance();
       PHASES = phases.map(p => ({ ...p, sprints: p.sprints ?? 2 }));
@@ -6356,9 +6589,37 @@
         return { name, color };
       } catch { return null; }
     }
+    const HOME_TITLE_KEY = "gantt-home-title";
+    const HOME_DESC_KEY = "gantt-home-description";
+    const DEFAULT_HOME_TITLE = "Gantt projects";
+    const DEFAULT_HOME_DESC = "Create and open project schedules. Each project has its own tasks and settings.";
+    let homePageHeaderInited = false;
+    function initHomePageHeader() {
+      const titleEl = document.getElementById("homePageTitle");
+      const descEl = document.getElementById("homePageDescription");
+      if (!titleEl || !descEl) return;
+      const savedTitle = localStorage.getItem(HOME_TITLE_KEY);
+      const savedDesc = localStorage.getItem(HOME_DESC_KEY);
+      if (savedTitle != null) titleEl.textContent = savedTitle;
+      if (savedDesc != null) descEl.textContent = savedDesc;
+      if (!homePageHeaderInited) {
+        homePageHeaderInited = true;
+        const saveTitle = () => {
+          const v = (titleEl.textContent || "").trim() || DEFAULT_HOME_TITLE;
+          if (!v) titleEl.textContent = DEFAULT_HOME_TITLE;
+          localStorage.setItem(HOME_TITLE_KEY, (titleEl.textContent || "").trim() || DEFAULT_HOME_TITLE);
+        };
+        const saveDesc = () => {
+          localStorage.setItem(HOME_DESC_KEY, (descEl.textContent || "").trim());
+        };
+        titleEl.addEventListener("blur", saveTitle);
+        descEl.addEventListener("blur", saveDesc);
+      }
+    }
     function renderHomeView() {
       const listEl = document.getElementById("homeProjectList");
       if (!listEl) return;
+      initHomePageHeader();
       const projects = loadProjectsList();
       const badgeEl = document.getElementById("homeProjectCountBadge");
       if (badgeEl) badgeEl.textContent = String(projects.length);
@@ -6370,7 +6631,7 @@
         if (!isEditMode) {
           card.addEventListener("click", (e) => {
             if (e.target.closest(".home-project-delete-btn") || e.target.closest(".home-project-duplicate-btn")) return;
-            location.hash = "#/project/" + p.id;
+            location.hash = getProjectUrl(p);
           });
         }
         if (!isEditMode) {
@@ -6527,6 +6788,27 @@
       if (!id) {
         currentProjectId = null;
         renderHomeView();
+        const addFab = document.getElementById("addTaskFab");
+        if (addFab) addFab.style.display = "none";
+        document.getElementById("fabPhaseMenu")?.classList.remove("visible");
+        const depLineEl = document.getElementById("ganttDependencyLine");
+        if (depLineEl) depLineEl.classList.remove("visible");
+        const childContainer = document.getElementById("ganttChildConnectorsContainer");
+        if (childContainer) childContainer.innerHTML = "";
+        const unlinkBtn = document.getElementById("ganttDependencyUnlinkBtn");
+        if (unlinkBtn) unlinkBtn.classList.remove("visible");
+        document.body.classList.remove("shift-mode");
+        if (document._allConnectorsCleanup) {
+          document._allConnectorsCleanup();
+          document._allConnectorsCleanup = null;
+        }
+        document.querySelectorAll("body > .gantt-dependency-unlink-btn.connector-unlink-always-visible").forEach(btn => btn.remove());
+        const singleLine = document.getElementById("ganttDependencyLine");
+        if (singleLine) singleLine.style.visibility = "";
+        const allLines = document.getElementById("ganttAllDependencyLines");
+        if (allLines) allLines.classList.remove("visible");
+        const ganttGrid = document.getElementById("ganttGrid");
+        ganttGrid?.querySelectorAll(".gantt-row:not(.gantt-header)").forEach(r => { r.draggable = true; });
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
             if (homeView) homeView.classList.add("active");
@@ -6539,6 +6821,8 @@
       currentProjectId = id;
       ensureProjectInList(id);
       if (!sameProject) initGantt();
+      const addFab = document.getElementById("addTaskFab");
+      if (addFab) addFab.style.display = "";
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           if (homeView) homeView.classList.remove("active");
@@ -6609,7 +6893,15 @@
         if (titleEl && !titleEl.textContent.trim()) { titleEl.textContent = title; }
         if (descEl && !descEl.textContent.trim()) { descEl.textContent = desc; }
         savePageHeader(title, desc);
-        if (currentProjectId) ensureProjectInList(currentProjectId, title);
+        if (currentProjectId) {
+          ensureProjectInList(currentProjectId, title);
+          const url = getProjectUrl({ id: currentProjectId, name: title });
+          if (typeof history !== "undefined" && history.replaceState) {
+            history.replaceState(null, "", url);
+          } else {
+            location.hash = url;
+          }
+        }
       };
       if (titleEl) titleEl.addEventListener("blur", saveHeader);
       if (descEl) descEl.addEventListener("blur", saveHeader);
@@ -6654,7 +6946,9 @@
       document.getElementById("settingsPhaseDurationMode")?.addEventListener("change", () => {
         const el = document.getElementById("settingsPhaseDurationMode");
         const list = document.getElementById("settingsPhaseList");
+        const snapWrap = document.getElementById("settingsSnapToSprintWrap");
         if (el && list) list.dataset.phaseMode = el.value === "fixed" ? "fixed" : "dynamic";
+        if (snapWrap) snapWrap.style.display = el?.value === "fixed" ? "" : "none";
       });
       document.getElementById("settingsAutoPopulate")?.addEventListener("click", () => {
         const baseDate = getProjectStartDate() || WEEK_START;
@@ -6750,6 +7044,132 @@
       const singleLineEl = document.getElementById("ganttDependencyLine");
       let connectorDrag = null;
       let connectorUpdateTid = null;
+
+      function attachSingleLineDotHandlers(depLineDot1, depLineDot2, depLinePath, depLinePathHover, primaryIdx, dependentIdx, getCoords, primaryColor) {
+        const circle1 = depLineDot1?.querySelector?.("circle") || depLineDot1?.firstElementChild;
+        const circle2 = depLineDot2?.querySelector?.("circle") || depLineDot2?.firstElementChild;
+        const path = depLinePath;
+        const pathHit = depLinePathHover;
+        const dotR = 3;
+        const addHandlers = (circle, end, dotEl) => {
+          const onDown = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const coords = getCoords();
+            const { x1, y1, x2, y2 } = coords;
+            const fixedX = end === "primary" ? x2 : x1;
+            const fixedY = end === "primary" ? y2 : y1;
+            const otherX = end === "primary" ? x1 : x2;
+            const otherY = end === "primary" ? y1 : y2;
+            dotEl.classList.add("connector-dot-dragging");
+            path.classList.add("connector-dragging");
+            const onMove = (e2) => {
+              e2.preventDefault();
+              const cx = e2.clientX;
+              const cy = e2.clientY;
+              dotEl.setAttribute("transform", `translate(${cx}, ${cy - (end === "primary" ? dotR : 0)})`);
+              const newD = end === "primary" ? connectorPathD(cx, cy, fixedX, fixedY) : connectorPathD(fixedX, fixedY, cx, cy);
+              path.setAttribute("d", newD);
+              if (pathHit) pathHit.setAttribute("d", newD);
+              const ganttWrapper = document.querySelector(".gantt-wrapper");
+              const prevWrapperPE = ganttWrapper?.style.pointerEvents;
+              if (ganttWrapper) ganttWrapper.style.pointerEvents = "auto";
+              const elements = document.elementsFromPoint(cx, cy);
+              if (ganttWrapper) ganttWrapper.style.pointerEvents = prevWrapperPE || "";
+              let hoveredIdx = null;
+              for (const el of elements) {
+                const row = el.closest?.(".gantt-row[data-index]");
+                if (row && !row.classList.contains("gantt-header")) {
+                  hoveredIdx = parseInt(row.getAttribute("data-index"), 10);
+                  break;
+                }
+                const barEl = el.closest?.(".gantt-bar");
+                if (barEl) {
+                  hoveredIdx = parseInt(barEl.getAttribute("data-index"), 10);
+                  break;
+                }
+              }
+              let previewColor = "#a3a3a3";
+              if (hoveredIdx !== null && !isNaN(hoveredIdx)) {
+                if (end === "primary" && hoveredIdx !== dependentIdx && !wouldCreateCycle(dependentIdx, hoveredIdx)) {
+                  previewColor = getPhaseColor(tasks[hoveredIdx].phase || PHASES[0]?.id);
+                } else if (end === "dependent" && hoveredIdx !== primaryIdx && !wouldCreateCycle(hoveredIdx, primaryIdx)) {
+                  previewColor = getPhaseColor(tasks[hoveredIdx].phase || PHASES[0]?.id);
+                }
+              }
+              path.setAttribute("stroke", previewColor);
+            };
+            const onUp = (e2) => {
+              e2.preventDefault();
+              e2.stopPropagation();
+              document.removeEventListener("mousemove", onMove);
+              document.removeEventListener("mouseup", onUp);
+              const ganttWrapper = document.querySelector(".gantt-wrapper");
+              const prevWrapperPE = ganttWrapper?.style.pointerEvents;
+              if (ganttWrapper) ganttWrapper.style.pointerEvents = "auto";
+              const elements = document.elementsFromPoint(e2.clientX, e2.clientY);
+              if (ganttWrapper) ganttWrapper.style.pointerEvents = prevWrapperPE || "";
+              let newIdx = null;
+              for (const el of elements) {
+                const row = el.closest?.(".gantt-row[data-index]");
+                if (row && !row.classList.contains("gantt-header")) {
+                  newIdx = parseInt(row.getAttribute("data-index"), 10);
+                  break;
+                }
+                const bar = el.closest?.(".gantt-bar");
+                if (bar) {
+                  newIdx = parseInt(bar.getAttribute("data-index"), 10);
+                  break;
+                }
+              }
+              dotEl.classList.remove("connector-dot-dragging");
+              path.classList.remove("connector-dragging");
+              let didUpdate = false;
+              let toastMessage = "";
+              if (newIdx !== null && !isNaN(newIdx)) {
+                if (end === "primary" && newIdx !== dependentIdx && !wouldCreateCycle(dependentIdx, newIdx)) {
+                  pushTasksUndo();
+                  tasks[dependentIdx].dependsOn = newIdx;
+                  propagateDependencyChanges(newIdx);
+                  didUpdate = true;
+                  const childTask = tasks[dependentIdx];
+                  const newParentTask = tasks[newIdx];
+                  const childName = (childTask.star ? "★ " : "") + (childTask.task || "Task");
+                  const parentName = (newParentTask.star ? "★ " : "") + (newParentTask.task || "Task");
+                  toastMessage = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> "${childName}" → "${parentName}"`;
+                } else if (end === "dependent" && newIdx !== primaryIdx && !wouldCreateCycle(newIdx, primaryIdx)) {
+                  pushTasksUndo();
+                  tasks[dependentIdx].dependsOn = null;
+                  tasks[newIdx].dependsOn = primaryIdx;
+                  propagateDependencyChanges(primaryIdx);
+                  didUpdate = true;
+                  const newChildTask = tasks[newIdx];
+                  const parentTask = tasks[primaryIdx];
+                  const childName = (newChildTask.star ? "★ " : "") + (newChildTask.task || "Task");
+                  const parentName = (parentTask.star ? "★ " : "") + (parentTask.task || "Task");
+                  toastMessage = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> "${childName}" → "${parentName}"`;
+                }
+              }
+              if (didUpdate) {
+                saveTasks();
+                renderTasks();
+                if (toastMessage) showToast(toastMessage, { onUndo: performUndo });
+              } else if (path && primaryColor) {
+                path.setAttribute("stroke", primaryColor);
+              }
+            };
+            document.addEventListener("mousemove", onMove);
+            document.addEventListener("mouseup", onUp, { once: true });
+            onMove(e);
+          };
+          circle.addEventListener("mousedown", onDown);
+          return () => circle.removeEventListener("mousedown", onDown);
+        };
+        const off1 = circle1 ? addHandlers(circle1, "primary", depLineDot1) : () => {};
+        const off2 = circle2 ? addHandlers(circle2, "dependent", depLineDot2) : () => {};
+        return () => { off1(); off2(); };
+      }
+
       function updateAllConnectors() {
         if (!allLinesEl || !grid) return;
         allLinesEl.innerHTML = "";
@@ -6977,6 +7397,7 @@
                 let toastMessage = "";
                 if (connectorDrag && newIdx !== null && !isNaN(newIdx)) {
                   if (connectorDrag.end === "primary" && newIdx !== connectorDrag.dependentIdx && !wouldCreateCycle(connectorDrag.dependentIdx, newIdx)) {
+                    pushTasksUndo();
                     tasks[connectorDrag.dependentIdx].dependsOn = newIdx;
                     propagateDependencyChanges(newIdx);
                     didUpdate = true;
@@ -6986,6 +7407,7 @@
                     const parentName = (newParentTask.star ? "★ " : "") + (newParentTask.task || "Task");
                     toastMessage = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> "${childName}" → "${parentName}"`;
                   } else if (connectorDrag.end === "dependent" && newIdx !== connectorDrag.primaryIdx && !wouldCreateCycle(newIdx, connectorDrag.primaryIdx)) {
+                    pushTasksUndo();
                     tasks[connectorDrag.dependentIdx].dependsOn = null;
                     tasks[newIdx].dependsOn = connectorDrag.primaryIdx;
                     propagateDependencyChanges(connectorDrag.primaryIdx);
@@ -7000,7 +7422,7 @@
                 if (didUpdate) {
                   saveTasks();
                   renderTasks();
-                  if (toastMessage) showToast(toastMessage);
+                  if (toastMessage) showToast(toastMessage, { onUndo: performUndo });
                 }
                 circle.classList.remove("connector-dot-dragging");
                 path.classList.remove("connector-dragging");
@@ -7017,9 +7439,9 @@
           allLinesEl.appendChild(c1);
           allLinesEl.appendChild(c2);
           
-          // Create unlink button for this connector
+          // Create unlink button for this connector (visible immediately in shift mode)
           const unlinkBtn = document.createElement("button");
-          unlinkBtn.className = "gantt-dependency-unlink-btn";
+          unlinkBtn.className = "gantt-dependency-unlink-btn connector-unlink-always-visible visible";
           unlinkBtn.type = "button";
           unlinkBtn.title = "Unlink tasks";
           unlinkBtn.style.position = "fixed";
@@ -7039,28 +7461,14 @@
             const parentTask = tasks[primaryIdx];
             const childName = (childTask.star ? "★ " : "") + (childTask.task || "Task");
             const parentName = (parentTask.star ? "★ " : "") + (parentTask.task || "Task");
+            pushTasksUndo();
             childTask.dependsOn = null;
             saveTasks();
             renderTasks();
-            showToast(`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.84 12.25l1.72-1.71h-.02a5.004 5.004 0 0 0-.12-7.07 5.006 5.006 0 0 0-6.95 0l-1.72 1.71"/><path d="M5.17 11.75l-1.71 1.71a5.004 5.004 0 0 0 .12 7.07 5.006 5.006 0 0 0 6.95 0l1.71-1.71"/><line x1="8" y1="2" x2="8" y2="5"/><line x1="2" y1="8" x2="5" y2="8"/><line x1="16" y1="19" x2="16" y2="22"/><line x1="19" y1="16" x2="22" y2="16"/></svg> "${childName}" unlinked from "${parentName}"`);
+            showToast(`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.84 12.25l1.72-1.71h-.02a5.004 5.004 0 0 0-.12-7.07 5.006 5.006 0 0 0-6.95 0l-1.72 1.71"/><path d="M5.17 11.75l-1.71 1.71a5.004 5.004 0 0 0 .12 7.07 5.006 5.006 0 0 0 6.95 0l1.71-1.71"/><line x1="8" y1="2" x2="8" y2="5"/><line x1="2" y1="8" x2="5" y2="8"/><line x1="16" y1="19" x2="16" y2="22"/><line x1="19" y1="16" x2="22" y2="16"/></svg> "${childName}" unlinked from "${parentName}"`, { onUndo: performUndo });
           });
           
-          // Hover handlers
-          let hoverTimer = null;
-          const showBtn = () => {
-            if (hoverTimer) clearTimeout(hoverTimer);
-            unlinkBtn.classList.add("visible");
-          };
-          const hideBtn = () => {
-            hoverTimer = setTimeout(() => {
-              unlinkBtn.classList.remove("visible");
-            }, 200);
-          };
-          path.addEventListener("mouseenter", showBtn);
-          path.addEventListener("mouseleave", hideBtn);
-          unlinkBtn.addEventListener("mouseenter", showBtn);
-          unlinkBtn.addEventListener("mouseleave", hideBtn);
-          
+          // In shift mode unlink button is always visible (no hover-to-show)
           document.body.appendChild(unlinkBtn);
           shiftModeUnlinkButtons.push(unlinkBtn);
         });
@@ -7186,11 +7594,12 @@
                 const parentTask = tasks[newIdx];
                 const childName = (childTask.star ? "★ " : "") + (childTask.task || "Task");
                 const parentName = (parentTask.star ? "★ " : "") + (parentTask.task || "Task");
+                pushTasksUndo();
                 tasks[i].dependsOn = newIdx;
                 propagateDependencyChanges(newIdx);
                 saveTasks();
                 renderTasks();
-                showToast(`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> "${childName}" → "${parentName}"`);
+                showToast(`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> "${childName}" → "${parentName}"`, { onUndo: performUndo });
               }
             };
             document.addEventListener("mousemove", onMove);
@@ -7312,11 +7721,12 @@
                 const parentTask = tasks[i];
                 const childName = (childTask.star ? "★ " : "") + (childTask.task || "Task");
                 const parentName = (parentTask.star ? "★ " : "") + (parentTask.task || "Task");
+                pushTasksUndo();
                 tasks[newIdx].dependsOn = i;
                 propagateDependencyChanges(i);
                 saveTasks();
                 renderTasks();
-                showToast(`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> "${childName}" → "${parentName}"`);
+                showToast(`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> "${childName}" → "${parentName}"`, { onUndo: performUndo });
               }
             };
             document.addEventListener("mousemove", onMove);
@@ -7378,7 +7788,10 @@
         document.body.classList.remove("shift-mode");
         grid?.querySelectorAll(".gantt-row:not(.gantt-header)").forEach(r => { r.draggable = true; });
         if (singleLineEl) singleLineEl.style.visibility = "";
-        if (allLinesEl) allLinesEl.classList.remove("visible");
+        if (allLinesEl) {
+          allLinesEl.classList.remove("visible");
+          allLinesEl.innerHTML = "";
+        }
         if (document._allConnectorsCleanup) {
           document._allConnectorsCleanup();
           document._allConnectorsCleanup = null;
@@ -7441,9 +7854,13 @@
         ensureProjectInList(newId, "Untitled project");
         homeEditProjectId = newId;
         renderHomeView();
+        requestAnimationFrame(() => {
+          const newCard = document.querySelector(".home-project-card.edit-mode");
+          if (newCard) newCard.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        });
       }
       document.addEventListener("click", (e) => {
-        if (!e.target.closest("#homeFab") && !e.target.closest(".home-fab")) return;
+        if (!e.target.closest("#homeFab") && !e.target.closest(".home-new-project-btn")) return;
         const homeView = document.getElementById("homeView");
         if (!homeView?.classList.contains("active")) return;
         e.preventDefault();
