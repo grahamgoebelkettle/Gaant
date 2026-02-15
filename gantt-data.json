@@ -2,7 +2,7 @@
   "projects": [
     {
       "id": "p-1771131136904",
-      "name": "Sample project copy",
+      "name": "1111",
       "createdAt": 1771131136904
     },
     {
@@ -42,7 +42,7 @@
         }
       ],
       "settings": {
-        "title": "Sample project copy",
+        "title": "1111",
         "description": "new description",
         "phases": [
           {
