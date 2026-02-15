@@ -1399,7 +1399,7 @@
     }
     .app-views-wrap.settings-sidebar-open .settings-sidebar {
       transform: translateX(0);
-      overflow: visible;
+      overflow: hidden;
       border-left: 1px solid var(--border-default);
       box-shadow: -4px 0 16px rgba(0,0,0,0.08);
     }
@@ -1957,6 +1957,10 @@
       justify-content: flex-end;
       gap: 8px;
       flex-shrink: 0;
+    }
+    @media (max-width: 900px), (max-height: 700px) {
+      .settings-sidebar { max-height: 100vh; height: 100vh; overflow: hidden; }
+      .settings-drawer { max-height: 100vh; min-height: 0; }
     }
     @media (max-width: 480px) {
       .settings-sidebar { width: 100%; }
@@ -2747,6 +2751,35 @@
     .storage-modal-use-btn { margin-top: 16px; }
     .settings-storage-inline .storage-modal-tabs { margin-top: 8px; margin-bottom: 12px; }
     .settings-storage-inline .storage-modal-panel { margin-top: 0; }
+    .storage-type-picker { margin-top: 8px; }
+    .storage-type-tiles { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+    .storage-type-tile {
+      position: relative;
+      display: block;
+      width: 100%;
+      padding: 12px 14px;
+      text-align: left;
+      font-family: inherit;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      box-sizing: border-box;
+    }
+    .storage-type-tile:hover { border-color: var(--border-strong); background: var(--bg-hover); }
+    .storage-type-tile.selected {
+      border-color: var(--color-general-primary);
+      background: rgba(99, 102, 241, 0.08);
+    }
+    .storage-type-tile.selected .storage-type-tile-title { font-weight: 600; }
+    .storage-type-tile-title { font-size: 14px; font-weight: 500; color: var(--text-primary); margin: 0 0 2px 0; }
+    .storage-type-tile-desc { font-size: 12px; color: var(--text-secondary); margin: 0; line-height: 1.35; }
+    .storage-details { margin-top: 4px; padding-top: 16px; border-top: 1px solid var(--border-default); }
+    .storage-details-panel { display: none; }
+    .storage-details-panel.active { display: block; }
+    .storage-local-tile-actions { margin-top: 0; padding-top: 0; border-top: none; display: flex; flex-wrap: wrap; gap: 8px; }
+    .storage-local-tile-actions .home-shared-file-btn { margin: 0; }
     .storage-local-tiles { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
     .storage-local-tile {
       position: relative;
@@ -3608,66 +3641,70 @@
         <div class="settings-tab-panel" id="settingsTabStorage">
           <div class="settings-section settings-storage-inline">
             <label>Where data is stored</label>
-            <div class="storage-modal-tabs" role="tablist">
-              <button type="button" class="storage-modal-tab active" role="tab" id="storageTabExternal" data-tab="external" aria-selected="true"><span class="storage-tab-label">External</span><span class="storage-tab-check" aria-hidden="true"></span></button>
-              <button type="button" class="storage-modal-tab" role="tab" id="storageTabLocal" data-tab="local" aria-selected="false"><span class="storage-tab-label">Local</span><span class="storage-tab-check" aria-hidden="true"></span></button>
-            </div>
-            <div id="storagePanelExternal" class="storage-modal-panel active" role="tabpanel">
-              <div class="settings-section">
-                <label>GitHub sync</label>
-                <label for="sharedFileUrl" title="JSON URL (GitHub raw or any CORS-accessible URL)">Sync File</label>
-                <div class="shared-file-input-wrap">
-                  <input type="url" id="sharedFileUrl" placeholder="https://raw.githubusercontent.com/.../gantt-data.json" />
-                  <div class="shared-file-input-icons">
-                    <button type="button" class="shared-file-input-icon" id="sharedFileLoad" title="Load from URL" aria-label="Load from URL"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
-                    <button type="button" class="shared-file-input-icon" id="sharedFileRefresh" title="Refresh" aria-label="Refresh"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></button>
-                    <button type="button" class="shared-file-input-icon" id="sharedFileDownload" title="Download JSON" aria-label="Download JSON"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
-                  </div>
+            <div class="storage-type-picker" role="group" aria-label="Storage type">
+              <div class="storage-type-tiles" id="storageTypeTiles">
+                <div class="storage-type-tile" data-value="github" role="button" tabindex="0">
+                  <div class="storage-type-tile-title">GitHub sync</div>
+                  <div class="storage-type-tile-desc">Load and push a gantt-data.json file to a GitHub repo.</div>
                 </div>
-                <div class="shared-file-modal-status" id="sharedFileModalStatus">
-                  <span class="shared-file-modal-status-dot none" id="sharedFileModalStatusDot"></span>
-                  <span class="shared-file-modal-status-text" id="sharedFileModalStatusText">Not set</span>
+                <div class="storage-type-tile" data-value="supabase" role="button" tabindex="0">
+                  <div class="storage-type-tile-title">Supabase (cloud)</div>
+                  <div class="storage-type-tile-desc">Cloud save with login. Boards sync across devices.</div>
                 </div>
-                <div class="shared-file-modal-section">
-                  <label for="sharedFileGitHubToken" title="Push to GitHub (owner): Personal Access Token with repo scope">Access Token</label>
-                  <div class="shared-file-modal-token-row">
-                    <div class="shared-file-input-wrap shared-file-input-wrap-token">
-                      <input type="password" id="sharedFileGitHubToken" placeholder="ghp_..." autocomplete="off" />
-                      <div class="shared-file-input-icons">
-                        <button type="button" class="shared-file-input-icon" id="sharedFileClearToken" title="Clear token" aria-label="Clear token"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-                        <button type="button" class="shared-file-input-icon" id="sharedFilePush" title="Push to GitHub" aria-label="Push to GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></button>
-                      </div>
+                <div class="storage-type-tile" data-value="local_storage" role="button" tabindex="0" title="Stored in browser local storage. Data will be erased if browser cache or site data is cleared. Use backup/restore to save a copy.">
+                  <div class="storage-type-tile-title">Local storage</div>
+                  <div class="storage-type-tile-desc">Store in the browser with optional backup/restore to a file.</div>
+                </div>
+                <div class="storage-type-tile" data-value="local_cache" role="button" tabindex="0" title="Stored in browser cache. Data will be erased if browser cache or site data is cleared. Not recommended for important data.">
+                  <div class="storage-type-tile-title">Local cache</div>
+                  <div class="storage-type-tile-desc">Browser cache only. Data can be lost if cache is cleared. Not recommended.</div>
+                </div>
+              </div>
+              <div class="storage-details" id="storageDetails">
+                <div class="storage-details-panel" id="storageDetailsGitHub" data-type="github">
+                  <label for="sharedFileUrl" title="JSON URL (GitHub raw or any CORS-accessible URL)">Sync File</label>
+                  <div class="shared-file-input-wrap">
+                    <input type="url" id="sharedFileUrl" placeholder="https://raw.githubusercontent.com/.../gantt-data.json" />
+                    <div class="shared-file-input-icons">
+                      <button type="button" class="shared-file-input-icon" id="sharedFileLoad" title="Load from URL" aria-label="Load from URL"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+                      <button type="button" class="shared-file-input-icon" id="sharedFileRefresh" title="Refresh" aria-label="Refresh"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></button>
+                      <button type="button" class="shared-file-input-icon" id="sharedFileDownload" title="Download JSON" aria-label="Download JSON"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
                     </div>
                   </div>
-                  <div class="shared-file-modal-status shared-file-modal-token-status" id="sharedFileModalTokenStatus">
-                    <span class="shared-file-modal-status-dot none" id="sharedFileModalTokenStatusDot"></span>
-                    <span class="shared-file-modal-status-text" id="sharedFileModalTokenStatusText">Not set</span>
+                  <div class="shared-file-modal-status" id="sharedFileModalStatus">
+                    <span class="shared-file-modal-status-dot none" id="sharedFileModalStatusDot"></span>
+                    <span class="shared-file-modal-status-text" id="sharedFileModalStatusText">Not set</span>
+                  </div>
+                  <div class="shared-file-modal-section">
+                    <label for="sharedFileGitHubToken" title="Push to GitHub (owner): Personal Access Token with repo scope">Access Token</label>
+                    <div class="shared-file-modal-token-row">
+                      <div class="shared-file-input-wrap shared-file-input-wrap-token">
+                        <input type="password" id="sharedFileGitHubToken" placeholder="ghp_..." autocomplete="off" />
+                        <div class="shared-file-input-icons">
+                          <button type="button" class="shared-file-input-icon" id="sharedFileClearToken" title="Clear token" aria-label="Clear token"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+                          <button type="button" class="shared-file-input-icon" id="sharedFilePush" title="Push to GitHub" aria-label="Push to GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="shared-file-modal-status shared-file-modal-token-status" id="sharedFileModalTokenStatus">
+                      <span class="shared-file-modal-status-dot none" id="sharedFileModalTokenStatusDot"></span>
+                      <span class="shared-file-modal-status-text" id="sharedFileModalTokenStatusText">Not set</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div class="settings-section" style="margin-top: 20px;">
-                <label>Supabase (cloud save)</label>
-                <button type="button" class="home-shared-file-btn" id="settingsSupabaseAuthBtn">Log in or configure Supabase</button>
-                <small class="settings-hint" id="settingsSupabaseHint">If the button does nothing, enable Supabase in template.html (uncomment the Supabase script line).</small>
-              </div>
-            </div>
-            <div id="storagePanelLocal" class="storage-modal-panel" role="tabpanel">
-              <p class="settings-hint" style="margin-top: 0;">Choose how to store data on this device. Save applies your choice.</p>
-              <div class="storage-local-tiles" role="group" aria-label="Local storage type">
-                <div class="storage-local-tile selected" data-value="local_storage" role="button" tabindex="0">
-                  <input type="radio" name="storageLocalType" id="storageLocalStorage" value="local_storage" checked style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;">
-                  <div class="storage-local-tile-title">Local storage</div>
-                  <div class="storage-local-tile-desc">Store in the browser with optional backup/restore to a file. Full editing.</div>
+                <div class="storage-details-panel" id="storageDetailsSupabase" data-type="supabase">
+                  <button type="button" class="home-shared-file-btn" id="settingsSupabaseAuthBtn">Log in or configure Supabase</button>
+                  <small class="settings-hint" id="settingsSupabaseHint">If the button does nothing, enable Supabase in template.html (uncomment the Supabase script line).</small>
+                </div>
+                <div class="storage-details-panel" id="storageDetailsLocalStorage" data-type="local_storage">
                   <div class="storage-local-tile-actions">
                     <button type="button" class="home-shared-file-btn" id="storageModalBackupToFile">Backup to file</button>
                     <input type="file" id="storageModalRestoreFileInput" accept=".json,application/json" style="display: none;">
                     <button type="button" class="home-shared-file-btn" id="storageModalRestoreFromFile">Restore from file</button>
                   </div>
                 </div>
-                <div class="storage-local-tile" data-value="local_cache" role="button" tabindex="0">
-                  <input type="radio" name="storageLocalType" id="storageLocalCache" value="local_cache" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;">
-                  <div class="storage-local-tile-title">Local cache</div>
-                  <div class="storage-local-tile-desc">Browser cache only. No file backup; data can be lost if cache is cleared. Not recommended for important data.</div>
+                <div class="storage-details-panel" id="storageDetailsLocalCache" data-type="local_cache">
+                  <p class="settings-hint" style="margin: 0;">No configuration needed. Save to apply.</p>
                 </div>
               </div>
             </div>
@@ -8255,37 +8292,36 @@
 
       // Apply storage settings only when Storage tab was the active tab in the sidebar
       var storageTabActive = !!document.querySelector('.settings-tab[data-tab="storage"].active');
-      var panelExternal = document.getElementById("storagePanelExternal");
-      var panelLocal = document.getElementById("storagePanelLocal");
-      var externalActive = storageTabActive && panelExternal && panelExternal.classList.contains("active");
-      var localActive = storageTabActive && panelLocal && panelLocal.classList.contains("active");
-      if (externalActive && typeof setStorageMode === "function") {
-        var urlEl = document.getElementById("sharedFileUrl");
-        var tokenEl = document.getElementById("sharedFileGitHubToken");
-        try {
-          if (urlEl && (urlEl.value || "").trim()) localStorage.setItem(SHARED_FILE_URL_KEY, urlEl.value.trim());
-          if (tokenEl && (tokenEl.value || "").trim()) localStorage.setItem(GITHUB_TOKEN_KEY, tokenEl.value.trim());
-        } catch (e) {}
-        setStorageMode("github");
-        if (typeof applyStorageModeUI === "function") applyStorageModeUI("github");
-        currentProjectId = null;
-        if (typeof location !== "undefined") location.hash = "#/";
-        if (typeof handleRoute === "function") handleRoute();
-        if (typeof window.__doLoadFromStoredUrl === "function") window.__doLoadFromStoredUrl();
-        else if (typeof window.__fetchSharedUpdates === "function") window.__fetchSharedUpdates();
-        if (typeof updateWriteAccessUI === "function") updateWriteAccessUI();
-      } else if (localActive && typeof setStorageMode === "function") {
-        var radio = document.querySelector('input[name="storageLocalType"]:checked');
-        var localMode = (radio && radio.value) || "local_storage";
-        if (localMode === "local_cache") {
-          try { localStorage.removeItem(SHARED_FILE_URL_KEY); localStorage.removeItem(GITHUB_TOKEN_KEY); } catch (e) {}
-          if (typeof clearLocalProjectData === "function") clearLocalProjectData();
+      var selectedTile = storageTabActive && document.querySelector('.storage-type-tile.selected');
+      var selectedType = selectedTile ? selectedTile.dataset.value : null;
+      if (selectedType && typeof setStorageMode === "function") {
+        if (selectedType === "github") {
+          var urlEl = document.getElementById("sharedFileUrl");
+          var tokenEl = document.getElementById("sharedFileGitHubToken");
+          try {
+            if (urlEl && (urlEl.value || "").trim()) localStorage.setItem(SHARED_FILE_URL_KEY, urlEl.value.trim());
+            if (tokenEl && (tokenEl.value || "").trim()) localStorage.setItem(GITHUB_TOKEN_KEY, tokenEl.value.trim());
+          } catch (e) {}
+          setStorageMode("github");
+          if (typeof applyStorageModeUI === "function") applyStorageModeUI("github");
+          currentProjectId = null;
+          if (typeof location !== "undefined") location.hash = "#/";
+          if (typeof handleRoute === "function") handleRoute();
+          if (typeof window.__doLoadFromStoredUrl === "function") window.__doLoadFromStoredUrl();
+          else if (typeof window.__fetchSharedUpdates === "function") window.__fetchSharedUpdates();
+        } else if (selectedType === "supabase") {
+          if (typeof applyStorageModeUI === "function") applyStorageModeUI("supabase");
+        } else if (selectedType === "local_storage" || selectedType === "local_cache") {
+          if (selectedType === "local_cache") {
+            try { localStorage.removeItem(SHARED_FILE_URL_KEY); localStorage.removeItem(GITHUB_TOKEN_KEY); } catch (e) {}
+            if (typeof clearLocalProjectData === "function") clearLocalProjectData();
+          }
+          setStorageMode(selectedType);
+          if (typeof applyStorageModeUI === "function") applyStorageModeUI(selectedType);
+          currentProjectId = null;
+          if (typeof location !== "undefined") location.hash = "#/";
+          if (typeof handleRoute === "function") handleRoute();
         }
-        setStorageMode(localMode);
-        if (typeof applyStorageModeUI === "function") applyStorageModeUI(localMode);
-        currentProjectId = null;
-        if (typeof location !== "undefined") location.hash = "#/";
-        if (typeof handleRoute === "function") handleRoute();
         if (typeof updateWriteAccessUI === "function") updateWriteAccessUI();
       }
 
@@ -8510,22 +8546,20 @@
             location.hash = getProjectUrl(p);
           });
         }
-        const previewWrap = document.createElement("div");
-        previewWrap.className = "home-project-timeline-preview" + (isEditMode ? " home-timeline-empty" : "");
-        if (!isEditMode) {
-          let showPreviews = true;
-          try { showPreviews = localStorage.getItem(HOME_TIMELINE_PREVIEWS_KEY) !== "false"; } catch (e) {}
-          if (showPreviews) {
+        let showPreviews = true;
+        try { showPreviews = localStorage.getItem(HOME_TIMELINE_PREVIEWS_KEY) !== "false"; } catch (e) {}
+        if (showPreviews) {
+          const previewWrap = document.createElement("div");
+          previewWrap.className = "home-project-timeline-preview" + (isEditMode ? " home-timeline-empty" : "");
+          if (!isEditMode) {
             if (window.ganttStorage?.isCloudEnabled()) {
               window.ganttStorage.ensureBoardDataLoaded(p.id).then(() => renderHomeTimelinePreview(p.id, previewWrap));
             } else {
               renderHomeTimelinePreview(p.id, previewWrap);
             }
-          } else {
-            previewWrap.classList.add("home-timeline-empty");
           }
+          card.appendChild(previewWrap);
         }
-        card.appendChild(previewWrap);
         const body = document.createElement("div");
         body.className = "home-project-card-body";
         const info = document.createElement("div");
@@ -8584,6 +8618,7 @@
           const localTag = document.createElement("span");
           localTag.className = "home-project-local-tag";
           localTag.textContent = "Local";
+          localTag.title = "Stored locally. Data will be erased if browser cache or site data is cleared.";
           footer.appendChild(localTag);
         }
         const phaseInfo = !isEditMode ? getProjectCurrentPhase(p.id) : null;
@@ -10062,6 +10097,11 @@
           var panel = document.getElementById("settingsTab" + panelId);
           if (panel) panel.classList.add("active");
           if (tabId === "tasks" && typeof updateAutoPopulateSectionVisibility === "function") updateAutoPopulateSectionVisibility();
+          if (tabId === "storage" && typeof window.switchStorageType === "function") {
+            var mode = typeof getStorageMode === "function" ? getStorageMode() : "github";
+            var type = (window.ganttStorage?.isCloudEnabled && window.ganttStorage.isCloudEnabled()) ? "supabase" : (mode === "local_cache" ? "local_cache" : (mode === "local_storage" ? "local_storage" : "github"));
+            window.switchStorageType(type);
+          }
           if (tabId === "function") {
             var isBoard = tabRow.id === "settingsTabsBoard";
             var homePanel = document.getElementById("settingsGeneralHome");
@@ -10076,37 +10116,29 @@
       migrateLegacySingleProject();
       initAuthUI();
       initSettingsSidebar();
-      (function setupStorageModalTabs() {
-        var tabs = document.querySelectorAll(".storage-modal-tab");
-        var panels = document.querySelectorAll(".storage-modal-panel");
-        function updateStorageTabChecks() {
+      (function setupStorageTypePicker() {
+        var tiles = document.querySelectorAll(".storage-type-tile");
+        var detailPanels = document.querySelectorAll(".storage-details-panel");
+        function getCurrentStorageType() {
           var mode = getStorageMode() || "github";
-          var tab = (mode === "github") ? "external" : "local";
-          tabs.forEach(function (t) {
-            t.classList.toggle("storage-tab-selected", t.dataset.tab === tab);
-          });
+          if (window.ganttStorage?.isCloudEnabled && window.ganttStorage.isCloudEnabled()) return "supabase";
+          return mode;
         }
-        function switchStorageTab(tab) {
-          var tabId = "storageTab" + (tab === "external" ? "External" : "Local");
-          var panelId = "storagePanel" + (tab === "external" ? "External" : "Local");
-          tabs.forEach(function (t) {
-            var isActive = t.id === tabId;
-            t.classList.toggle("active", isActive);
-            t.setAttribute("aria-selected", isActive);
+        function switchStorageType(type) {
+          tiles.forEach(function (t) {
+            t.classList.toggle("selected", t.dataset.value === type);
           });
-          panels.forEach(function (p) {
-            p.classList.toggle("active", p.id === panelId);
+          detailPanels.forEach(function (p) {
+            p.classList.toggle("active", p.dataset.type === type);
           });
-          updateStorageTabChecks();
-          if (tab === "local") {
-            var mode = getStorageMode() || "local_storage";
-            var radio = document.getElementById(mode === "local_cache" ? "storageLocalCache" : "storageLocalStorage");
-            if (radio) radio.checked = true;
-          }
+          if (type === "local_storage" && typeof initLocalBackupHandlers === "function") initLocalBackupHandlers();
+          if (type === "github" && typeof updateModalStatus === "function") updateModalStatus();
         }
         window.switchStorageTab = function (tab) {
-          switchStorageTab(tab);
+          if (tab === "external") switchStorageType("github");
+          else if (tab === "local") switchStorageType(getStorageMode() === "local_cache" ? "local_cache" : "local_storage");
         };
+        window.switchStorageType = switchStorageType;
         window.closeStorageModal = function () {
           document.getElementById("appViewsWrap")?.classList.remove("settings-sidebar-open");
         };
@@ -10119,8 +10151,7 @@
           if (titleEl) titleEl.textContent = "Settings";
           if (tabsHome) tabsHome.style.display = "";
           if (tabsBoard) tabsBoard.style.display = "none";
-          var mode = getStorageMode() || "github";
-          switchStorageTab(mode === "github" ? "external" : "local");
+          switchStorageType(getCurrentStorageType());
           document.getElementById("appViewsWrap")?.classList.add("settings-sidebar-open");
           document.querySelectorAll(".settings-tab").forEach(function (t) { t.classList.remove("active"); });
           document.querySelectorAll(".settings-tab-panel").forEach(function (p) { p.classList.remove("active"); });
@@ -10130,34 +10161,20 @@
           if (storagePanel) storagePanel.classList.add("active");
           if (typeof updateModalStatus === "function") updateModalStatus();
         };
-        tabs.forEach(function (t) {
-          t.addEventListener("click", function () { switchStorageTab(t.dataset.tab); });
-        });
-        var mode = getStorageMode() || "github";
-        var localRadio = document.getElementById(mode === "local_cache" ? "storageLocalCache" : "storageLocalStorage");
-        if (localRadio) localRadio.checked = true;
-        function syncStorageLocalTiles() {
-          var checked = document.querySelector('input[name="storageLocalType"]:checked');
-          document.querySelectorAll('.storage-local-tile').forEach(function (t) {
-            t.classList.toggle('selected', t.querySelector('input[name="storageLocalType"]') === checked);
-          });
-        }
-        syncStorageLocalTiles();
-        document.querySelector('.storage-local-tiles')?.addEventListener("click", function (e) {
-          if (e.target.closest('.storage-local-tile-actions')) return;
-          var tile = e.target.closest('.storage-local-tile');
+        document.getElementById("storageTypeTiles")?.addEventListener("click", function (e) {
+          if (e.target.closest(".storage-local-tile-actions")) return;
+          var tile = e.target.closest(".storage-type-tile");
           if (!tile) return;
-          var radio = tile.querySelector('input[name="storageLocalType"]');
-          if (radio) { radio.checked = true; syncStorageLocalTiles(); }
+          switchStorageType(tile.dataset.value);
         });
-        document.querySelector('.storage-local-tiles')?.addEventListener("keydown", function (e) {
+        document.getElementById("storageTypeTiles")?.addEventListener("keydown", function (e) {
           if (e.key !== "Enter" && e.key !== " ") return;
-          var tile = e.target.closest('.storage-local-tile');
+          var tile = e.target.closest(".storage-type-tile");
           if (!tile) return;
           e.preventDefault();
-          var radio = tile.querySelector('input[name="storageLocalType"]');
-          if (radio) { radio.checked = true; syncStorageLocalTiles(); }
+          switchStorageType(tile.dataset.value);
         });
+        switchStorageType(getCurrentStorageType());
         document.getElementById("storageModalBackupToFile")?.addEventListener("click", function () {
           var snap = exportSharedSnapshot();
           var blob = new Blob([JSON.stringify(snap, null, 2)], { type: "application/json" });
