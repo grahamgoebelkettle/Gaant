@@ -7,6 +7,7 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
     :root {
+      --button-radius: 8px;
       --color-general-primary: #171717;
       --color-general-primary-hover: #262626;
       --color-general-primary-active: #0a0a0a;
@@ -311,7 +312,7 @@
     .gantt-row:hover .task-dependency-icon { opacity: 1; }
     .task-dependency-tooltip {
       position: fixed;
-      z-index: 9999;
+      z-index: 100050;
       padding: 8px 12px;
       background: #171717;
       color: #fafafa;
@@ -367,7 +368,7 @@
       padding: 6px 14px;
       font-size: 13px;
       font-weight: 500;
-      border-radius: 6px;
+      border-radius: var(--button-radius);
       border: none;
       cursor: pointer;
       font-family: inherit;
@@ -882,7 +883,7 @@
     }
     .gantt-bar-tooltip {
       position: fixed;
-      z-index: 100000;
+      z-index: 100050;
       min-width: 200px;
       max-width: 240px;
       padding: 10px 12px;
@@ -942,7 +943,7 @@
     .gantt-cell[contenteditable]:focus,
     .gantt-task-cell:focus-within {
       background: var(--row-bg-default);
-      box-shadow: inset 0 0 0 2px var(--color-general-primary);
+      box-shadow: inset 0 0 0 1px var(--color-general-primary);
     }
     .add-task-fab {
       position: fixed;
@@ -1019,6 +1020,17 @@
       border-radius: 3px;
       flex-shrink: 0;
     }
+    .fab-phase-menu-item-disabled {
+      cursor: default;
+      opacity: 0.6;
+    }
+    .fab-phase-menu-item-disabled:hover { background: transparent; }
+    .fab-phase-menu-badge {
+      font-size: 11px;
+      color: #a3a3a3;
+      font-weight: 400;
+      margin-left: 4px;
+    }
     @media (prefers-color-scheme: dark) {
       .add-task-fab {
         background: #ffffff;
@@ -1040,7 +1052,7 @@
       padding: 8px 16px;
       font-size: 14px;
       font-weight: 600;
-      border-radius: 8px;
+      border-radius: var(--button-radius);
       border: none;
       cursor: pointer;
       font-family: inherit;
@@ -1050,6 +1062,15 @@
     }
     .home-new-project-btn:hover {
       opacity: 0.9;
+    }
+    .home-new-project-btn-dropdown {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .home-new-project-chevron {
+      font-size: 10px;
+      opacity: 0.8;
     }
     .home-readonly-badge {
       position: fixed;
@@ -1328,7 +1349,7 @@
     .page-header-title-wrap h1:focus,
     .page-header-title-wrap .subtitle:focus {
       outline: none;
-      box-shadow: inset 0 0 0 2px var(--color-general-primary);
+      box-shadow: inset 0 0 0 1px var(--color-general-primary);
     }
     .settings-btn {
       width: 36px;
@@ -1337,7 +1358,7 @@
       border: none;
       background: transparent;
       color: var(--text-secondary);
-      border-radius: 8px;
+      border-radius: var(--button-radius);
       color: #737373;
       cursor: pointer;
       display: flex;
@@ -1357,23 +1378,27 @@
       min-height: 0;
     }
     .settings-sidebar {
-      position: absolute;
+      position: fixed;
       right: 0;
       top: 0;
       bottom: 0;
-      width: 0;
+      width: 320px;
+      height: 100vh;
       overflow: hidden;
       display: flex;
       flex-direction: column;
       background: var(--bg-surface);
       border-left: none;
-      transition: width 0.2s ease;
       min-height: 0;
       z-index: 100;
       box-shadow: none;
+      transform: translateX(100%);
+      transition: transform 0.25s ease;
+      padding: 0;
+      margin: 0;
     }
     .app-views-wrap.settings-sidebar-open .settings-sidebar {
-      width: 320px;
+      transform: translateX(0);
       overflow: visible;
       border-left: 1px solid var(--border-default);
       box-shadow: -4px 0 16px rgba(0,0,0,0.08);
@@ -1409,17 +1434,23 @@
       padding: 0 24px;
       border-bottom: 1px solid var(--border-default);
       flex-shrink: 0;
+      min-width: 0;
     }
     .settings-tab {
-      padding: 12px 20px;
+      flex: 1 1 0;
+      min-width: 0;
+      padding: 12px 10px;
       border: none;
       background: transparent;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 500;
       color: var(--text-tertiary);
       cursor: pointer;
-      border-bottom: 2px solid transparent;
+      border-bottom: 1px solid transparent;
       margin-bottom: -1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .settings-tab:hover { color: var(--text-primary); }
     .settings-tab.active {
@@ -1552,7 +1583,7 @@
       transform: translateX(20px);
     }
     .settings-toggle-switch input:focus-visible + .settings-toggle-slider {
-      box-shadow: 0 0 0 2px var(--color-general-primary);
+      box-shadow: 0 0 0 1px var(--color-general-primary);
     }
     .settings-segmented {
       display: flex;
@@ -1661,10 +1692,35 @@
       box-sizing: border-box;
     }
     .settings-add-phase:hover { background: var(--bg-hover); border-color: var(--border-strong); }
+    .settings-phase-list-header {
+      display: none;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 4px;
+      margin-bottom: 2px;
+    }
+    .settings-phase-list[data-phase-mode="fixed"] .settings-phase-list-header {
+      display: flex;
+    }
+    .settings-phase-list-header-phase {
+      flex: 1;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-tertiary);
+    }
+    .settings-phase-list-header-sprints {
+      width: 100px;
+      min-width: 100px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-tertiary);
+    }
     .settings-phase-sprints {
       display: none;
       align-items: stretch;
       height: 36px;
+      width: 100px;
+      min-width: 100px;
     }
     .settings-phase-list[data-phase-mode="fixed"] .settings-phase-sprints {
       display: flex;
@@ -1673,13 +1729,33 @@
       display: flex;
       align-items: center;
       height: 36px;
-      padding: 0 10px 0 12px;
+      padding: 0 4px;
       font-size: 13px;
       border: 1px solid var(--border-strong);
       border-radius: 6px;
       background: var(--bg-surface);
       box-sizing: border-box;
+      gap: 0;
     }
+    .settings-phase-sprints-stepper-btn {
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      border: none;
+      border-radius: 4px;
+      background: transparent;
+      color: var(--text-primary);
+      font-size: 16px;
+      line-height: 1;
+      cursor: pointer;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .settings-phase-sprints-stepper-btn:hover { background: var(--bg-hover); color: var(--color-general-primary); }
+    .settings-phase-sprints-stepper-btn:disabled { opacity: 0.4; cursor: not-allowed; }
     .settings-phase-sprints input {
       width: 28px;
       padding: 0;
@@ -1689,7 +1765,7 @@
       color: var(--text-primary);
       font-size: 13px;
       font-family: inherit;
-      text-align: right;
+      text-align: center;
       -moz-appearance: textfield;
       appearance: textfield;
     }
@@ -1698,12 +1774,6 @@
       -webkit-appearance: none;
       appearance: none;
       margin: 0;
-    }
-    .settings-phase-sprints .sprints-suffix {
-      margin-left: 4px;
-      font-size: 13px;
-      color: var(--text-tertiary);
-      white-space: nowrap;
     }
     .settings-palette-grid {
       display: flex;
@@ -1717,7 +1787,7 @@
       padding: 10px 12px;
       width: 100%;
       box-sizing: border-box;
-      border: 2px solid var(--border-strong);
+      border: 1px solid var(--border-strong);
       border-radius: 8px;
       cursor: pointer;
       background: var(--bg-surface);
@@ -1747,6 +1817,7 @@
       background-size: 12px;
     }
     .settings-dependent-trigger:hover { border-color: var(--border-default); }
+    .settings-dependent-trigger:disabled { opacity: 0.6; cursor: not-allowed; pointer-events: none; }
     .settings-dependent-wrap.open .settings-dependent-trigger { border-color: var(--color-general-primary); }
     .settings-dependent-panel {
       display: none;
@@ -1849,7 +1920,7 @@
       background: transparent;
       border: 1px solid var(--border-strong);
       border: 1px dashed #d4d4d4;
-      border-radius: 6px;
+      border-radius: var(--button-radius);
       cursor: pointer;
     }
     .settings-save-palette-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
@@ -1858,8 +1929,8 @@
     .settings-party-item span { flex: 1; min-width: 0; }
     .settings-party-item button { flex-shrink: 0; padding: 2px 8px; font-size: 12px; color: var(--text-tertiary); background: transparent; border: none; border-radius: 4px; cursor: pointer; font-family: inherit; }
     .settings-party-item button:hover { color: #b91c1c; background: rgba(185,28,28,0.1); }
-    .settings-add-party-row { display: flex; gap: 8px; align-items: center; width: 100%; box-sizing: border-box; }
-    .settings-add-party-row .settings-add-phase { width: auto; flex-shrink: 0; margin-top: 0; }
+    .settings-add-party-row { display: flex; flex-direction: column; gap: 8px; width: 100%; box-sizing: border-box; }
+    .settings-add-party-row .settings-add-phase { width: 100%; margin-top: 0; }
     .settings-party-input { flex: 1; min-width: 0; padding: 10px 14px; font-size: 14px; border: 1px solid var(--border-strong); border-radius: 6px; font-family: inherit; min-height: 40px; box-sizing: border-box; }
     .settings-auto-populate-btn {
       width: 100%;
@@ -1870,7 +1941,7 @@
       color: var(--bg-body);
       background: var(--text-primary);
       border: none;
-      border-radius: 6px;
+      border-radius: var(--button-radius);
       cursor: pointer;
       font-family: inherit;
       box-sizing: border-box;
@@ -1888,6 +1959,7 @@
       flex-shrink: 0;
     }
     @media (max-width: 480px) {
+      .settings-sidebar { width: 100%; }
       .settings-drawer { width: 100%; height: 100vh; max-height: 100vh; }
       .settings-drawer-header { padding: 16px 16px 16px 20px; }
       .settings-drawer-header h2 { font-size: 17px; }
@@ -1901,7 +1973,7 @@
       padding: 8px 20px;
       font-size: 14px;
       font-weight: 500;
-      border-radius: 6px;
+      border-radius: var(--button-radius);
       border: none;
       background: var(--text-primary);
       color: var(--bg-body);
@@ -2161,7 +2233,7 @@
       color: var(--text-tertiary);
       background: transparent;
       border: none;
-      border-radius: 6px;
+      border-radius: var(--button-radius);
       cursor: pointer;
       box-sizing: border-box;
     }
@@ -2535,7 +2607,7 @@
       color: var(--color-general-primary);
       background: var(--bg-surface);
       border: 1px solid var(--border-default);
-      border-radius: 12px;
+      border-radius: var(--button-radius);
       cursor: pointer;
       transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
     }
@@ -2590,7 +2662,7 @@
     #homePageTitle:focus,
     #homePageDescription:focus {
       outline: none;
-      box-shadow: inset 0 0 0 2px var(--color-general-primary);
+      box-shadow: inset 0 0 0 1px var(--color-general-primary);
     }
     .home-project-count-badge {
       display: inline-flex;
@@ -2610,7 +2682,7 @@
     .home-shared-file-label { display: block; font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; }
     .home-shared-file-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .home-shared-file-input { flex: 1; min-width: 200px; padding: 8px 10px; font-size: 13px; border: 1px solid var(--border-default); border-radius: 6px; font-family: inherit; }
-    .home-shared-file-btn { padding: 8px 12px; font-size: 13px; border-radius: 6px; border: 1px solid var(--border-strong); background: var(--bg-surface); color: var(--text-primary); cursor: pointer; font-family: inherit; }
+    .home-shared-file-btn { padding: 8px 12px; font-size: 13px; border-radius: var(--button-radius); border: 1px solid var(--border-strong); background: var(--bg-surface); color: var(--text-primary); cursor: pointer; font-family: inherit; }
     .home-shared-file-btn:hover { background: var(--bg-hover); }
     .home-shared-file-push { margin-top: 12px; }
     .home-shared-file-push .home-shared-file-label { margin-bottom: 4px; }
@@ -2628,7 +2700,7 @@
     @keyframes home-sync-dot-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     .home-shared-file-status-text { font-size: 13px; color: var(--text-secondary); }
     .home-shared-file-status-text strong { color: var(--text-primary); font-weight: 600; }
-    .home-shared-file-open-btn { padding: 8px 16px; font-size: 14px; font-weight: 600; border-radius: 8px; border: 1px solid var(--border-strong); background: var(--bg-surface); color: var(--text-primary); cursor: pointer; font-family: inherit; }
+    .home-shared-file-open-btn { padding: 8px 16px; font-size: 14px; font-weight: 600; border-radius: var(--button-radius); border: 1px solid var(--border-strong); background: var(--bg-surface); color: var(--text-primary); cursor: pointer; font-family: inherit; }
     .home-shared-file-open-btn:hover { background: var(--bg-hover); }
     .shared-file-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 24px; }
     .shared-file-modal-overlay.visible { display: flex; }
@@ -2636,7 +2708,7 @@
     .shared-file-modal-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: -24px -24px 16px -24px; padding: 16px 24px; border-bottom: 1px solid var(--border-default); background: var(--bg-surface); flex-shrink: 0; }
     .shared-file-modal-header h3 { margin: 0; font-size: 18px; font-weight: 600; flex: 1; min-width: 0; }
     .shared-file-modal-close {
-      width: 36px; height: 36px; min-width: 36px; min-height: 36px; padding: 0; border: none; background: transparent; border-radius: 8px; color: var(--text-tertiary); cursor: pointer; font-size: 22px; line-height: 1; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      width: 36px; height: 36px; min-width: 36px; min-height: 36px; padding: 0; border: none; background: transparent; border-radius: var(--button-radius); color: var(--text-tertiary); cursor: pointer; font-size: 22px; line-height: 1; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
     }
     .shared-file-modal-close:hover { background: var(--bg-subtle); color: var(--text-primary); }
     .shared-file-modal h3 { margin: 0 0 16px 0; font-size: 18px; font-weight: 600; }
@@ -2649,7 +2721,7 @@
     .shared-file-modal .shared-file-modal-status-dot.local { background: var(--stroke-default); }
     .shared-file-modal label { display: block; font-size: 12px; font-weight: 500; color: var(--text-secondary); margin-bottom: 4px; }
     .shared-file-input-wrap { display: flex; align-items: stretch; margin-bottom: 12px; border: 1px solid var(--border-strong); border-radius: 6px; background: var(--bg-surface); transition: box-shadow 0.15s ease; }
-    .shared-file-input-wrap:focus-within { box-shadow: 0 0 0 2px var(--color-general-primary); outline: none; }
+    .shared-file-input-wrap:focus-within { box-shadow: 0 0 0 1px var(--color-general-primary); outline: none; }
     .shared-file-input-wrap input { flex: 1; min-width: 0; padding: 10px 12px; border: none; border-radius: 6px 0 0 6px; font-size: 14px; box-sizing: border-box; background: transparent; color: var(--text-primary); font-family: inherit; }
     .shared-file-input-wrap input::placeholder { color: var(--text-tertiary); opacity: 1; }
     .shared-file-input-wrap input:focus { outline: none; }
@@ -2662,7 +2734,7 @@
     .shared-file-modal .shared-file-modal-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
     .shared-file-modal .shared-file-modal-section { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-default); }
     .storage-modal-tabs { display: flex; gap: 0; margin: 0 0 20px 0; border-bottom: 1px solid var(--border-default); }
-    .storage-modal-tab { padding: 10px 16px; font-size: 13px; font-weight: 500; color: var(--text-secondary); background: none; border: none; border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer; font-family: inherit; }
+    .storage-modal-tab { padding: 10px 16px; font-size: 13px; font-weight: 500; color: var(--text-secondary); background: none; border: none; border-bottom: 1px solid transparent; margin-bottom: -1px; cursor: pointer; font-family: inherit; }
     .storage-modal-tab:hover { color: var(--text-primary); }
     .storage-modal-tab.active { color: var(--color-general-primary); border-bottom-color: var(--color-general-primary); }
     .storage-modal-tab .storage-tab-check { margin-left: 4px; }
@@ -2675,6 +2747,44 @@
     .storage-modal-use-btn { margin-top: 16px; }
     .settings-storage-inline .storage-modal-tabs { margin-top: 8px; margin-bottom: 12px; }
     .settings-storage-inline .storage-modal-panel { margin-top: 0; }
+    .storage-local-tiles { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
+    .storage-local-tile {
+      position: relative;
+      display: block;
+      width: 100%;
+      padding: 16px 18px;
+      text-align: left;
+      font-family: inherit;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+      box-sizing: border-box;
+    }
+    .storage-local-tile:hover { border-color: var(--border-strong); background: var(--bg-hover); }
+    .storage-local-tile.selected {
+      border: 1px solid #059669;
+      background: rgba(5, 150, 105, 0.16);
+      box-shadow: none;
+    }
+    .storage-local-tile.selected .storage-local-tile-title { color: var(--text-primary); font-weight: 600; }
+    .storage-local-tile.selected .storage-local-tile-desc { color: var(--text-secondary); }
+    .storage-local-tile.selected::after {
+      content: "";
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 18px;
+      height: 18px;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23059669' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E") no-repeat center;
+      background-size: contain;
+      pointer-events: none;
+    }
+    .storage-local-tile-title { font-size: 15px; font-weight: 600; color: var(--text-primary); margin: 0 0 4px 0; }
+    .storage-local-tile-desc { font-size: 13px; color: var(--text-secondary); margin: 0; line-height: 1.4; }
+    .storage-local-tile-actions { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-subtle); display: flex; flex-wrap: wrap; gap: 8px; }
+    .storage-local-tile-actions .home-shared-file-btn { margin: 0; }
     @media (max-width: 480px) {
       .shared-file-modal-overlay { padding: 0; align-items: stretch; justify-content: stretch; }
       .shared-file-modal { width: 100%; height: 100vh; max-height: 100vh; border-radius: 0; border-left: none; border-right: none; border-top: none; padding: 0; }
@@ -2690,7 +2800,7 @@
       padding: 8px 14px;
       font-size: 13px;
       font-weight: 500;
-      border-radius: 6px;
+      border-radius: var(--button-radius);
       border: 1px solid var(--border-strong);
       background: var(--bg-surface);
       color: var(--text-primary);
@@ -3037,11 +3147,22 @@
       flex: 1 0 auto;
       min-height: 0;
     }
+    .gantt-wrapper:has(#ganttEmptyState:not(.hidden)) .gantt-grid {
+      flex: 0 0 auto;
+    }
+    .gantt-wrapper:has(#ganttEmptyState:not(.hidden)) .gantt-empty-state {
+      flex: 1 1 0;
+      min-height: 0;
+    }
     @media (max-width: 480px) {
       .gantt-wrapper { overflow: visible; flex: 0 1 auto; }
       .gantt-wrapper .gantt-grid { flex: 0 1 auto; }
     }
     .gantt-empty-state {
+      position: sticky;
+      top: 0;
+      left: 0;
+      z-index: 2;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -3051,36 +3172,36 @@
       color: var(--text-secondary);
       text-align: center;
       padding: 16px 24px;
-      flex-shrink: 0;
+      flex: 1 1 0;
+      min-height: 280px;
+      width: 100%;
+      box-sizing: border-box;
       border-top: 1px solid var(--border-strong);
     }
     .gantt-empty-state.hidden { display: none !important; }
+    .settings-auto-populate-section.hidden { display: none !important; }
     .gantt-empty-state .empty-title { font-size: 18px; font-weight: 600; color: var(--text-primary); }
-    .gantt-empty-state-actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
-    .gantt-empty-state .btn-empty-primary {
-      padding: 12px 24px;
-      font-size: 14px;
-      font-weight: 600;
-      border-radius: 8px;
-      border: none;
-      background: var(--color-general-primary);
-      color: var(--bg-body);
-      cursor: pointer;
-      font-family: inherit;
-    }
-    .gantt-empty-state .btn-empty-primary:hover { background: var(--color-general-primary-hover); }
+    .gantt-empty-state-actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; align-items: center; }
+    .gantt-empty-state .btn-empty-primary,
     .gantt-empty-state .btn-empty-secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
       padding: 12px 24px;
       font-size: 14px;
       font-weight: 600;
-      border-radius: 8px;
+      border-radius: var(--button-radius);
       border: 1px solid var(--border-strong);
       background: var(--bg-surface);
       color: var(--text-primary);
       cursor: pointer;
       font-family: inherit;
     }
+    .gantt-empty-state .btn-empty-primary:hover,
     .gantt-empty-state .btn-empty-secondary:hover { background: var(--bg-hover); }
+    .gantt-empty-state .btn-empty-primary svg,
+    .gantt-empty-state .btn-empty-secondary svg { width: 18px; height: 18px; flex-shrink: 0; }
     .task-chevron {
       display: inline-flex;
       margin-right: 8px;
@@ -3097,6 +3218,45 @@
   </style>
 </head>
 <body>
+  <div class="task-dependency-tooltip" id="taskDependencyTooltip" role="tooltip"></div>
+  <div class="detach-confirm-popup" id="detachConfirmPopup" role="dialog" aria-labelledby="detachConfirmMsg">
+    <div class="detach-confirm-msg" id="detachConfirmMsg"></div>
+    <p class="detach-confirm-hint" id="detachConfirmHint">You can allow dependent tasks to have their own dates in Board settings → Tasks → Dependent tasks.</p>
+    <div class="detach-confirm-actions">
+      <button type="button" class="detach-confirm-cancel">Keep link</button>
+      <button type="button" class="detach-confirm-detach">Detach</button>
+    </div>
+  </div>
+  <div class="detach-confirm-popup phase-confirm-popup" id="phaseConfirmPopup" role="dialog" aria-labelledby="phaseConfirmMsg">
+    <div class="detach-confirm-msg" id="phaseConfirmMsg"></div>
+    <p class="phase-confirm-hint">You can allow dependent tasks to have their own dates in Board settings → Tasks → Dependent tasks.</p>
+    <div class="detach-confirm-actions">
+      <button type="button" class="phase-confirm-keep">Keep current phase</button>
+      <button type="button" class="phase-confirm-move">Move to phase</button>
+    </div>
+  </div>
+  <div class="detach-confirm-popup" id="deleteConfirmPopup" role="dialog" aria-labelledby="deleteConfirmMsg">
+    <div class="detach-confirm-msg" id="deleteConfirmMsg"></div>
+    <div class="detach-confirm-actions">
+      <button type="button" class="delete-confirm-cancel">Cancel</button>
+      <button type="button" class="delete-confirm-delete">Delete</button>
+    </div>
+  </div>
+  <div class="phase-select-menu" id="phaseSelectMenu" role="menu" aria-label="Phase">
+    <div class="phase-select-menu-title">Phase</div>
+    <div class="phase-select-menu-list" id="phaseSelectMenuList"></div>
+  </div>
+  <div class="fab-phase-menu" id="fabPhaseMenu" role="menu" aria-label="Start in phase">
+    <div class="fab-phase-menu-title">Start in phase</div>
+    <div class="fab-phase-menu-list" id="fabPhaseMenuList"></div>
+  </div>
+  <div class="home-new-board-menu fab-phase-menu" id="homeNewBoardMenu" role="menu" aria-label="New board options">
+    <div class="fab-phase-menu-list">
+      <button type="button" class="fab-phase-menu-item" data-action="scratch" role="menuitem">Start from Scratch</button>
+      <button type="button" class="fab-phase-menu-item" data-action="linked" role="menuitem">Linked board</button>
+      <button type="button" class="fab-phase-menu-item fab-phase-menu-item-disabled" data-action="templates" role="menuitem" disabled>Templates <span class="fab-phase-menu-badge">coming soon</span></button>
+    </div>
+  </div>
   <div class="app-views-wrap" id="appViewsWrap">
   <div class="app-views-inner">
   <div id="landingView" class="app-view">
@@ -3181,38 +3341,6 @@
     </div>
   </header>
 
-  <div class="task-dependency-tooltip" id="taskDependencyTooltip" role="tooltip"></div>
-  <div class="detach-confirm-popup" id="detachConfirmPopup" role="dialog" aria-labelledby="detachConfirmMsg">
-    <div class="detach-confirm-msg" id="detachConfirmMsg"></div>
-    <p class="detach-confirm-hint" id="detachConfirmHint">You can allow dependent tasks to have their own dates in Board settings → General → Dependent tasks.</p>
-    <div class="detach-confirm-actions">
-      <button type="button" class="detach-confirm-cancel">Keep link</button>
-      <button type="button" class="detach-confirm-detach">Detach</button>
-    </div>
-  </div>
-  <div class="detach-confirm-popup phase-confirm-popup" id="phaseConfirmPopup" role="dialog" aria-labelledby="phaseConfirmMsg">
-    <div class="detach-confirm-msg" id="phaseConfirmMsg"></div>
-    <p class="phase-confirm-hint">You can allow dependent tasks to have their own dates in Board settings → General → Dependent tasks.</p>
-    <div class="detach-confirm-actions">
-      <button type="button" class="phase-confirm-keep">Keep current phase</button>
-      <button type="button" class="phase-confirm-move">Move to phase</button>
-    </div>
-  </div>
-  <div class="detach-confirm-popup" id="deleteConfirmPopup" role="dialog" aria-labelledby="deleteConfirmMsg">
-    <div class="detach-confirm-msg" id="deleteConfirmMsg"></div>
-    <div class="detach-confirm-actions">
-      <button type="button" class="delete-confirm-cancel">Cancel</button>
-      <button type="button" class="delete-confirm-delete">Delete</button>
-    </div>
-  </div>
-  <div class="phase-select-menu" id="phaseSelectMenu" role="menu" aria-label="Phase">
-    <div class="phase-select-menu-title">Phase</div>
-    <div class="phase-select-menu-list" id="phaseSelectMenuList"></div>
-  </div>
-  <div class="fab-phase-menu" id="fabPhaseMenu" role="menu" aria-label="Start in phase">
-    <div class="fab-phase-menu-title">Start in phase</div>
-    <div class="fab-phase-menu-list" id="fabPhaseMenuList"></div>
-  </div>
   <svg class="gantt-dependency-line" id="ganttDependencyLine" aria-hidden="true">
     <path id="ganttDependencyLinePathHover" d="" stroke="transparent" stroke-width="12" fill="none"/>
     <path id="ganttDependencyLinePath" d="" stroke="#a3a3a3" stroke-width="1" stroke-dasharray="4 3" fill="none"/>
@@ -3288,8 +3416,14 @@
       <span class="empty-title">No tasks yet</span>
       <p>Configure phases and settings, or add sample tasks to explore the chart.</p>
       <div class="gantt-empty-state-actions">
-        <button type="button" class="btn-empty-primary" id="ganttEmptyConfigure">Configure project</button>
-        <button type="button" class="btn-empty-secondary" id="ganttEmptyPopulate">Add sample tasks</button>
+        <button type="button" class="btn-empty-primary" id="ganttEmptyConfigure">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Configure project
+        </button>
+        <button type="button" class="btn-empty-secondary" id="ganttEmptyPopulate">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          Add sample tasks
+        </button>
       </div>
     </div>
   </div>
@@ -3308,6 +3442,7 @@
       <div class="settings-tabs settings-tabs--board" id="settingsTabsBoard" style="display: none;">
         <button type="button" class="settings-tab active" data-tab="function">General</button>
         <button type="button" class="settings-tab" data-tab="details">Details</button>
+        <button type="button" class="settings-tab" data-tab="tasks">Tasks</button>
         <button type="button" class="settings-tab" data-tab="style">Style</button>
       </div>
       <div class="settings-drawer-body">
@@ -3351,41 +3486,6 @@
               <input type="date" id="settingsProjectEndDate">
               <small class="settings-hint">When set, the timeline is capped at this date; the board won't extend beyond it.</small>
             </div>
-            <div class="settings-section">
-              <label>Dependent tasks</label>
-              <select id="settingsDependencyGap" aria-hidden="true" style="position:absolute;opacity:0;pointer-events:none;height:0;width:0;">
-                <option value="0">0 days (start when previous ends)</option>
-                <option value="1">1 day</option>
-                <option value="2">2 days</option>
-                <option value="3">3 days</option>
-                <option value="5">5 days</option>
-                <option value="7">1 week</option>
-                <option value="14">2 weeks</option>
-              </select>
-              <div class="settings-dependent-wrap" id="settingsDependentWrap">
-                <button type="button" class="settings-dependent-trigger" id="settingsDependentTrigger" aria-expanded="false" aria-haspopup="true">0 days (start when previous ends)</button>
-                <div class="settings-dependent-panel" id="settingsDependentPanel" role="menu">
-                  <button type="button" class="settings-dependent-option" role="menuitem" data-value="0">0 days (start when previous ends)</button>
-                  <button type="button" class="settings-dependent-option" role="menuitem" data-value="1">1 day</button>
-                  <button type="button" class="settings-dependent-option" role="menuitem" data-value="2">2 days</button>
-                  <button type="button" class="settings-dependent-option" role="menuitem" data-value="3">3 days</button>
-                  <button type="button" class="settings-dependent-option" role="menuitem" data-value="5">5 days</button>
-                  <button type="button" class="settings-dependent-option" role="menuitem" data-value="7">1 week</button>
-                  <button type="button" class="settings-dependent-option" role="menuitem" data-value="14">2 weeks</button>
-                  <div class="settings-dependent-divider"></div>
-                  <div class="settings-dependent-checkbox-wrap">
-                    <div class="settings-toggle-row">
-                      <label for="settingsIndependentDependencies" class="settings-toggle-label">Independent start dates & phases for dependencies</label>
-                      <label class="settings-toggle-switch" aria-hidden="true">
-                        <input type="checkbox" id="settingsIndependentDependencies">
-                        <span class="settings-toggle-slider"></span>
-                      </label>
-                    </div>
-                    <small class="settings-hint">When enabled, dependent tasks can have their own start date and phase instead of following the parent. The link remains for tracking; dates are not auto-adjusted.</small>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
         <div class="settings-tab-panel" id="settingsTabDetails">
@@ -3398,9 +3498,55 @@
             <small class="settings-hint">Dynamic: phase header width reflects the date range of tasks in that phase. Fixed: set a number of sprints (2 weeks each) per phase.</small>
           </div>
           <div class="settings-section">
-            <label>Phases</label>
+            <label class="settings-phase-section-label" id="settingsPhaseSectionLabel" style="display: none;">Phases</label>
             <div class="settings-phase-list" id="settingsPhaseList" data-phase-mode="fixed"></div>
             <button type="button" class="settings-add-phase" id="settingsAddPhase">+ Add phase</button>
+          </div>
+          <div class="settings-section">
+            <label>Team Members</label>
+            <p class="settings-hint" style="margin-top: 0;">Names shown in the Team member dropdown for tasks. Saved with the project.</p>
+            <div class="settings-party-list" id="settingsResponsiblePartiesList"></div>
+            <div class="settings-add-party-row">
+              <input type="text" id="settingsPartyInput" placeholder="Add name, press Enter" class="settings-party-input" />
+              <button type="button" class="settings-add-phase" id="settingsAddParty">+ Add</button>
+            </div>
+          </div>
+        </div>
+        <div class="settings-tab-panel" id="settingsTabTasks">
+          <div class="settings-section">
+            <label>Dependent tasks</label>
+            <small class="settings-hint" style="margin-top: 0; margin-bottom: 8px; display: block;">Gap between the end of the previous task and the start of the dependent. 0 days = start when previous ends.</small>
+            <select id="settingsDependencyGap" aria-hidden="true" style="position:absolute;opacity:0;pointer-events:none;height:0;width:0;">
+              <option value="0">0 days</option>
+              <option value="1">1 day</option>
+              <option value="2">2 days</option>
+              <option value="3">3 days</option>
+              <option value="5">5 days</option>
+              <option value="7">1 week</option>
+              <option value="14">2 weeks</option>
+            </select>
+            <div class="settings-dependent-wrap" id="settingsDependentWrap">
+              <button type="button" class="settings-dependent-trigger" id="settingsDependentTrigger" aria-expanded="false" aria-haspopup="true">0 days</button>
+              <div class="settings-dependent-panel" id="settingsDependentPanel" role="menu">
+                <button type="button" class="settings-dependent-option" role="menuitem" data-value="0">0 days</button>
+                <button type="button" class="settings-dependent-option" role="menuitem" data-value="1">1 day</button>
+                <button type="button" class="settings-dependent-option" role="menuitem" data-value="2">2 days</button>
+                <button type="button" class="settings-dependent-option" role="menuitem" data-value="3">3 days</button>
+                <button type="button" class="settings-dependent-option" role="menuitem" data-value="5">5 days</button>
+                <button type="button" class="settings-dependent-option" role="menuitem" data-value="7">1 week</button>
+                <button type="button" class="settings-dependent-option" role="menuitem" data-value="14">2 weeks</button>
+              </div>
+            </div>
+            <div class="settings-dependent-independent-wrap" style="margin-top: 12px;">
+              <div class="settings-toggle-row">
+                <label for="settingsIndependentDependencies" class="settings-toggle-label">Independent start dates & phases for dependencies</label>
+                <label class="settings-toggle-switch" aria-hidden="true">
+                  <input type="checkbox" id="settingsIndependentDependencies">
+                  <span class="settings-toggle-slider"></span>
+                </label>
+              </div>
+              <small class="settings-hint">When enabled, dependent tasks can have their own start date and phase instead of following the parent. The link remains for tracking; dates are not auto-adjusted.</small>
+            </div>
           </div>
           <div class="settings-section">
             <div class="settings-toggle-row" title="When enabled (fixed phases only), increasing a phase's sprint count will shift later tasks so they stay after the extended phase.">
@@ -3420,16 +3566,7 @@
               </label>
             </div>
           </div>
-          <div class="settings-section">
-            <label>Responsible parties</label>
-            <p class="settings-hint" style="margin-top: 0;">Names shown in the Responsible dropdown for tasks. Saved with the project.</p>
-            <div class="settings-party-list" id="settingsResponsiblePartiesList"></div>
-            <div class="settings-add-party-row">
-              <input type="text" id="settingsPartyInput" placeholder="Add name, press Enter" class="settings-party-input" />
-              <button type="button" class="settings-add-phase" id="settingsAddParty">+ Add</button>
-            </div>
-          </div>
-          <div class="settings-section">
+          <div id="settingsAutoPopulateSection" class="settings-section settings-auto-populate-section">
             <label>Sample data</label>
             <button type="button" class="settings-auto-populate-btn" id="settingsAutoPopulate">Auto-populate 5 linked tasks</button>
             <small class="settings-hint">Replaces all tasks with 5 sample tasks (Research → Design → Review → Build → Launch) linked consecutively. Useful to explore the board without starting from scratch.</small>
@@ -3478,7 +3615,7 @@
             <div id="storagePanelExternal" class="storage-modal-panel active" role="tabpanel">
               <div class="settings-section">
                 <label>GitHub sync</label>
-                <label for="sharedFileUrl">JSON URL (GitHub raw or any CORS-accessible URL)</label>
+                <label for="sharedFileUrl" title="JSON URL (GitHub raw or any CORS-accessible URL)">Sync File</label>
                 <div class="shared-file-input-wrap">
                   <input type="url" id="sharedFileUrl" placeholder="https://raw.githubusercontent.com/.../gantt-data.json" />
                   <div class="shared-file-input-icons">
@@ -3492,7 +3629,7 @@
                   <span class="shared-file-modal-status-text" id="sharedFileModalStatusText">Not set</span>
                 </div>
                 <div class="shared-file-modal-section">
-                  <label for="sharedFileGitHubToken">Push to GitHub (owner): Personal Access Token with <code>repo</code> scope</label>
+                  <label for="sharedFileGitHubToken" title="Push to GitHub (owner): Personal Access Token with repo scope">Access Token</label>
                   <div class="shared-file-modal-token-row">
                     <div class="shared-file-input-wrap shared-file-input-wrap-token">
                       <input type="password" id="sharedFileGitHubToken" placeholder="ghp_..." autocomplete="off" />
@@ -3501,6 +3638,10 @@
                         <button type="button" class="shared-file-input-icon" id="sharedFilePush" title="Push to GitHub" aria-label="Push to GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></button>
                       </div>
                     </div>
+                  </div>
+                  <div class="shared-file-modal-status shared-file-modal-token-status" id="sharedFileModalTokenStatus">
+                    <span class="shared-file-modal-status-dot none" id="sharedFileModalTokenStatusDot"></span>
+                    <span class="shared-file-modal-status-text" id="sharedFileModalTokenStatusText">Not set</span>
                   </div>
                 </div>
               </div>
@@ -3512,24 +3653,22 @@
             </div>
             <div id="storagePanelLocal" class="storage-modal-panel" role="tabpanel">
               <p class="settings-hint" style="margin-top: 0;">Choose how to store data on this device. Save applies your choice.</p>
-              <div class="settings-section">
-                <label class="settings-checkbox-label">
-                  <input type="radio" name="storageLocalType" id="storageLocalStorage" value="local_storage" />
-                  <span>Local storage</span>
-                </label>
-                <small class="settings-hint">Store in the browser with optional backup/restore to a file. Full editing.</small>
-                <div class="shared-file-modal-actions" style="margin-top: 10px;">
-                  <button type="button" class="home-shared-file-btn" id="storageModalBackupToFile">Backup to file</button>
-                  <input type="file" id="storageModalRestoreFileInput" accept=".json,application/json" style="display: none;">
-                  <button type="button" class="home-shared-file-btn" id="storageModalRestoreFromFile">Restore from file</button>
+              <div class="storage-local-tiles" role="group" aria-label="Local storage type">
+                <div class="storage-local-tile selected" data-value="local_storage" role="button" tabindex="0">
+                  <input type="radio" name="storageLocalType" id="storageLocalStorage" value="local_storage" checked style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;">
+                  <div class="storage-local-tile-title">Local storage</div>
+                  <div class="storage-local-tile-desc">Store in the browser with optional backup/restore to a file. Full editing.</div>
+                  <div class="storage-local-tile-actions">
+                    <button type="button" class="home-shared-file-btn" id="storageModalBackupToFile">Backup to file</button>
+                    <input type="file" id="storageModalRestoreFileInput" accept=".json,application/json" style="display: none;">
+                    <button type="button" class="home-shared-file-btn" id="storageModalRestoreFromFile">Restore from file</button>
+                  </div>
                 </div>
-              </div>
-              <div class="settings-section">
-                <label class="settings-checkbox-label">
-                  <input type="radio" name="storageLocalType" id="storageLocalCache" value="local_cache" />
-                  <span>Local cache</span>
-                </label>
-                <small class="settings-hint">Browser cache only. No file backup; data can be lost if cache is cleared. Not recommended for important data.</small>
+                <div class="storage-local-tile" data-value="local_cache" role="button" tabindex="0">
+                  <input type="radio" name="storageLocalType" id="storageLocalCache" value="local_cache" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;">
+                  <div class="storage-local-tile-title">Local cache</div>
+                  <div class="storage-local-tile-desc">Browser cache only. No file backup; data can be lost if cache is cleared. Not recommended for important data.</div>
+                </div>
               </div>
             </div>
           </div>
@@ -3961,6 +4100,98 @@
         if (window.notifySharedDataChanged) window.notifySharedDataChanged();
       } catch (e) { console.warn("Could not save custom palettes:", e); }
     }
+    function autoSavePaletteFromPhaseColors() {
+      const phaseItems = document.querySelectorAll(".settings-phase-item");
+      const colors = [...phaseItems].map(item => {
+        const colorInp = item.querySelector('input[type="color"]');
+        return colorInp?.value || "#737373";
+      }).filter(Boolean);
+      if (colors.length === 0) return;
+      const titleEl = document.getElementById("settingsTitle");
+      const boardName = (titleEl?.value || "").trim() || "Board";
+      const custom = loadCustomPalettes();
+      let idx = custom.findIndex(p => (p.name || "").trim() === boardName);
+      if (idx >= 0) {
+        custom[idx].colors = colors;
+      } else {
+        custom.push({ name: boardName, colors });
+        idx = custom.length - 1;
+      }
+      saveCustomPalettes(custom);
+      const paletteGrid = document.getElementById("settingsPaletteGrid");
+      if (!paletteGrid) return;
+      const strokePreview = document.querySelector("#settingsBarStyle .settings-segmented-option[data-value='stroke']")?.classList.contains("selected");
+      const gridIndex = COLOR_PALETTES.length + idx;
+      let opt = paletteGrid.querySelector(".settings-palette-option[data-index=\"" + gridIndex + "\"]");
+      if (opt) {
+        opt.dataset.colors = JSON.stringify(colors);
+        const swatchesEl = opt.querySelector(".settings-palette-swatches");
+        if (swatchesEl) {
+          swatchesEl.innerHTML = "";
+          colors.forEach(c => {
+            const span = document.createElement("span");
+            applyPaletteSwatchStyle(span, c, strokePreview);
+            swatchesEl.appendChild(span);
+          });
+        }
+        paletteGrid.querySelectorAll(".settings-palette-option").forEach(o => o.classList.remove("selected"));
+        opt.classList.add("selected");
+      } else if (idx === custom.length - 1) {
+        opt = document.createElement("button");
+        opt.type = "button";
+        opt.className = "settings-palette-option selected";
+        opt.dataset.index = String(gridIndex);
+        opt.dataset.colors = JSON.stringify(colors);
+        const nameWrap = document.createElement("div");
+        nameWrap.className = "settings-palette-name-wrap";
+        const nameInput = document.createElement("input");
+        nameInput.type = "text";
+        nameInput.className = "settings-palette-name-input";
+        nameInput.value = boardName;
+        nameInput.readOnly = false;
+        nameInput.addEventListener("click", (e) => e.stopPropagation());
+        nameInput.addEventListener("focus", (e) => e.stopPropagation());
+        const renameBtn = document.createElement("button");
+        renameBtn.type = "button";
+        renameBtn.className = "settings-palette-rename-btn";
+        renameBtn.textContent = "Rename";
+        renameBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const newName = prompt("Palette name", nameInput.value?.trim() || "My palette")?.trim();
+          if (newName == null || newName === nameInput.value) return;
+          const cust = loadCustomPalettes();
+          const customIdx = gridIndex - COLOR_PALETTES.length;
+          if (customIdx >= 0 && cust[customIdx]) {
+            cust[customIdx].name = newName;
+            saveCustomPalettes(cust);
+            nameInput.value = newName;
+          }
+        });
+        nameWrap.appendChild(nameInput);
+        nameWrap.appendChild(renameBtn);
+        opt.appendChild(nameWrap);
+        const swatchesEl = document.createElement("div");
+        swatchesEl.className = "settings-palette-swatches";
+        colors.forEach(c => {
+          const span = document.createElement("span");
+          applyPaletteSwatchStyle(span, c, strokePreview);
+          swatchesEl.appendChild(span);
+        });
+        opt.appendChild(swatchesEl);
+        opt.addEventListener("click", () => {
+          paletteGrid.querySelectorAll(".settings-palette-option").forEach(o => o.classList.remove("selected"));
+          opt.classList.add("selected");
+          document.querySelectorAll(".settings-phase-item").forEach((item, i) => {
+            const colorInp = item.querySelector('input[type="color"]');
+            if (colorInp && colors[i]) colorInp.value = colors[i];
+          });
+        });
+        paletteGrid.querySelectorAll(".settings-palette-option").forEach(o => o.classList.remove("selected"));
+        paletteGrid.appendChild(opt);
+        opt.classList.add("selected");
+      }
+    }
     function getSavedView() {
       if (window.ganttStorage?.isCloudEnabled() && currentProjectId) {
         const v = window.ganttStorage.loadView(currentProjectId);
@@ -4251,6 +4482,28 @@
       const d = new Date(parseInt(parts[1], 10), parseInt(parts[2], 10) - 1, parseInt(parts[3], 10));
       return isNaN(d.getTime()) ? null : d;
     }
+    function clampTaskDatesToProjectRange(startDate, endDate) {
+      if (!startDate || !endDate) return { startDate, endDate };
+      let start = new Date(startDate.getTime());
+      let end = new Date(endDate.getTime());
+      const projectStart = getProjectStartDate();
+      const projectEnd = getProjectEndDate();
+      if (projectStart) {
+        const minStart = new Date(projectStart.getFullYear(), projectStart.getMonth(), projectStart.getDate());
+        if (start.getTime() < minStart.getTime()) {
+          start = new Date(minStart);
+          if (end.getTime() < start.getTime()) end = new Date(start.getTime() + 24 * 60 * 60 * 1000);
+        }
+      }
+      if (projectEnd) {
+        const maxEnd = new Date(projectEnd.getFullYear(), projectEnd.getMonth(), projectEnd.getDate(), 23, 59, 59, 999);
+        if (end.getTime() > maxEnd.getTime()) {
+          end = new Date(maxEnd);
+          if (start.getTime() > end.getTime()) start = new Date(end.getTime() - 24 * 60 * 60 * 1000);
+        }
+      }
+      return { startDate: start, endDate: end };
+    }
     let lastBarChangeOriginalDurationMs = null;
     let lastBarChangeTaskIndex = null;
     let lastBarChangeOriginalStartDate = null;
@@ -4468,7 +4721,9 @@
         if (t.endDate) maxDate = maxDate ? new Date(Math.max(maxDate.getTime(), t.endDate.getTime())) : new Date(t.endDate);
       });
       if (!minDate && !maxDate && !fixedStart) {
-        WEEK_START = new Date(DEFAULT_WEEK_START);
+        const today = new Date();
+        WEEK_START = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        WEEK_START.setDate(WEEK_START.getDate() - WEEK_START.getDay());
         WEEKS = fixedPhaseWeeks != null ? Math.max(8, fixedPhaseWeeks) : 8;
         return;
       }
@@ -4476,22 +4731,27 @@
       let weekStart;
       if (fixedStart) {
         const anchor = new Date(fixedStart.getFullYear(), fixedStart.getMonth(), fixedStart.getDate());
-        if (minDate && minDate < anchor) {
-          weekStart = new Date(minDate);
-          weekStart.setDate(weekStart.getDate() - weekStart.getDay());
-        } else {
-          weekStart = anchor;
-        }
+        weekStart = new Date(anchor);
+        weekStart.setDate(weekStart.getDate() - weekStart.getDay());
       } else {
         const start = minDate || maxDate;
         weekStart = new Date(start);
         weekStart.setDate(weekStart.getDate() - weekStart.getDay());
       }
       WEEK_START = weekStart;
+      const projectStart = getProjectStartDate();
+      if (projectStart) {
+        const projectStartOfDay = new Date(projectStart.getFullYear(), projectStart.getMonth(), projectStart.getDate());
+        const chartStartMs = WEEK_START.getTime();
+        if (chartStartMs < projectStartOfDay.getTime()) {
+          WEEK_START = new Date(projectStartOfDay);
+          WEEK_START.setDate(WEEK_START.getDate() - WEEK_START.getDay());
+        }
+      }
       if (fixedPhaseWeeks != null) {
         WEEKS = Math.max(8, fixedPhaseWeeks);
       } else {
-        const weeksNeeded = Math.floor((end - weekStart) / WEEK_MS) + 1;
+        const weeksNeeded = Math.floor((end - WEEK_START) / WEEK_MS) + 1;
         WEEKS = Math.max(8, weeksNeeded);
       }
       const fixedEnd = getProjectEndDate();
@@ -6164,10 +6424,15 @@
           } else {
             lastShownBoundary = null;
           }
-          task.startDate = rawStart;
-          task.endDate = new Date(task.startDate.getTime() + durationDays * 24 * 60 * 60 * 1000);
-          currentLeft = (dateToOffset(task.startDate) / WEEKS) * 100;
+          const candidateEnd = new Date(rawStart.getTime() + durationDays * 24 * 60 * 60 * 1000);
+          const clamped = clampTaskDatesToProjectRange(rawStart, candidateEnd);
+          task.startDate = clamped.startDate;
+          task.endDate = clamped.endDate;
+          const startOffset = dateToOffset(task.startDate);
+          const endOffset = dateToOffset(task.endDate);
+          currentLeft = (startOffset / WEEKS) * 100;
           bar.style.left = currentLeft + "%";
+          bar.style.width = (Math.max(1/7, endOffset - startOffset) / WEEKS) * 100 + "%";
           task.start = formatDate(task.startDate);
           task.end = formatDate(task.endDate);
           const phaseAtPos = getPhaseForWeekOffset(dateToOffset(task.startDate), index);
@@ -6209,8 +6474,10 @@
           if (wouldSnapToSprint(task.startDate)) {
             const snapped = snapDateToSprint(task.startDate);
             const durationMs = task.endDate.getTime() - task.startDate.getTime();
-            task.startDate = snapped;
-            task.endDate = new Date(snapped.getTime() + durationMs);
+            const candidateEnd = new Date(snapped.getTime() + durationMs);
+            const clamped = clampTaskDatesToProjectRange(snapped, candidateEnd);
+            task.startDate = clamped.startDate;
+            task.endDate = clamped.endDate;
             task.start = formatDate(task.startDate);
             task.end = formatDate(task.endDate);
             const startOffset = dateToOffset(task.startDate);
@@ -6328,10 +6595,15 @@
           } else {
             lastShownBoundary = null;
           }
-          task.startDate = rawStart;
-          task.endDate = offsetToDate(dateToOffset(task.startDate) + (currentWidth / 100) * WEEKS);
-          currentLeft = (dateToOffset(task.startDate) / WEEKS) * 100;
+          const candidateEnd = offsetToDate(dateToOffset(rawStart) + (currentWidth / 100) * WEEKS);
+          const clamped = clampTaskDatesToProjectRange(rawStart, candidateEnd);
+          task.startDate = clamped.startDate;
+          task.endDate = clamped.endDate;
+          const startOffset = dateToOffset(task.startDate);
+          const endOffset = dateToOffset(task.endDate);
+          currentLeft = (startOffset / WEEKS) * 100;
           bar.style.left = currentLeft + "%";
+          bar.style.width = ((endOffset - startOffset) / WEEKS) * 100 + "%";
           task.start = formatDate(task.startDate);
           task.end = formatDate(task.endDate);
           const phaseAtPos = getPhaseForWeekOffset(dateToOffset(task.startDate), index);
@@ -6704,7 +6976,7 @@
         if (idx >= 0) {
           pushTasksUndo();
           const copy = {
-            task: task.task,
+            task: (task.task || "").trim() ? (task.task || "").trim() + " copy" : "copy",
             phase: task.phase,
             party: task.party,
             start: task.start,
@@ -6993,8 +7265,8 @@
         startDate = offsetToDate(startWeekOffset);
         endDate = new Date(startDate.getTime() + 6 * 24 * 60 * 60 * 1000); // one week from phase start
       } else {
-        const now = new Date();
-        startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const defaultStart = getProjectStartDate() || new Date();
+        startDate = new Date(defaultStart.getFullYear(), defaultStart.getMonth(), defaultStart.getDate());
         endDate = new Date(startDate.getTime() + 6 * 24 * 60 * 60 * 1000);
       }
       const newTask = { task: "New task", phase: resolvedPhaseId, party: "Unassigned", start: "", end: "", startDate, endDate, star: false, overview: "", subTasks: [], blockers: [], links: [], dependsOn: null };
@@ -7002,6 +7274,7 @@
       newTask.end = formatDate(newTask.endDate);
       tasks.push(newTask);
       saveTasks();
+      if (typeof dismissEmptyState === "function") dismissEmptyState();
       if (typeof updateChartRange === "function") updateChartRange();
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
@@ -7426,7 +7699,7 @@
       let draggedItem = null;
       phaseList.addEventListener("dragstart", (e) => {
         const item = e.target.closest(".settings-phase-item");
-        if (!item || e.target.closest('input[type="text"]') || e.target.closest('input[type="number"]') || e.target.closest('input[type="color"]') || e.target.closest(".settings-phase-remove")) return;
+        if (!item || e.target.closest('input[type="text"]') || e.target.closest('input[type="number"]') || e.target.closest('input[type="color"]') || e.target.closest(".settings-phase-remove") || e.target.closest(".settings-phase-sprints-stepper-btn")) return;
         draggedItem = item;
         item.classList.add("dragging");
         e.dataTransfer.effectAllowed = "move";
@@ -7507,16 +7780,47 @@
       if (gapEl) gapEl.value = String(s.dependencyGapDays ?? 0);
       const dependentTrigger = document.getElementById("settingsDependentTrigger");
       if (dependentTrigger && gapEl?.selectedOptions?.[0]) dependentTrigger.textContent = gapEl.selectedOptions[0].textContent;
+      function toYYYYMMDD(raw) {
+        if (!raw || typeof raw !== "string") return "";
+        var trimmed = raw.trim();
+        var ymd = trimmed.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+        if (ymd) return trimmed;
+        var d = new Date(trimmed);
+        if (isNaN(d.getTime())) return "";
+        var y = d.getFullYear();
+        var m = String(d.getMonth() + 1).padStart(2, "0");
+        var day = String(d.getDate()).padStart(2, "0");
+        return y + "-" + m + "-" + day;
+      }
       const psEl = document.getElementById("settingsProjectStartDate");
-      if (psEl) psEl.value = s.projectStartDate || "";
+      if (psEl) {
+        if (s.projectStartDate) {
+          psEl.value = toYYYYMMDD(s.projectStartDate);
+        } else {
+          var projects = loadProjectsList() || [];
+          var proj = projects.find(function (p) { return p.id === currentProjectId; });
+          var createdAt = proj && proj.createdAt != null ? proj.createdAt : null;
+          if (createdAt != null) {
+            var d = new Date(createdAt);
+            var y = d.getFullYear();
+            var m = String(d.getMonth() + 1).padStart(2, "0");
+            var day = String(d.getDate()).padStart(2, "0");
+            psEl.value = y + "-" + m + "-" + day;
+          } else {
+            psEl.value = "";
+          }
+        }
+      }
       const peEl = document.getElementById("settingsProjectEndDate");
-      if (peEl) peEl.value = s.projectEndDate || "";
+      if (peEl) peEl.value = s.projectEndDate ? toYYYYMMDD(s.projectEndDate) : "";
       const snapEl = document.getElementById("settingsSnapToSprint");
       if (snapEl) snapEl.checked = s == null ? true : !!s.snapToSprint;
       const moveTasksEl = document.getElementById("settingsMoveTasksWhenSprintExtended");
       if (moveTasksEl) moveTasksEl.checked = !!s?.moveTasksWhenSprintExtended;
       const indepEl = document.getElementById("settingsIndependentDependencies");
       if (indepEl) indepEl.checked = !!s?.allowIndependentDependencies;
+      const dependentTriggerEl = document.getElementById("settingsDependentTrigger");
+      if (dependentTriggerEl) dependentTriggerEl.disabled = !!indepEl?.checked;
       const showDurationEl = document.getElementById("settingsShowDurationOnBar");
       if (showDurationEl) showDurationEl.checked = !!s?.showDurationOnBar;
       const phaseDurationEl = document.getElementById("settingsPhaseDurationMode");
@@ -7524,9 +7828,24 @@
       if (phaseDurationEl) phaseDurationEl.value = phaseMode;
       const phaseList = document.getElementById("settingsPhaseList");
       if (phaseList) phaseList.dataset.phaseMode = phaseMode;
+      const phaseSectionLabel = document.getElementById("settingsPhaseSectionLabel");
+      if (phaseSectionLabel) phaseSectionLabel.style.display = phaseMode === "dynamic" ? "" : "none";
       const snapWrap = document.getElementById("settingsSnapToSprintWrap");
       if (snapWrap) snapWrap.style.display = phaseMode === "fixed" ? "" : "none";
       phaseList.innerHTML = "";
+      if (phaseMode === "fixed") {
+        const header = document.createElement("div");
+        header.className = "settings-phase-list-header";
+        const headerPhase = document.createElement("div");
+        headerPhase.className = "settings-phase-list-header-phase";
+        headerPhase.textContent = "Phases";
+        header.appendChild(headerPhase);
+        const headerSprints = document.createElement("div");
+        headerSprints.className = "settings-phase-list-header-sprints";
+        headerSprints.textContent = "Sprints";
+        header.appendChild(headerSprints);
+        phaseList.appendChild(header);
+      }
       const renderPhaseItem = (p, i) => {
         const item = document.createElement("div");
         item.className = "settings-phase-item";
@@ -7543,23 +7862,68 @@
         removeBtn.className = "settings-phase-remove";
         removeBtn.textContent = "\u2212";
         removeBtn.title = "Remove phase";
-        removeBtn.disabled = phaseList.children.length < 1;
+        removeBtn.disabled = phaseList.querySelectorAll(".settings-phase-item").length < 2;
         removeBtn.addEventListener("click", (e) => {
           e.stopPropagation();
           item.remove();
           phaseList.querySelectorAll(".settings-phase-remove").forEach(btn => {
-            btn.disabled = phaseList.children.length < 2;
+            btn.disabled = phaseList.querySelectorAll(".settings-phase-item").length < 2;
           });
         });
         const colorInp = document.createElement("input");
         colorInp.type = "color";
         colorInp.className = "settings-phase-swatch";
         colorInp.value = p.color;
+        colorInp.addEventListener("change", function () {
+          if (typeof autoSavePaletteFromPhaseColors === "function") autoSavePaletteFromPhaseColors();
+        });
         inputWrap.appendChild(colorInp);
         inputWrap.appendChild(inp);
         inputWrap.appendChild(removeBtn);
+        const sprintsWrap = document.createElement("div");
+        sprintsWrap.className = "settings-phase-sprints";
+        const sprintsInner = document.createElement("div");
+        sprintsInner.className = "settings-phase-sprints-inner";
+        const sprintsInp = document.createElement("input");
+        sprintsInp.type = "number";
+        sprintsInp.min = "1";
+        sprintsInp.max = "52";
+        sprintsInp.value = Math.max(1, Math.min(52, parseInt(p.sprints, 10) || 2));
+        const minusBtn = document.createElement("button");
+        minusBtn.type = "button";
+        minusBtn.className = "settings-phase-sprints-stepper-btn";
+        minusBtn.textContent = "\u2212";
+        minusBtn.title = "Decrease sprints";
+        const plusBtn = document.createElement("button");
+        plusBtn.type = "button";
+        plusBtn.className = "settings-phase-sprints-stepper-btn";
+        plusBtn.textContent = "+";
+        plusBtn.title = "Increase sprints";
+        function updateStepperState() {
+          var v = Math.max(1, Math.min(52, parseInt(sprintsInp.value, 10) || 2));
+          sprintsInp.value = v;
+          minusBtn.disabled = v <= 1;
+          plusBtn.disabled = v >= 52;
+        }
+        minusBtn.addEventListener("click", function () {
+          var v = Math.max(1, parseInt(sprintsInp.value, 10) || 2) - 1;
+          sprintsInp.value = v;
+          updateStepperState();
+        });
+        plusBtn.addEventListener("click", function () {
+          var v = Math.min(52, (parseInt(sprintsInp.value, 10) || 2) + 1);
+          sprintsInp.value = v;
+          updateStepperState();
+        });
+        sprintsInp.addEventListener("change", updateStepperState);
+        sprintsInner.appendChild(minusBtn);
+        sprintsInner.appendChild(sprintsInp);
+        sprintsInner.appendChild(plusBtn);
+        sprintsWrap.appendChild(sprintsInner);
         item.appendChild(inputWrap);
+        item.appendChild(sprintsWrap);
         phaseList.appendChild(item);
+        updateStepperState();
       };
       PHASES.forEach((p, i) => renderPhaseItem(p, i));
       document.getElementById("settingsAddPhase").onclick = () => {
@@ -7570,10 +7934,11 @@
         const sel = paletteGrid.querySelector(".settings-palette-option.selected");
         let colors = [];
         if (sel?.dataset.colors) { try { colors = JSON.parse(sel.dataset.colors); } catch {} }
-        const color = colors[phaseList.children.length] || "#737373";
-        renderPhaseItem({ id, name: "New phase", color, sprints: 2 }, phaseList.children.length);
+        const itemCount = phaseList.querySelectorAll(".settings-phase-item").length;
+        const color = colors[itemCount] || "#737373";
+        renderPhaseItem({ id, name: "New phase", color, sprints: 2 }, itemCount);
         phaseList.querySelectorAll(".settings-phase-remove").forEach(btn => {
-          btn.disabled = phaseList.children.length < 2;
+          btn.disabled = phaseList.querySelectorAll(".settings-phase-item").length < 2;
         });
       };
       const partyListEl = document.getElementById("settingsResponsiblePartiesList");
@@ -7762,7 +8127,13 @@
     function closeSettingsModal() {
       applyRowAppearance();
       document.getElementById("appViewsWrap")?.classList.remove("settings-sidebar-open");
-      if (currentProjectId && typeof window.updateWriteAccessUI === "function") window.updateWriteAccessUI();
+      if (currentProjectId) {
+        if (typeof window.updateWriteAccessUI === "function") window.updateWriteAccessUI();
+        else {
+          var addFab = document.getElementById("addTaskFab");
+          if (addFab) addFab.style.display = "";
+        }
+      }
     }
     function saveSettingsFromModal() {
       if (typeof window.hasWriteAccess === "function" && !window.hasWriteAccess()) return;
@@ -7862,9 +8233,10 @@
         const spans = partyListContainer.querySelectorAll(".settings-party-item span");
         responsibleParties = [...spans].map(function(sp) { return (sp.textContent || "").trim(); }).filter(Boolean);
       }
-      saveProjectSettings({ ...s, title, description: desc, phases, paletteIndex, dependencyGapDays, rowAppearance, strokeMode, showDurationOnBar, projectStartDate, projectEndDate, phaseDurationMode, snapToSprint, moveTasksWhenSprintExtended, allowIndependentDependencies, responsibleParties });
+      saveProjectSettings({ ...s, title, description: desc, phases, paletteIndex, dependencyGapDays, rowAppearance, strokeMode, showDurationOnBar, projectStartDate, projectEndDate, phaseDurationMode, snapToSprint, moveTasksWhenSprintExtended, allowIndependentDependencies, responsibleParties, emptyStateDismissed: true });
       if (currentProjectId) ensureProjectInList(currentProjectId, title);
       applyRowAppearance();
+      if (typeof updateEmptyState === "function") updateEmptyState();
       PHASES = phases.map(p => ({ ...p, sprints: p.sprints ?? 2 }));
       const allPalettes = [...COLOR_PALETTES, ...loadCustomPalettes()];
       const palette = allPalettes[paletteIndex];
@@ -8306,12 +8678,26 @@
     function updateEmptyState() {
       const emptyEl = document.getElementById("ganttEmptyState");
       if (!emptyEl) return;
+      const s = loadProjectSettings();
       var readOnly = typeof window.hasWriteAccess === "function" && !window.hasWriteAccess();
-      if (readOnly || !isPlaceholderOnlyProject()) {
+      var dismissed = !!s?.emptyStateDismissed;
+      if (readOnly || dismissed || !isPlaceholderOnlyProject()) {
         emptyEl.classList.add("hidden");
       } else {
         emptyEl.classList.remove("hidden");
       }
+      if (typeof updateAutoPopulateSectionVisibility === "function") updateAutoPopulateSectionVisibility();
+    }
+    function dismissEmptyState() {
+      const s = loadProjectSettings() || {};
+      if (s.emptyStateDismissed) return;
+      saveProjectSettings({ ...s, emptyStateDismissed: true });
+      if (typeof updateEmptyState === "function") updateEmptyState();
+    }
+    function updateAutoPopulateSectionVisibility() {
+      var el = document.getElementById("settingsAutoPopulateSection");
+      if (!el) return;
+      el.classList.toggle("hidden", !isPlaceholderOnlyProject());
     }
     async function handleRoute() {
       const id = getProjectIdFromHash();
@@ -8358,6 +8744,10 @@
       ensureProjectInList(id);
       if (!sameProject) initGantt();
       if (typeof window.updateWriteAccessUI === "function") window.updateWriteAccessUI();
+      else {
+        var addFab = document.getElementById("addTaskFab");
+        if (addFab) addFab.style.display = "";
+      }
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           if (homeView) homeView.classList.remove("active");
@@ -8366,6 +8756,10 @@
       });
     }
     function runSamplePopulate() {
+      if (!isPlaceholderOnlyProject()) {
+        if (typeof showToast === "function") showToast("Auto-populate is only available when the board is empty or has only the default placeholder task.", { type: "error" });
+        return;
+      }
       if (PHASES.length === 0) {
         if (typeof showToast === "function") showToast("Add at least one phase in Board settings first.");
         openSettingsModal();
@@ -8465,11 +8859,6 @@
         const panel = document.getElementById("settingsDependentPanel");
         const gapSelect = document.getElementById("settingsDependencyGap");
         if (!wrap || !trigger || !panel || !gapSelect) return;
-        trigger.addEventListener("click", (e) => {
-          e.stopPropagation();
-          const open = wrap.classList.toggle("open");
-          trigger.setAttribute("aria-expanded", open);
-        });
         panel.querySelectorAll(".settings-dependent-option").forEach(btn => {
           btn.addEventListener("click", () => {
             const val = btn.dataset.value;
@@ -8479,7 +8868,23 @@
             trigger.setAttribute("aria-expanded", "false");
           });
         });
-        panel.querySelector(".settings-dependent-checkbox-wrap")?.addEventListener("click", (e) => e.stopPropagation());
+        const indepCheck = document.getElementById("settingsIndependentDependencies");
+        function syncDependentDropdownDisabled() {
+          const disabled = !!indepCheck?.checked;
+          trigger.disabled = disabled;
+          if (disabled) {
+            wrap.classList.remove("open");
+            trigger.setAttribute("aria-expanded", "false");
+          }
+        }
+        indepCheck?.addEventListener("change", syncDependentDropdownDisabled);
+        trigger.addEventListener("click", (e) => {
+          e.stopPropagation();
+          if (trigger.disabled) return;
+          const open = wrap.classList.toggle("open");
+          trigger.setAttribute("aria-expanded", open);
+        });
+        syncDependentDropdownDisabled();
         document.addEventListener("click", (e) => {
           if (wrap.classList.contains("open") && !wrap.contains(e.target)) {
             wrap.classList.remove("open");
@@ -8492,9 +8897,28 @@
         const list = document.getElementById("settingsPhaseList");
         const snapWrap = document.getElementById("settingsSnapToSprintWrap");
         if (el && list) list.dataset.phaseMode = el.value === "fixed" ? "fixed" : "dynamic";
+        const phaseSectionLabel = document.getElementById("settingsPhaseSectionLabel");
+        if (phaseSectionLabel) phaseSectionLabel.style.display = el?.value === "dynamic" ? "" : "none";
         if (snapWrap) snapWrap.style.display = el?.value === "fixed" ? "" : "none";
+        if (el?.value === "fixed" && list && !list.querySelector(".settings-phase-list-header")) {
+          const header = document.createElement("div");
+          header.className = "settings-phase-list-header";
+          const headerPhase = document.createElement("div");
+          headerPhase.className = "settings-phase-list-header-phase";
+          headerPhase.textContent = "Phases";
+          header.appendChild(headerPhase);
+          const headerSprints = document.createElement("div");
+          headerSprints.className = "settings-phase-list-header-sprints";
+          headerSprints.textContent = "Sprints";
+          header.appendChild(headerSprints);
+          list.insertBefore(header, list.firstChild);
+        }
       });
       document.getElementById("settingsAutoPopulate")?.addEventListener("click", () => {
+        if (!isPlaceholderOnlyProject()) {
+          if (typeof showToast === "function") showToast("Auto-populate is only available when the board is empty or has only the default placeholder task.", { type: "error" });
+          return;
+        }
         const baseDate = getProjectStartDate() || WEEK_START;
         const sampleTaskNames = ["Research", "Design", "Review", "Build", "Launch"];
         const n = Math.min(sampleTaskNames.length, Math.max(1, PHASES.length));
@@ -8549,6 +8973,7 @@
       if (viewSelect) {
         const saved = getSavedView();
         if (saved && VIEW_ORDER.includes(saved)) viewSelect.value = saved;
+        else viewSelect.value = "project";
       }
       document.addEventListener("keydown", (e) => {
         if (e.target.closest("input, select, textarea, [contenteditable]")) return;
@@ -9581,9 +10006,10 @@
           tabRow.querySelectorAll(".settings-tab").forEach(function (t) { t.classList.remove("active"); });
           this.classList.add("active");
           document.querySelectorAll(".settings-tab-panel").forEach(function (p) { p.classList.remove("active"); });
-          var panelId = tabId === "function" ? "Function" : tabId === "style" ? "Style" : tabId === "details" ? "Details" : tabId === "storage" ? "Storage" : "Function";
+          var panelId = tabId === "function" ? "Function" : tabId === "style" ? "Style" : tabId === "details" ? "Details" : tabId === "tasks" ? "Tasks" : tabId === "storage" ? "Storage" : "Function";
           var panel = document.getElementById("settingsTab" + panelId);
           if (panel) panel.classList.add("active");
+          if (tabId === "tasks" && typeof updateAutoPopulateSectionVisibility === "function") updateAutoPopulateSectionVisibility();
           if (tabId === "function") {
             var isBoard = tabRow.id === "settingsTabsBoard";
             var homePanel = document.getElementById("settingsGeneralHome");
@@ -9658,6 +10084,28 @@
         var mode = getStorageMode() || "github";
         var localRadio = document.getElementById(mode === "local_cache" ? "storageLocalCache" : "storageLocalStorage");
         if (localRadio) localRadio.checked = true;
+        function syncStorageLocalTiles() {
+          var checked = document.querySelector('input[name="storageLocalType"]:checked');
+          document.querySelectorAll('.storage-local-tile').forEach(function (t) {
+            t.classList.toggle('selected', t.querySelector('input[name="storageLocalType"]') === checked);
+          });
+        }
+        syncStorageLocalTiles();
+        document.querySelector('.storage-local-tiles')?.addEventListener("click", function (e) {
+          if (e.target.closest('.storage-local-tile-actions')) return;
+          var tile = e.target.closest('.storage-local-tile');
+          if (!tile) return;
+          var radio = tile.querySelector('input[name="storageLocalType"]');
+          if (radio) { radio.checked = true; syncStorageLocalTiles(); }
+        });
+        document.querySelector('.storage-local-tiles')?.addEventListener("keydown", function (e) {
+          if (e.key !== "Enter" && e.key !== " ") return;
+          var tile = e.target.closest('.storage-local-tile');
+          if (!tile) return;
+          e.preventDefault();
+          var radio = tile.querySelector('input[name="storageLocalType"]');
+          if (radio) { radio.checked = true; syncStorageLocalTiles(); }
+        });
         document.getElementById("storageModalBackupToFile")?.addEventListener("click", function () {
           var snap = exportSharedSnapshot();
           var blob = new Blob([JSON.stringify(snap, null, 2)], { type: "application/json" });
@@ -9770,6 +10218,8 @@
         var statusText = document.getElementById("sharedFileStatusText");
         var modalStatusDot = document.getElementById("sharedFileModalStatusDot");
         var modalStatusText = document.getElementById("sharedFileModalStatusText");
+        var modalTokenStatusDot = document.getElementById("sharedFileModalTokenStatusDot");
+        var modalTokenStatusText = document.getElementById("sharedFileModalTokenStatusText");
         var modalOverlay = document.getElementById("sharedFileModalOverlay");
         var openModalBtn = document.getElementById("sharedFileOpenModal");
         var closeModalBtn = document.getElementById("sharedFileModalClose");
@@ -9842,6 +10292,11 @@
           if (modalStatusDot) { modalStatusDot.className = "shared-file-modal-status-dot " + (synced ? "synced" : "local"); }
           if (modalStatusText) modalStatusText.textContent = synced ? "Synced" + (st.type !== "none" ? " \u2022 " + (st.type === "github" ? "GitHub: " + st.label : st.label) : "") : "Local";
         }
+        function updateModalTokenStatus() {
+          var hasToken = (tokenInput && tokenInput.value && tokenInput.value.trim()) ? true : false;
+          if (modalTokenStatusDot) modalTokenStatusDot.className = "shared-file-modal-status-dot " + (hasToken ? "synced" : "none");
+          if (modalTokenStatusText) modalTokenStatusText.textContent = hasToken ? "Set" : "Not set";
+        }
         function openSharedFileModal() {
           if (typeof window.openStorageModal === "function") window.openStorageModal();
           if (window.switchStorageTab) window.switchStorageTab("github");
@@ -9850,6 +10305,7 @@
             if (tokenInput) tokenInput.value = localStorage.getItem(GITHUB_TOKEN_KEY) || "";
           } catch (e) {}
           updateModalStatus();
+          updateModalTokenStatus();
         }
         function closeSharedFileModal() {
           try { if (tokenInput && tokenInput.value.trim()) localStorage.setItem(GITHUB_TOKEN_KEY, tokenInput.value.trim()); } catch (e) {}
@@ -9864,11 +10320,13 @@
         if (clearTokenBtn) clearTokenBtn.addEventListener("click", function () {
           try { localStorage.removeItem(GITHUB_TOKEN_KEY); } catch (e) {}
           if (tokenInput) tokenInput.value = "";
+          updateModalTokenStatus();
           updateHomeStatus();
           if (typeof updateWriteAccessUI === "function") updateWriteAccessUI();
           if (typeof showToast === "function") showToast("Token cleared.", { type: "success" });
         });
         if (urlInput) urlInput.addEventListener("input", updateModalStatus);
+        if (tokenInput) tokenInput.addEventListener("input", updateModalTokenStatus);
         updateHomeStatus();
         function sharedJsonFetchOptions() {
           return {
@@ -10250,16 +10708,55 @@
           if (newCard) newCard.scrollIntoView({ behavior: "smooth", block: "nearest" });
         });
       }
+      const homeFabBtn = document.getElementById("homeFab");
+      const homeNewBoardMenu = document.getElementById("homeNewBoardMenu");
+      function closeHomeNewBoardMenu() {
+        if (!homeNewBoardMenu) return;
+        homeNewBoardMenu.classList.remove("visible");
+        if (homeFabBtn) homeFabBtn.setAttribute("aria-expanded", "false");
+        document.removeEventListener("click", homeNewBoardMenu._outsideClick);
+        document.removeEventListener("keydown", homeNewBoardMenu._escapeKey);
+      }
       document.addEventListener("click", async (e) => {
         if (!e.target.closest("#homeFab")) return;
         const homeView = document.getElementById("homeView");
         if (!homeView?.classList.contains("active")) return;
         e.preventDefault();
         e.stopPropagation();
-        try {
-          await createNewProject();
-        } catch (err) {
-          if (typeof showToast === "function") showToast("Could not create project.", { type: "error" });
+        if (homeNewBoardMenu?.classList.contains("visible")) {
+          closeHomeNewBoardMenu();
+          return;
+        }
+        const fabRect = homeFabBtn.getBoundingClientRect();
+        homeNewBoardMenu.style.left = Math.max(12, fabRect.left) + "px";
+        homeNewBoardMenu.style.right = "auto";
+        homeNewBoardMenu.style.top = (fabRect.bottom + 8) + "px";
+        homeNewBoardMenu.style.bottom = "auto";
+        homeNewBoardMenu.classList.add("visible");
+        if (homeFabBtn) homeFabBtn.setAttribute("aria-expanded", "true");
+        homeNewBoardMenu._outsideClick = (ev) => {
+          if (homeNewBoardMenu.contains(ev.target) || homeFabBtn?.contains(ev.target)) return;
+          closeHomeNewBoardMenu();
+        };
+        homeNewBoardMenu._escapeKey = (ev) => { if (ev.key === "Escape") closeHomeNewBoardMenu(); };
+        setTimeout(() => {
+          document.addEventListener("click", homeNewBoardMenu._outsideClick);
+          document.addEventListener("keydown", homeNewBoardMenu._escapeKey);
+        }, 0);
+      });
+      homeNewBoardMenu?.addEventListener("click", async (e) => {
+        const item = e.target.closest(".fab-phase-menu-item[data-action]");
+        if (!item || item.disabled) return;
+        const action = item.dataset.action;
+        closeHomeNewBoardMenu();
+        if (action === "scratch") {
+          try {
+            await createNewProject();
+          } catch (err) {
+            if (typeof showToast === "function") showToast("Could not create project.", { type: "error" });
+          }
+        } else if (action === "linked") {
+          if (typeof showToast === "function") showToast("Linked boards coming soon.", { type: "info" });
         }
       });
       (function initViewCycling() {
