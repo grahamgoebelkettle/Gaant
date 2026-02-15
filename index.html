@@ -2251,7 +2251,10 @@
     .home-shared-file-btn:hover { background: var(--bg-hover); }
     .home-shared-file-push { margin-top: 12px; }
     .home-shared-file-push .home-shared-file-label { margin-bottom: 4px; }
-    .home-shared-file-status { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+    .home-shared-file-status { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 0; }
+    .home-sync-inline { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 8px 12px; border: 1px solid var(--border-default); border-radius: 8px; min-height: 38px; box-sizing: border-box; }
+    .home-sync-inline .home-shared-file-status-text { cursor: pointer; font-size: 14px; }
+    .home-sync-inline .home-shared-file-status-text:hover { color: var(--text-primary); }
     .home-shared-file-status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
     .home-shared-file-status-dot.github { background: #238636; }
     .home-shared-file-status-dot.synced { background: #238636; }
@@ -2260,7 +2263,7 @@
     .home-shared-file-status-dot.local { background: var(--stroke-default); }
     .home-shared-file-status-text { font-size: 13px; color: var(--text-secondary); }
     .home-shared-file-status-text strong { color: var(--text-primary); font-weight: 600; }
-    .home-shared-file-open-btn { padding: 8px 14px; font-size: 13px; border-radius: 6px; border: 1px solid var(--border-strong); background: var(--bg-surface); color: var(--text-primary); cursor: pointer; font-family: inherit; }
+    .home-shared-file-open-btn { padding: 8px 16px; font-size: 14px; font-weight: 600; border-radius: 8px; border: 1px solid var(--border-strong); background: var(--bg-surface); color: var(--text-primary); cursor: pointer; font-family: inherit; }
     .home-shared-file-open-btn:hover { background: var(--bg-hover); }
     .shared-file-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 24px; }
     .shared-file-modal-overlay.visible { display: flex; }
@@ -2706,17 +2709,17 @@
             </div>
           </div>
           <span id="ganttAuthLoginWrap"><button type="button" class="gantt-auth-btn" id="ganttAuthLogin">Log in (save to cloud)</button></span>
+          <div class="home-sync-inline" id="sharedFileSection">
+            <div class="home-shared-file-status">
+              <span class="home-shared-file-status-dot local" id="sharedFileStatusDot"></span>
+              <span class="home-shared-file-status-text" id="sharedFileStatusText">Local</span>
+              <button type="button" class="home-shared-file-open-btn" id="sharedFileOpenModal">Sync Settings</button>
+            </div>
+          </div>
           <button type="button" class="home-new-project-btn" id="homeFab" aria-label="New project">+ New project</button>
         </div>
       </div>
       <p class="home-subtitle" id="homePageDescription" contenteditable="true">Create and open project schedules. Each project has its own tasks and settings.</p>
-      <div class="home-shared-file" id="sharedFileSection">
-        <div class="home-shared-file-status">
-          <span class="home-shared-file-status-dot none" id="sharedFileStatusDot"></span>
-          <span class="home-shared-file-status-text" id="sharedFileStatusText">Local</span>
-          <button type="button" class="home-shared-file-open-btn" id="sharedFileOpenModal">Sync settings</button>
-        </div>
-      </div>
     </div>
     <div class="home-project-list" id="homeProjectList"></div>
   </div>
@@ -7436,7 +7439,9 @@
         const footer = document.createElement("div");
         footer.className = "home-project-card-footer";
         const isLocal = !window.ganttStorage?.isCloudEnabled();
-        if (isLocal && !isEditMode) {
+        let hasSharedUrl = false;
+        try { var u = localStorage.getItem(SHARED_FILE_URL_KEY); hasSharedUrl = !!(u && u.trim()); } catch (e) {}
+        if (isLocal && !hasSharedUrl && !isEditMode) {
           const localTag = document.createElement("span");
           localTag.className = "home-project-local-tag";
           localTag.textContent = "Local";
@@ -8825,11 +8830,10 @@
         }
         function updateHomeStatus() {
           var synced = isSynced();
-          var url = "";
-          try { url = localStorage.getItem(SHARED_FILE_URL_KEY) || EXAMPLE_SHARED_FILE_URL; } catch (e) {}
-          var st = getSharedFileStatus(url);
           if (statusDot) { statusDot.className = "home-shared-file-status-dot " + (synced ? "synced" : "local"); }
-          if (statusText) statusText.innerHTML = synced ? "<strong>Synced</strong>" + (st.type !== "none" ? " \u2022 " + (st.type === "github" ? "GitHub: " + st.label : st.label) : "") : "Local";
+          if (statusText) statusText.textContent = synced ? "Synced with GitHub" : "Local";
+          var openBtn = document.getElementById("sharedFileOpenModal");
+          if (openBtn) openBtn.style.display = synced ? "none" : "";
         }
         function updateModalStatus() {
           var url = (urlInput && urlInput.value) ? urlInput.value : "";
@@ -8852,6 +8856,7 @@
           updateHomeStatus();
         }
         if (openModalBtn) openModalBtn.addEventListener("click", openSharedFileModal);
+        if (statusText) statusText.addEventListener("click", openSharedFileModal);
         if (closeModalBtn) closeModalBtn.addEventListener("click", closeSharedFileModal);
         if (modalOverlay) modalOverlay.addEventListener("click", function (e) { if (e.target === modalOverlay) closeSharedFileModal(); });
         if (urlInput) urlInput.addEventListener("input", updateModalStatus);
