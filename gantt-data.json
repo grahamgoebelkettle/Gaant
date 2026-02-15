@@ -369,13 +369,13 @@
       "tasks": [
         {
           "task": "my first task",
-          "phase": "review",
-          "phaseSecondary": "delivery",
+          "phase": "discovery",
+          "phaseSecondary": "ideation",
           "party": "Unassigned",
-          "start": "5/14",
-          "end": "6/16",
-          "startDate": "2026-05-14T18:53:50.640Z",
-          "endDate": "2026-06-16T16:23:45.081Z",
+          "start": "3/2",
+          "end": "4/4",
+          "startDate": "2026-03-03T01:35:21.340Z",
+          "endDate": "2026-04-04T23:05:15.781Z",
           "star": false,
           "overview": "",
           "subTasks": [],
@@ -433,7 +433,7 @@
         "responsibleParties": [],
         "scrollPosition": {
           "scrollTop": 0,
-          "scrollLeft": 924
+          "scrollLeft": 72
         }
       },
       "view": "default",
