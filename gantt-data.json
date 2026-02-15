@@ -12,7 +12,7 @@
     },
     {
       "id": "p-1771131853990",
-      "name": "May fourth",
+      "name": "Please work!",
       "createdAt": 1771131853990
     },
     {
@@ -182,7 +182,7 @@
         }
       ],
       "settings": {
-        "title": "May fourth",
+        "title": "Please work!",
         "description": "Drag bars to reschedule • Drag edges to change dates • Drag rows to reorder • Click a row to expand details • Click cells to edit"
       },
       "view": "default",
