@@ -369,13 +369,13 @@
       "tasks": [
         {
           "task": "my first task",
-          "phase": "ideation",
+          "phase": "development",
           "phaseSecondary": null,
           "party": "Unassigned",
-          "start": "4/16",
-          "end": "4/22",
-          "startDate": "2026-04-16T18:53:54.372Z",
-          "endDate": "2026-04-22T18:53:54.372Z",
+          "start": "4/21",
+          "end": "4/27",
+          "startDate": "2026-04-21T08:41:28.410Z",
+          "endDate": "2026-04-27T08:41:28.410Z",
           "star": false,
           "overview": "",
           "subTasks": [],
@@ -386,7 +386,55 @@
       ],
       "settings": {
         "title": "one million!!!",
-        "description": "Drag bars to reschedule • Drag edges to change dates • Drag rows to reorder • Click a row to expand details • Click cells to edit"
+        "description": "Drag bars to reschedule • Drag edges to change dates • Drag rows to reorder • Click a row to expand details • Click cells to edit",
+        "phases": [
+          {
+            "id": "discovery",
+            "name": "Discovery",
+            "color": "#eab308",
+            "sprints": 2
+          },
+          {
+            "id": "ideation",
+            "name": "Ideation",
+            "color": "#0d9488",
+            "sprints": 2
+          },
+          {
+            "id": "development",
+            "name": "Development",
+            "color": "#0284c7",
+            "sprints": 2
+          },
+          {
+            "id": "review",
+            "name": "Review",
+            "color": "#14b8a6",
+            "sprints": 2
+          },
+          {
+            "id": "delivery",
+            "name": "Delivery",
+            "color": "#6366f1",
+            "sprints": 2
+          }
+        ],
+        "paletteIndex": 0,
+        "dependencyGapDays": 0,
+        "rowAppearance": "default",
+        "strokeMode": false,
+        "showDurationOnBar": false,
+        "projectStartDate": "2026-02-15",
+        "projectEndDate": null,
+        "phaseDurationMode": "fixed",
+        "snapToSprint": false,
+        "moveTasksWhenSprintExtended": false,
+        "allowIndependentDependencies": false,
+        "responsibleParties": [],
+        "scrollPosition": {
+          "scrollTop": 0,
+          "scrollLeft": 792
+        }
       },
       "view": "default",
       "custom_palettes": []
