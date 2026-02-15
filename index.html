@@ -2243,6 +2243,36 @@
       color: var(--bg-body);
     }
     .home-subtitle { color: var(--text-secondary); margin: 0 0 24px 0; font-size: 14px; }
+    .home-shared-file { margin-bottom: 24px; }
+    .home-shared-file-label { display: block; font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; }
+    .home-shared-file-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .home-shared-file-input { flex: 1; min-width: 200px; padding: 8px 10px; font-size: 13px; border: 1px solid var(--border-default); border-radius: 6px; font-family: inherit; }
+    .home-shared-file-btn { padding: 8px 12px; font-size: 13px; border-radius: 6px; border: 1px solid var(--border-strong); background: var(--bg-surface); color: var(--text-primary); cursor: pointer; font-family: inherit; }
+    .home-shared-file-btn:hover { background: var(--bg-hover); }
+    .home-shared-file-push { margin-top: 12px; }
+    .home-shared-file-push .home-shared-file-label { margin-bottom: 4px; }
+    .home-shared-file-status { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+    .home-shared-file-status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .home-shared-file-status-dot.github { background: #238636; }
+    .home-shared-file-status-dot.custom { background: var(--text-tertiary); }
+    .home-shared-file-status-dot.none { background: var(--stroke-default); }
+    .home-shared-file-status-text { font-size: 13px; color: var(--text-secondary); }
+    .home-shared-file-status-text strong { color: var(--text-primary); font-weight: 600; }
+    .home-shared-file-open-btn { padding: 8px 14px; font-size: 13px; border-radius: 6px; border: 1px solid var(--border-strong); background: var(--bg-surface); color: var(--text-primary); cursor: pointer; font-family: inherit; }
+    .home-shared-file-open-btn:hover { background: var(--bg-hover); }
+    .shared-file-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 24px; }
+    .shared-file-modal-overlay.visible { display: flex; }
+    .shared-file-modal { background: var(--bg-surface); border-radius: 12px; padding: 24px; width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-md); border: 1px solid var(--border-default); }
+    .shared-file-modal h3 { margin: 0 0 16px 0; font-size: 18px; font-weight: 600; }
+    .shared-file-modal .shared-file-modal-status { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; padding: 10px 12px; background: var(--bg-subtle); border-radius: 8px; font-size: 13px; }
+    .shared-file-modal .shared-file-modal-status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .shared-file-modal .shared-file-modal-status-dot.github { background: #238636; }
+    .shared-file-modal .shared-file-modal-status-dot.custom { background: var(--text-tertiary); }
+    .shared-file-modal .shared-file-modal-status-dot.none { background: var(--stroke-default); }
+    .shared-file-modal label { display: block; font-size: 12px; font-weight: 500; color: var(--text-secondary); margin-bottom: 4px; }
+    .shared-file-modal input[type="url"], .shared-file-modal input[type="password"] { width: 100%; padding: 10px 12px; margin-bottom: 12px; border-radius: 6px; border: 1px solid var(--border-strong); font-size: 14px; box-sizing: border-box; }
+    .shared-file-modal .shared-file-modal-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+    .shared-file-modal .shared-file-modal-section { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-default); }
     .home-header-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     .home-header-actions { display: flex; align-items: center; gap: 10px; margin-left: auto; }
     .gantt-auth-btn {
@@ -2370,6 +2400,7 @@
     .gantt-auth-modal .auth-use-different { font-size: 12px; color: var(--text-tertiary); margin-top: 16px; }
     .gantt-auth-modal .auth-use-different button { background: none; border: none; color: var(--text-secondary); cursor: pointer; text-decoration: underline; font-size: 12px; padding: 0; font-family: inherit; }
     .gantt-auth-modal .auth-use-different button:hover { color: var(--text-primary); }
+    .gantt-auth-modal .auth-use-different-sep { margin: 0 6px; color: var(--text-tertiary); }
     .gantt-auth-modal .auth-project-hint { font-size: 11px; color: var(--text-tertiary); margin: 10px 0 0 0; word-break: break-all; }
     .gantt-auth-modal .auth-test-wrap { margin-top: 14px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     .gantt-auth-modal .auth-test-result { font-size: 12px; color: var(--text-secondary); }
@@ -2670,11 +2701,18 @@
               <button type="button" class="gantt-auth-dropdown-item" id="ganttAuthLogout" role="menuitem">Log out</button>
             </div>
           </div>
-          <button type="button" class="gantt-auth-btn" id="ganttAuthLogin">Log in (save to cloud)</button>
+          <span id="ganttAuthLoginWrap"><button type="button" class="gantt-auth-btn" id="ganttAuthLogin">Log in (save to cloud)</button></span>
           <button type="button" class="home-new-project-btn" id="homeFab" aria-label="New project">+ New project</button>
         </div>
       </div>
       <p class="home-subtitle" id="homePageDescription" contenteditable="true">Create and open project schedules. Each project has its own tasks and settings.</p>
+      <div class="home-shared-file" id="sharedFileSection">
+        <div class="home-shared-file-status">
+          <span class="home-shared-file-status-dot none" id="sharedFileStatusDot"></span>
+          <span class="home-shared-file-status-text" id="sharedFileStatusText">Shared file: Not set</span>
+          <button type="button" class="home-shared-file-open-btn" id="sharedFileOpenModal">Sync settings</button>
+        </div>
+      </div>
     </div>
     <div class="home-project-list" id="homeProjectList"></div>
   </div>
@@ -2987,7 +3025,11 @@
             <button type="button" class="gantt-auth-btn gantt-auth-btn-secondary" id="ganttAuthSignupSubmit">Sign up</button>
           </div>
         </form>
-        <div class="auth-use-different"><button type="button" id="ganttAuthShowConfig">Use different Supabase project</button></div>
+        <div class="auth-use-different">
+          <button type="button" id="ganttAuthShowConfig">Use different Supabase project</button>
+          <span class="auth-use-different-sep">·</span>
+          <button type="button" id="ganttAuthClearSession">Clear session and reload</button>
+        </div>
         <p class="auth-project-hint" id="ganttAuthProjectHint" aria-live="polite"></p>
         <div class="auth-test-wrap">
           <button type="button" class="gantt-auth-btn gantt-auth-btn-secondary" id="ganttAuthTestConnection">Test connection</button>
@@ -2998,9 +3040,37 @@
     </div>
   </div>
 
+  <div class="shared-file-modal-overlay" id="sharedFileModalOverlay">
+    <div class="shared-file-modal">
+      <h3>Shared file &amp; GitHub sync</h3>
+      <div class="shared-file-modal-status" id="sharedFileModalStatus">
+        <span class="shared-file-modal-status-dot none" id="sharedFileModalStatusDot"></span>
+        <span class="shared-file-modal-status-text" id="sharedFileModalStatusText">Not set</span>
+      </div>
+      <label for="sharedFileUrl">JSON URL (GitHub raw or any CORS-accessible URL)</label>
+      <input type="url" id="sharedFileUrl" placeholder="https://raw.githubusercontent.com/.../gantt-data.json" class="home-shared-file-input" />
+      <div class="shared-file-modal-actions">
+        <button type="button" class="home-shared-file-btn" id="sharedFileLoad">Load</button>
+        <button type="button" class="home-shared-file-btn" id="sharedFileRefresh">Refresh</button>
+        <button type="button" class="home-shared-file-btn" id="sharedFileDownload">Download JSON</button>
+      </div>
+      <div class="shared-file-modal-section">
+        <label for="sharedFileGitHubToken">Push to GitHub (owner): Personal Access Token with <code>repo</code> scope</label>
+        <input type="password" id="sharedFileGitHubToken" placeholder="ghp_..." autocomplete="off" />
+        <div class="shared-file-modal-actions">
+          <button type="button" class="home-shared-file-btn" id="sharedFilePush">Push to GitHub</button>
+        </div>
+      </div>
+      <div class="shared-file-modal-actions" style="margin-top: 20px;">
+        <button type="button" class="gantt-auth-btn gantt-auth-btn-secondary" id="sharedFileModalClose">Close</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Load config from config.js (copy config.example.js to config.js and add your Supabase URL + anon key) -->
   <script src="config.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <!-- Supabase paused: uncomment the next line to enable cloud save / login -->
+  <!-- <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script> -->
   <script src="supabase-storage.js"></script>
   <script>
     const DEFAULT_WEEK_START = new Date(2026, 1, 2); // Feb 2, 2026
@@ -3026,6 +3096,9 @@
     let PHASES = [...DEFAULT_PHASES.map(p => ({ ...p }))];
 
     const PROJECTS_LIST_KEY = "gantt-projects";
+    const SHARED_FILE_URL_KEY = "gantt-shared-file-url";
+    const GITHUB_TOKEN_KEY = "gantt-github-token";
+    const EXAMPLE_SHARED_FILE_URL = "https://raw.githubusercontent.com/grahamgoebelkettle/Gaant/refs/heads/main/gantt-data.json";
     function getCustomPalettesKey() {
       return "gantt-custom-palettes-" + (currentProjectId || "default");
     }
@@ -3085,6 +3158,42 @@
     function saveProjectsList(list) {
       if (window.ganttStorage?.isCloudEnabled()) { window.ganttStorage.saveProjectsList(list); return; }
       saveProjectsListLocal(list);
+    }
+    function exportSharedSnapshot() {
+      const rawList = localStorage.getItem(PROJECTS_LIST_KEY);
+      const projects = (rawList ? (function () { try { var p = JSON.parse(rawList); return Array.isArray(p) ? p : []; } catch (e) { return []; } })() : []) || [];
+      const boards = {};
+      projects.forEach(function (p) {
+        const id = p.id;
+        try {
+          const t = localStorage.getItem("gantt-tasks-" + id);
+          const s = localStorage.getItem("gantt-settings-" + id);
+          const v = localStorage.getItem("gantt-view-" + id);
+          const cp = localStorage.getItem("gantt-custom-palettes-" + id);
+          boards[id] = {
+            tasks: t ? JSON.parse(t) : [],
+            settings: s ? JSON.parse(s) : {},
+            view: (v && v.trim()) || "default",
+            custom_palettes: cp ? JSON.parse(cp) : []
+          };
+        } catch (e) { boards[id] = { tasks: [], settings: {}, view: "default", custom_palettes: [] }; }
+      });
+      return { projects: projects, boards: boards };
+    }
+    function importSharedSnapshot(data) {
+      if (!data || !data.projects || !Array.isArray(data.projects)) return;
+      try {
+        localStorage.setItem(PROJECTS_LIST_KEY, JSON.stringify(data.projects));
+        const boards = data.boards || {};
+        data.projects.forEach(function (p) {
+          const id = p.id;
+          const b = boards[id] || {};
+          localStorage.setItem("gantt-tasks-" + id, JSON.stringify(b.tasks || []));
+          localStorage.setItem("gantt-settings-" + id, JSON.stringify(b.settings || {}));
+          localStorage.setItem("gantt-view-" + id, (b.view && b.view.trim()) ? b.view : "default");
+          localStorage.setItem("gantt-custom-palettes-" + id, JSON.stringify(b.custom_palettes || []));
+        });
+      } catch (e) { console.warn("Import shared snapshot failed:", e); }
     }
     function isProjectNameTaken(name, excludeProjectId) {
       if (!name || typeof name !== "string") return false;
@@ -8386,6 +8495,8 @@
     }
     function initAuthUI() {
       if (!window.ganttStorage) return;
+      const loginWrap = document.getElementById("ganttAuthLoginWrap");
+      if (loginWrap) loginWrap.style.display = window.ganttStorage.isCloudEnabled() ? "" : "none";
       const loginBtn = document.getElementById("ganttAuthLogin");
       const wrap = document.getElementById("ganttAuthWrap");
       const userEmailEl = document.getElementById("ganttAuthUserEmail");
@@ -8558,6 +8669,13 @@
         configUrlInput?.focus();
       });
 
+      var clearSessionBtn = document.getElementById("ganttAuthClearSession");
+      if (clearSessionBtn) clearSessionBtn.addEventListener("click", async () => {
+        if (!confirm("Clear saved session and reload? You’ll need to log in again. Use this if login works in incognito but not in this window (cache issue).")) return;
+        if (window.ganttStorage) await window.ganttStorage.signOut();
+        location.reload();
+      });
+
       var testResultEl = document.getElementById("ganttAuthTestResult");
       var testConnBtn = document.getElementById("ganttAuthTestConnection");
       if (testConnBtn && testResultEl) testConnBtn.addEventListener("click", async function () {
@@ -8658,7 +8776,7 @@
         var session = await window.ganttStorage.getSession();
         if (session) await window.ganttStorage.ensureBoardsListLoaded();
         if (window.ganttStorage?.refreshAuthUI) window.ganttStorage.refreshAuthUI();
-        [100, 350, 800].forEach(function (delay) {
+        [100, 350, 800, 1500, 2500].forEach(function (delay) {
           setTimeout(async function () {
             var s = await window.ganttStorage.getSession();
             if (s) {
@@ -8668,6 +8786,191 @@
           }, delay);
         });
       }
+      (function initSharedFile() {
+        var urlInput = document.getElementById("sharedFileUrl");
+        var loadBtn = document.getElementById("sharedFileLoad");
+        var refreshBtn = document.getElementById("sharedFileRefresh");
+        var downloadBtn = document.getElementById("sharedFileDownload");
+        var statusDot = document.getElementById("sharedFileStatusDot");
+        var statusText = document.getElementById("sharedFileStatusText");
+        var modalStatusDot = document.getElementById("sharedFileModalStatusDot");
+        var modalStatusText = document.getElementById("sharedFileModalStatusText");
+        var modalOverlay = document.getElementById("sharedFileModalOverlay");
+        var openModalBtn = document.getElementById("sharedFileOpenModal");
+        var closeModalBtn = document.getElementById("sharedFileModalClose");
+        var tokenInput = document.getElementById("sharedFileGitHubToken");
+        try {
+          if (urlInput) urlInput.value = localStorage.getItem(SHARED_FILE_URL_KEY) || EXAMPLE_SHARED_FILE_URL;
+        } catch (e) {}
+        function getSharedFileStatus(url) {
+          var u = (url && url.trim()) || "";
+          if (!u) return { type: "none", label: "Not set" };
+          var m = u.match(/raw\.githubusercontent\.com\/([^/]+)\/([^/]+)\/refs\/heads\/([^/]+)\/(.+)/);
+          if (m) return { type: "github", label: m[1] + "/" + m[2] };
+          return { type: "custom", label: "Custom URL" };
+        }
+        function updateHomeStatus() {
+          var url = "";
+          try { url = localStorage.getItem(SHARED_FILE_URL_KEY) || EXAMPLE_SHARED_FILE_URL; } catch (e) {}
+          var st = getSharedFileStatus(url);
+          if (statusDot) { statusDot.className = "home-shared-file-status-dot " + st.type; }
+          if (statusText) statusText.innerHTML = st.type === "none" ? "Shared file: Not set" : st.type === "github" ? "GitHub: <strong>" + st.label + "</strong>" : "Shared file: <strong>" + st.label + "</strong>";
+        }
+        function updateModalStatus() {
+          var url = (urlInput && urlInput.value) ? urlInput.value : "";
+          var st = getSharedFileStatus(url);
+          if (modalStatusDot) { modalStatusDot.className = "shared-file-modal-status-dot " + st.type; }
+          if (modalStatusText) modalStatusText.textContent = st.type === "none" ? "Not set" : st.type === "github" ? "GitHub: " + st.label : st.label;
+        }
+        function openSharedFileModal() {
+          try {
+            if (urlInput) urlInput.value = localStorage.getItem(SHARED_FILE_URL_KEY) || EXAMPLE_SHARED_FILE_URL;
+            if (tokenInput) tokenInput.value = localStorage.getItem(GITHUB_TOKEN_KEY) || "";
+          } catch (e) {}
+          updateModalStatus();
+          if (modalOverlay) modalOverlay.classList.add("visible");
+        }
+        function closeSharedFileModal() {
+          try { if (tokenInput && tokenInput.value.trim()) localStorage.setItem(GITHUB_TOKEN_KEY, tokenInput.value.trim()); } catch (e) {}
+          if (modalOverlay) modalOverlay.classList.remove("visible");
+          updateHomeStatus();
+        }
+        if (openModalBtn) openModalBtn.addEventListener("click", openSharedFileModal);
+        if (closeModalBtn) closeModalBtn.addEventListener("click", closeSharedFileModal);
+        if (modalOverlay) modalOverlay.addEventListener("click", function (e) { if (e.target === modalOverlay) closeSharedFileModal(); });
+        if (urlInput) urlInput.addEventListener("input", updateModalStatus);
+        updateHomeStatus();
+        function doLoad(url) {
+          var u = (url && url.trim()) || "";
+          if (!u) { if (typeof showToast === "function") showToast("Enter a URL first.", { type: "error" }); return; }
+          var fetchUrl = u + (u.indexOf("?") >= 0 ? "&" : "?") + "t=" + Date.now();
+          fetch(fetchUrl, { cache: "no-store" })
+            .then(function (r) { if (!r.ok) throw new Error(r.status + " " + r.statusText); return r.json(); })
+            .then(function (data) {
+              importSharedSnapshot(data);
+              try { localStorage.setItem(SHARED_FILE_URL_KEY, u); } catch (e) {}
+              if (urlInput) urlInput.value = u;
+              updateHomeStatus();
+              updateModalStatus();
+              if (typeof renderHomeView === "function") renderHomeView();
+              location.hash = "#/";
+              if (typeof showToast === "function") showToast("Loaded shared file.", { type: "success" });
+            })
+            .catch(function (e) { if (typeof showToast === "function") showToast("Load failed: " + (e && e.message ? e.message : String(e)), { type: "error" }); });
+        }
+        if (loadBtn && urlInput) loadBtn.addEventListener("click", function () { doLoad(urlInput.value); });
+        if (refreshBtn && urlInput) refreshBtn.addEventListener("click", function () {
+          var url = urlInput.value.trim() || (function () { try { return localStorage.getItem(SHARED_FILE_URL_KEY) || ""; } catch (e) { return ""; } })();
+          doLoad(url);
+        });
+        if (downloadBtn) downloadBtn.addEventListener("click", function () {
+          var snap = exportSharedSnapshot();
+          var blob = new Blob([JSON.stringify(snap, null, 2)], { type: "application/json" });
+          var a = document.createElement("a");
+          a.href = URL.createObjectURL(blob);
+          a.download = "gantt-data.json";
+          a.click();
+          URL.revokeObjectURL(a.href);
+          if (typeof showToast === "function") showToast("Downloaded gantt-data.json. Commit to your repo so others can Load/Refresh.", { type: "success" });
+        });
+        function parseGitHubRawUrl(url) {
+          if (!url || typeof url !== "string") return null;
+          var u = url.trim();
+          var m = u.match(/raw\.githubusercontent\.com\/([^/]+)\/([^/]+)\/refs\/heads\/([^/]+)\/(.+)/);
+          return m ? { owner: m[1], repo: m[2], branch: m[3], path: m[4] } : null;
+        }
+        function pushToGitHub(token, gh, pushBtn) {
+          function showPushError(msg) { safeToast("Push failed: " + msg, { type: "error" }); }
+          function statusToMessage(status) {
+            if (status === 401) return "Invalid or expired token. Check your Personal Access Token and try again.";
+            if (status === 403) return "Access denied. Use a token with repo scope (classic) or Contents read/write (fine-grained) and ensure the token has access to this repository.";
+            if (status === 404) return "Repo or file not found. Check URL and that the token can access the repo.";
+            if (status === 409) return "Conflict (file changed). Refresh the shared file, then try Push again.";
+            if (status === 422) return "Validation failed. Check branch name and file path.";
+            if (status >= 500) return "GitHub server error. Try again in a few minutes.";
+            return null;
+          }
+          function readErrorFromBody(text, status) {
+            try { var d = JSON.parse(text); return d.message || d.error || (Array.isArray(d.errors) && d.errors[0] && d.errors[0].message) || statusToMessage(status) || status + " error"; } catch (e) { return text && text.length < 120 ? text : (statusToMessage(status) || status + " error"); }
+          }
+          var snap = exportSharedSnapshot();
+          var json = JSON.stringify(snap, null, 2);
+          var content;
+          try { content = btoa(unescape(encodeURIComponent(json))); } catch (e) { showPushError("Could not encode data."); if (pushBtn) pushBtn.disabled = false; return; }
+          var pathEnc = gh.path.split("/").map(function (p) { return encodeURIComponent(p); }).join("/");
+          var api = "https://api.github.com/repos/" + encodeURIComponent(gh.owner) + "/" + encodeURIComponent(gh.repo) + "/contents/" + pathEnc;
+          var authHeader = /^ghp_/.test(token) ? "token " + token : "Bearer " + token;
+          function getSha() {
+            return fetch(api + "?ref=" + encodeURIComponent(gh.branch), { headers: { "Accept": "application/vnd.github.v3+json", "Authorization": authHeader } })
+              .then(function (r) {
+                return r.text().then(function (text) {
+                  if (r.status === 404) return { sha: null };
+                  if (!r.ok) throw new Error(readErrorFromBody(text, r.status));
+                  try { var d = JSON.parse(text); return { sha: d.sha }; } catch (e) { throw new Error("Invalid response from GitHub."); }
+                });
+              });
+          }
+          function doPut(sha) {
+            return fetch(api, {
+              method: "PUT",
+              headers: {
+                "Accept": "application/vnd.github.v3+json",
+                "Content-Type": "application/json",
+                "Authorization": authHeader
+              },
+              body: JSON.stringify({
+                message: "Update gantt data",
+                content: content,
+                branch: gh.branch,
+                sha: sha || undefined
+              })
+            });
+          }
+          getSha()
+            .then(function (o) {
+              if (!o) throw new Error("Could not read existing file info.");
+              return doPut(o.sha);
+            })
+            .then(function (r) {
+              if (r.status === 409) {
+                return getSha().then(function (o) { return doPut(o && o.sha); });
+              }
+              return r;
+            })
+            .then(function (r) {
+              return r.text().then(function (text) {
+                if (!r.ok) throw new Error(readErrorFromBody(text, r.status));
+                try { if (token && token.trim()) localStorage.setItem(GITHUB_TOKEN_KEY, token.trim()); } catch (e) {}
+                if (typeof showToast === "function") showToast("Pushed to GitHub. Others can Refresh to see changes.", { type: "success" });
+              });
+            })
+            .catch(function (e) {
+              var msg = e && e.message ? e.message : String(e);
+              if (msg.indexOf("Failed to fetch") !== -1 || msg.indexOf("NetworkError") !== -1) showPushError("Network error. Check connection or run the app from a local server (not file://)."); else showPushError(msg);
+            })
+            .finally(function () { if (pushBtn) pushBtn.disabled = false; });
+        }
+        var pushBtn = document.getElementById("sharedFilePush");
+        function safeToast(msg, type) {
+          try { if (typeof showToast === "function") showToast(msg, type || {}); else if (typeof alert !== "undefined") alert(msg); } catch (err) { if (typeof console !== "undefined") console.warn("Push:", msg); }
+        }
+        function onPushClick(e) {
+          var btn = e.target.id === "sharedFilePush" ? e.target : (e.target.closest && e.target.closest("#sharedFilePush"));
+          if (!btn) return;
+          e.preventDefault();
+          e.stopPropagation();
+          var urlEl = document.getElementById("sharedFileUrl");
+          var tokenEl = document.getElementById("sharedFileGitHubToken");
+          var token = (tokenEl && tokenEl.value || "").trim();
+          if (!token) { safeToast("Paste a GitHub Personal Access Token first.", { type: "error" }); return; }
+          var url = (urlEl && urlEl.value || "").trim() || (function () { try { return localStorage.getItem(SHARED_FILE_URL_KEY) || ""; } catch (e) { return ""; } })();
+          var gh = parseGitHubRawUrl(url);
+          if (!gh) { safeToast("Shared file URL must be a GitHub raw URL (raw.githubusercontent.com/...).", { type: "error" }); return; }
+          btn.disabled = true;
+          pushToGitHub(token, gh, btn);
+        }
+        document.addEventListener("click", onPushClick, true);
+      })();
       window.addEventListener("hashchange", () => handleRoute());
       async function createNewProject() {
         if (window.ganttStorage?.isCloudEnabled()) {
