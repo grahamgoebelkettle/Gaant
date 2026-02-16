@@ -1615,6 +1615,59 @@
     .settings-btn:hover { color: var(--text-primary); background: var(--bg-hover); }
     .settings-btn svg { width: 20px; height: 20px; transition: transform 0.3s ease; }
     .settings-btn:hover svg { transform: rotate(90deg); }
+    .share-modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(0,0,0,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .share-modal {
+      background: var(--bg-surface);
+      border-radius: 12px;
+      padding: 24px;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    }
+    .share-modal h3 { margin: 0 0 12px; font-size: 18px; font-weight: 600; }
+    .share-modal-desc { margin: 0 0 16px; font-size: 14px; color: var(--text-secondary); }
+    .share-modal-link-wrap { display: flex; gap: 8px; margin-bottom: 12px; }
+    .share-modal-input {
+      flex: 1;
+      padding: 10px 12px;
+      border: 1px solid var(--border-default);
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      background: var(--bg-subtle);
+      color: var(--text-primary);
+    }
+    .share-modal-copy {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 8px;
+      background: var(--color-general-primary);
+      color: white;
+      font-weight: 500;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .share-modal-copy:hover { opacity: 0.9; }
+    .share-modal-status { min-height: 20px; font-size: 13px; color: var(--text-tertiary); margin-bottom: 16px; }
+    .share-modal-close {
+      padding: 8px 16px;
+      border: 1px solid var(--border-default);
+      border-radius: 8px;
+      background: transparent;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .share-modal-close:hover { background: var(--bg-subtle); color: var(--text-primary); }
     .settings-overlay {
       display: none;
     }
@@ -4010,6 +4063,46 @@
       font-size: 14px;
     }
     .home-back-link:hover { color: var(--text-primary); }
+    .collaborators-avatar-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 0 12px;
+      border-bottom: 1px solid var(--border-subtle, #f0f0f0);
+      margin-bottom: 12px;
+    }
+    .collaborators-avatar-bar-label {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      flex-shrink: 0;
+    }
+    .collaborators-avatar-list {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+    .collaborators-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      overflow: hidden;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: white;
+      background: var(--color-general-primary, #6d28d9);
+      border: 2px solid var(--bg-surface);
+      box-sizing: border-box;
+    }
+    .collaborators-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
     .gantt-wrapper {
       display: flex;
       flex-direction: column;
@@ -4127,6 +4220,7 @@
   <div class="home-new-board-menu fab-phase-menu" id="homeNewBoardMenu" role="menu" aria-label="New board options">
     <div class="fab-phase-menu-list">
       <button type="button" class="fab-phase-menu-item" data-action="scratch" role="menuitem"><span class="fab-phase-menu-item-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg></span><span class="fab-phase-menu-item-text"><span class="fab-phase-menu-item-label">Empty</span><span class="fab-phase-menu-item-desc">Blank canvas for your project</span></span></button>
+      <button type="button" class="fab-phase-menu-item fab-phase-menu-item-cloud-only" id="homeNewBoardSharedItem" data-action="shared" role="menuitem" style="display:none"><span class="fab-phase-menu-item-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z"/></svg></span><span class="fab-phase-menu-item-text"><span class="fab-phase-menu-item-label">Shared</span><span class="fab-phase-menu-item-desc">Collaborate in realtime with your team</span></span></button>
       <button type="button" class="fab-phase-menu-item" data-action="linked" role="menuitem"><span class="fab-phase-menu-item-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"/></svg></span><span class="fab-phase-menu-item-text"><span class="fab-phase-menu-item-label">Linked</span><span class="fab-phase-menu-item-desc">Start with some connected tasks</span></span></button>
       <button type="button" class="fab-phase-menu-item fab-phase-menu-item-disabled" data-action="templates" role="menuitem" disabled><span class="fab-phase-menu-item-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"/></svg></span><span class="fab-phase-menu-item-text"><span class="fab-phase-menu-item-label">Templates</span><span class="fab-phase-menu-item-desc">Select from common projects</span></span><span class="fab-phase-menu-badge">soon</span></button>
       <button type="button" class="fab-phase-menu-item fab-phase-menu-item-disabled" data-action="excel" role="menuitem" disabled><span class="fab-phase-menu-item-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 8.25H7.5a2.25 2.25 0 0 0-2.25 2.25v9a2.25 2.25 0 0 0 2.25 2.25h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25H15M9 12l3 3m0 0 3-3m-3 3V2.25"/></svg></span><span class="fab-phase-menu-item-text"><span class="fab-phase-menu-item-label">Sync</span><span class="fab-phase-menu-item-desc">Upload an excel file</span></span><span class="fab-phase-menu-badge">soon</span></button>
@@ -4178,6 +4272,10 @@
         <button type="button" class="landing-option" id="landingOptionGitHub">
           Sync with GitHub
           <div class="landing-option-desc">Load and push a gantt-data.json file to a GitHub repo. Share with others and keep a remote backup.</div>
+        </button>
+        <button type="button" class="landing-option" id="landingOptionSupabase">
+          Save to Supabase (cloud)
+          <div class="landing-option-desc">Cloud save with login. Boards sync across devices.</div>
         </button>
         <button type="button" class="landing-option" id="landingOptionLocalStorage">
           Use local storage
@@ -4240,6 +4338,10 @@
 
   <div id="ganttView" class="app-view">
     <a href="#/" class="home-back-link" id="homeBackLink">← All boards</a>
+    <div class="collaborators-avatar-bar" id="collaboratorsAvatarBar" style="display:none" aria-label="Collaborators on this board">
+      <span class="collaborators-avatar-bar-label">Working on this board:</span>
+      <div class="collaborators-avatar-list" id="collaboratorsAvatarList"></div>
+    </div>
     <header class="page-header">
       <div class="page-header-title-wrap">
         <h1 id="pageTitle">Project Schedule</h1>
@@ -4253,6 +4355,9 @@
         <option value="default">Default (8 weeks)</option>
         <option value="project">Entire project</option>
       </select>
+      <button type="button" class="settings-btn share-btn" id="shareBoardBtn" data-tooltip="Share board" style="display:none">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+      </button>
       <button type="button" class="settings-btn" id="settingsBtn" data-tooltip="Board settings">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z"/><circle cx="12" cy="12" r="2.5" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
       </button>
@@ -4312,6 +4417,18 @@
   </div>
 
   <div class="gantt-toast" id="ganttToast" role="status" aria-live="polite"></div>
+  <div class="share-modal-overlay" id="shareModalOverlay" role="dialog" aria-labelledby="shareModalTitle" aria-modal="true" style="display:none">
+    <div class="share-modal">
+      <h3 id="shareModalTitle">Share board</h3>
+      <p class="share-modal-desc">Anyone with this link can join the board and collaborate in real time. Link expires in 7 days.</p>
+      <div class="share-modal-link-wrap">
+        <input type="text" id="shareModalLink" readonly class="share-modal-input" value="">
+        <button type="button" class="share-modal-copy" id="shareModalCopy">Copy</button>
+      </div>
+      <div class="share-modal-status" id="shareModalStatus"></div>
+      <button type="button" class="share-modal-close" id="shareModalClose">Close</button>
+    </div>
+  </div>
   <div class="gantt-drag-guide" id="ganttDragGuide" aria-hidden="true"></div>
   <div class="gantt-wrapper" id="ganttWrapper">
     <div class="gantt-grid" id="ganttGrid">
@@ -4551,7 +4668,7 @@
                       <label for="sharedFileGitHubToken" data-tooltip="Push to GitHub (owner): Personal Access Token with repo scope">Access Token</label>
                       <div class="shared-file-modal-token-row">
                         <div class="shared-file-input-wrap shared-file-input-wrap-token">
-                          <input type="password" id="sharedFileGitHubToken" placeholder="ghp_..." autocomplete="off" />
+                          <input type="text" id="sharedFileGitHubToken" placeholder="ghp_..." autocomplete="off" inputmode="text" />
                           <div class="shared-file-input-icons">
                             <button type="button" class="shared-file-input-icon" id="sharedFileClearToken" data-tooltip="Clear token" aria-label="Clear token"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
                             <button type="button" class="shared-file-input-icon" id="sharedFilePush" data-tooltip="Push to GitHub" aria-label="Push to GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></button>
@@ -4778,6 +4895,7 @@
     }
     let currentProjectId = null;
     let homeEditProjectId = null;
+    let realtimeUnsubscribe = null;
 
     function slugify(text) {
       return String(text || "")
@@ -4792,9 +4910,16 @@
       return "#/project/" + slugify(project?.name || "project");
     }
     const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    function getInviteTokenFromHash() {
+      const hash = typeof location !== "undefined" ? (location.hash || "").replace(/^#\/?/, "") : "";
+      const q = hash.indexOf("?");
+      if (q < 0) return null;
+      const params = new URLSearchParams(hash.slice(q));
+      return params.get("invite") || null;
+    }
     function getProjectIdFromHash() {
       const hash = typeof location !== "undefined" ? (location.hash || "").replace(/^#\/?/, "") : "";
-      const m = /^project\/(.+)$/.exec(hash);
+      const m = /^project\/([^?]+)/.exec(hash);
       if (!m) return null;
       const segment = m[1];
       if (UUID_REGEX.test(segment)) return segment;
@@ -5307,6 +5432,57 @@
       } catch (e) {
         console.warn("Could not save tasks:", e);
       }
+    }
+
+    function updateCollaboratorsAvatarBar(presenceState) {
+      const bar = document.getElementById("collaboratorsAvatarBar");
+      const list = document.getElementById("collaboratorsAvatarList");
+      if (!bar || !list) return;
+      const users = [];
+      const seen = new Set();
+      if (presenceState && typeof presenceState === "object") {
+        Object.values(presenceState).forEach((presences) => {
+          (Array.isArray(presences) ? presences : []).forEach((p) => {
+            const uid = p.user_id || p.userId;
+            if (uid && !seen.has(uid)) {
+              seen.add(uid);
+              users.push({ user_id: uid, email: p.email || "", initials: p.initials || "?", avatar_url: p.avatar_url || null });
+            }
+          });
+        });
+      }
+      if (users.length === 0) {
+        bar.style.display = "none";
+        return;
+      }
+      bar.style.display = "flex";
+      list.innerHTML = users.map((u) => {
+        const title = (u.email || "Collaborator").replace(/"/g, "&quot;");
+        const safeUrl = (u.avatar_url && typeof u.avatar_url === "string" && u.avatar_url.startsWith("https://")) ? u.avatar_url.replace(/"/g, "&quot;") : null;
+        if (safeUrl) {
+          return '<span class="collaborators-avatar" title="' + title + '" role="img" aria-label="' + title + '"><img src="' + safeUrl + '" alt=""></span>';
+        }
+        return '<span class="collaborators-avatar" title="' + title + '" role="img" aria-label="' + title + '">' + (u.initials || "?") + '</span>';
+      }).join("");
+    }
+
+    function applyRealtimeBoardUpdate() {
+      if (!currentProjectId) return;
+      tasks.length = 0;
+      tasks.push(...loadTasks());
+      tasks.forEach((_, i) => { if (tasks.some(t => t.dependsOn === i)) propagateDependencyChanges(i); });
+      applyProjectSettings();
+      const viewSelect = document.getElementById("viewMode");
+      if (viewSelect) {
+        const saved = getSavedView();
+        if (saved && VIEW_ORDER.includes(saved)) viewSelect.value = saved;
+      }
+      if (typeof updateChartRange === "function") updateChartRange();
+      if (typeof updateEmptyState === "function") updateEmptyState();
+      if (typeof renderTasks === "function") renderTasks();
+      if (typeof updateWeekWidth === "function") updateWeekWidth();
+      if (typeof renderPhaseHeaders === "function") renderPhaseHeaders();
+      if (typeof showToast === "function") showToast("Board updated by another collaborator");
     }
 
     const UNDO_MAX = 50;
@@ -9583,9 +9759,12 @@
         emptyWrap.className = "home-empty-state";
         emptyWrap.setAttribute("aria-live", "polite");
         const canWrite = typeof window.hasWriteAccess === "function" && window.hasWriteAccess();
+        const cloudEnabled = window.ganttStorage?.isCloudEnabled();
         const emptyIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>';
         const linkedIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"/></svg>';
-        const actionBtns = canWrite ? '<div class="home-empty-state-actions"><button type="button" class="home-empty-state-action-btn" data-action="scratch" aria-label="Empty board"><span class="home-empty-state-action-icon" aria-hidden="true">' + emptyIcon + '</span><span class="home-empty-state-action-text"><span class="home-empty-state-action-label">Empty</span><span class="home-empty-state-action-desc">Blank canvas for your project</span></span></button><button type="button" class="home-empty-state-action-btn" data-action="linked" aria-label="Linked board"><span class="home-empty-state-action-icon" aria-hidden="true">' + linkedIcon + '</span><span class="home-empty-state-action-text"><span class="home-empty-state-action-label">Linked</span><span class="home-empty-state-action-desc">Start with some connected tasks</span></span></button></div>' : "";
+        const sharedIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z"/></svg>';
+        const sharedBtn = (canWrite && cloudEnabled) ? '<button type="button" class="home-empty-state-action-btn" data-action="shared" aria-label="Shared board"><span class="home-empty-state-action-icon" aria-hidden="true">' + sharedIcon + '</span><span class="home-empty-state-action-text"><span class="home-empty-state-action-label">Shared</span><span class="home-empty-state-action-desc">Collaborate in realtime with your team</span></span></button>' : '';
+        const actionBtns = canWrite ? '<div class="home-empty-state-actions"><button type="button" class="home-empty-state-action-btn" data-action="scratch" aria-label="Empty board"><span class="home-empty-state-action-icon" aria-hidden="true">' + emptyIcon + '</span><span class="home-empty-state-action-text"><span class="home-empty-state-action-label">Empty</span><span class="home-empty-state-action-desc">Blank canvas for your project</span></span></button>' + sharedBtn + '<button type="button" class="home-empty-state-action-btn" data-action="linked" aria-label="Linked board"><span class="home-empty-state-action-icon" aria-hidden="true">' + linkedIcon + '</span><span class="home-empty-state-action-text"><span class="home-empty-state-action-label">Linked</span><span class="home-empty-state-action-desc">Start with some connected tasks</span></span></button></div>' : "";
         emptyWrap.innerHTML = '<div class="home-empty-state-visual"><span class="home-empty-state-bar bar-1" aria-hidden="true"></span><span class="home-empty-state-bar bar-2" aria-hidden="true"></span><span class="home-empty-state-bar bar-3" aria-hidden="true"></span><span class="home-empty-state-bar bar-4" aria-hidden="true"></span><div class="home-empty-state-line" aria-hidden="true"></div></div><h2 class="home-empty-state-title">You don\'t have any boards</h2><p class="home-empty-state-subtitle">Create your first one to start tracking</p>' + actionBtns;
         listEl.appendChild(emptyWrap);
         return;
@@ -9835,6 +10014,7 @@
         ganttGrid?.querySelectorAll(".gantt-row:not(.gantt-header)").forEach(r => { r.draggable = true; });
         if (typeof window.updateWriteAccessUI === "function") window.updateWriteAccessUI();
         if (typeof applyStorageModeUI === "function") applyStorageModeUI(getStorageMode() || "local_cache");
+        if (realtimeUnsubscribe) { realtimeUnsubscribe(); realtimeUnsubscribe = null; }
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
             if (homeView) homeView.classList.add("active");
@@ -9844,7 +10024,36 @@
         return;
       }
       if (homeView && homeView.classList.contains("active")) { /* home title/description edited in settings only */ }
-      if (window.ganttStorage?.isCloudEnabled()) await window.ganttStorage.ensureBoardDataLoaded(id);
+      const inviteToken = getInviteTokenFromHash();
+      if (inviteToken && window.ganttStorage?.isCloudEnabled() && UUID_REGEX.test(id)) {
+        const result = await window.ganttStorage.acceptBoardInvite(id, inviteToken);
+        if (result && result.ok) {
+          await window.ganttStorage.ensureBoardsListLoaded();
+          if (typeof showToast === "function") showToast("You've been added to \"" + (result.board_name || "this board") + "\"");
+          const cleanHash = "#/project/" + id;
+          if (typeof location !== "undefined" && location.hash !== cleanHash) location.replace(cleanHash);
+        } else if (result && !result.ok && typeof showToast === "function") {
+          showToast(result.error || "Invalid or expired invite link", { type: "error" });
+        }
+      }
+      if (realtimeUnsubscribe) { realtimeUnsubscribe(); realtimeUnsubscribe = null; }
+      const avatarBar = document.getElementById("collaboratorsAvatarBar");
+      if (avatarBar) avatarBar.style.display = "none";
+      if (window.ganttStorage?.isCloudEnabled()) {
+        await window.ganttStorage.ensureBoardDataLoaded(id);
+        const showPresence = UUID_REGEX.test(id);
+        realtimeUnsubscribe = window.ganttStorage.subscribeToBoardRealtime(
+          id,
+          () => {
+            if (currentProjectId !== id) return;
+            applyRealtimeBoardUpdate();
+          },
+          showPresence ? (state) => {
+            if (currentProjectId !== id) return;
+            updateCollaboratorsAvatarBar(state);
+          } : undefined
+        );
+      }
       const sameProject = currentProjectId === id;
       currentProjectId = id;
       ensureProjectInList(id);
@@ -11050,12 +11259,19 @@
           showAuthError("Login doesn't work when the app is opened as a local file. Run a local web server (e.g. python -m http.server 8000), then open http://localhost:8000 in an external browser (Chrome, Safari)—Cursor's built-in browser may not connect to localhost.");
           return;
         }
+        var cfg = (configUrlInput?.value?.trim() && configAnonInput?.value?.trim())
+          ? { url: configUrlInput.value.trim(), anonKey: configAnonInput.value.trim() }
+          : (window.ganttStorage && window.ganttStorage.getSavedConfig());
+        if (cfg && cfg.url && cfg.anonKey && !window.ganttStorage?.isCloudEnabled?.()) {
+          window.ganttStorage?.init?.(cfg);
+          try { await window.ganttStorage?.saveConfig?.(cfg); } catch (e) {}
+        }
         setAuthLoading("login");
         try {
           const result = await withTimeout(
             window.ganttStorage.signIn(email, password),
-            30000,
-            "Login timed out. Try: (1) Restore the project in the Supabase dashboard if it's paused. (2) Use the anon key from Settings → API → Legacy API Keys instead of the Publishable key. (3) Check the project URL above is correct."
+            60000,
+            "Login timed out. Try: (1) Restore the project in the Supabase dashboard if it's paused. (2) Use the anon key from Settings → API → Legacy API Keys instead of the Publishable key. (3) Check the project URL above is correct. (4) Ensure the app is served over https or localhost."
           );
           if (result && result.error) { showAuthError(result.error); return; }
           try {
@@ -11082,6 +11298,13 @@
         if (window.location.protocol === "file:") {
           showAuthError("Sign up doesn't work when the app is opened as a local file. Run a local web server (e.g. python -m http.server 8000), then open http://localhost:8000 in an external browser (Chrome, Safari)—Cursor's built-in browser may not connect to localhost.");
           return;
+        }
+        var cfg = (configUrlInput?.value?.trim() && configAnonInput?.value?.trim())
+          ? { url: configUrlInput.value.trim(), anonKey: configAnonInput.value.trim() }
+          : (window.ganttStorage && window.ganttStorage.getSavedConfig());
+        if (cfg && cfg.url && cfg.anonKey && !window.ganttStorage?.isCloudEnabled?.()) {
+          window.ganttStorage?.init?.(cfg);
+          try { await window.ganttStorage?.saveConfig?.(cfg); } catch (e) {}
         }
         setAuthLoading("signup");
         try {
@@ -11127,6 +11350,43 @@
     function initSettingsSidebar() {
       document.getElementById("homeSettingsBtn")?.addEventListener("click", openHomeSettings);
       document.getElementById("settingsClose")?.addEventListener("click", closeSettingsModal);
+      (function initShareModal() {
+        var overlay = document.getElementById("shareModalOverlay");
+        var linkInput = document.getElementById("shareModalLink");
+        var copyBtn = document.getElementById("shareModalCopy");
+        var statusEl = document.getElementById("shareModalStatus");
+        var closeBtn = document.getElementById("shareModalClose");
+        document.getElementById("shareBoardBtn")?.addEventListener("click", async function () {
+          if (!currentProjectId || !window.ganttStorage?.isCloudEnabled()) return;
+          var result = await window.ganttStorage.createBoardInviteLink(currentProjectId, 168);
+          if (result && result.error) {
+            if (typeof showToast === "function") showToast(result.error.message || "Could not create link", { type: "error" });
+            return;
+          }
+          var base = (typeof location !== "undefined" && location.origin) ? location.origin + (location.pathname || "") : "";
+          var url = base + "#/project/" + currentProjectId + "?invite=" + (result.token || "");
+          if (linkInput) linkInput.value = url;
+          if (statusEl) statusEl.textContent = "";
+          if (overlay) overlay.style.display = "flex";
+        });
+        copyBtn?.addEventListener("click", function () {
+          if (!linkInput || !linkInput.value) return;
+          linkInput.select();
+          try {
+            navigator.clipboard.writeText(linkInput.value);
+            if (statusEl) statusEl.textContent = "Copied to clipboard";
+            if (typeof showToast === "function") showToast("Link copied to clipboard");
+          } catch (e) {
+            if (statusEl) statusEl.textContent = "Could not copy";
+          }
+        });
+        closeBtn?.addEventListener("click", function () {
+          if (overlay) overlay.style.display = "none";
+        });
+        overlay?.addEventListener("click", function (e) {
+          if (e.target === overlay) overlay.style.display = "none";
+        });
+      })();
       document.getElementById("settingsCancel")?.addEventListener("click", closeSettingsModal);
       document.getElementById("settingsSave")?.addEventListener("click", saveSettingsFromModal);
       document.getElementById("settingsSupabaseAuthBtn")?.addEventListener("click", function () {
@@ -11278,6 +11538,14 @@
           var openBtn = document.getElementById("sharedFileOpenModal");
           if (openBtn) openBtn.click();
         });
+        document.getElementById("landingOptionSupabase")?.addEventListener("click", function () {
+          setStorageMode("supabase");
+          if (landingView) landingView.classList.remove("active");
+          handleRoute();
+          if (typeof applyStorageModeUI === "function") applyStorageModeUI("supabase");
+          var openBtn = document.getElementById("sharedFileOpenModal");
+          if (openBtn) openBtn.click();
+        });
         document.getElementById("landingOptionLocalStorage")?.addEventListener("click", function () {
           setStorageMode("local_storage");
           location.reload();
@@ -11378,6 +11646,9 @@
           if (addFab) addFab.style.display = canWrite ? "" : "none";
           var settingsBtn = document.getElementById("settingsBtn");
           if (settingsBtn) settingsBtn.style.display = canWrite ? "" : "none";
+          var shareBoardBtn = document.getElementById("shareBoardBtn");
+          var showShare = window.ganttStorage?.isCloudEnabled() && canWrite && typeof currentProjectId === "string" && UUID_REGEX.test(currentProjectId);
+          if (shareBoardBtn) shareBoardBtn.style.display = showShare ? "" : "none";
           var ganttView = document.getElementById("ganttView");
           if (ganttView) ganttView.classList.toggle("gantt-read-only", !canWrite);
           document.querySelectorAll("#ganttGrid .gantt-row:not(.gantt-header)").forEach(function (r) { r.draggable = canWrite; });
@@ -11845,6 +12116,29 @@
         window.notifySharedDataChanged = scheduleAutoPush;
       }
       window.addEventListener("hashchange", () => handleRoute());
+      async function createNewSharedBoard() {
+        if (typeof window.hasWriteAccess === "function" && !window.hasWriteAccess()) return;
+        if (!window.ganttStorage?.isCloudEnabled()) {
+          if (typeof showToast === "function") showToast("Log in to create shared boards that sync in realtime.", { type: "error" });
+          return;
+        }
+        const name = getUniqueProjectName("Shared Board");
+        let newId;
+        try {
+          newId = await window.ganttStorage.createBoard(name);
+        } catch (err) {
+          if (typeof showToast === "function") showToast("Could not create shared board. Try again or log out and back in.", { type: "error" });
+          return;
+        }
+        if (newId) {
+          ensureProjectInList(newId, name);
+          location.hash = "#/project/" + newId;
+          if (typeof handleRoute === "function") handleRoute();
+          if (typeof showToast === "function") showToast("Shared board created. Use the Share button (↑) to invite collaborators.");
+        } else {
+          if (typeof showToast === "function") showToast("Could not create shared board. Check connection or try logging out and back in.", { type: "error" });
+        }
+      }
       async function createNewProject() {
         if (typeof window.hasWriteAccess === "function" && !window.hasWriteAccess()) return;
         if (window.ganttStorage?.isCloudEnabled()) {
@@ -12016,6 +12310,8 @@
           homeNewBoardMenu.style.top = (rect ? rect.bottom + 8 : 88) + "px";
           homeNewBoardMenu.style.bottom = "auto";
         }
+        const sharedItem = document.getElementById("homeNewBoardSharedItem");
+        if (sharedItem) sharedItem.style.display = (window.ganttStorage?.isCloudEnabled() ? "" : "none");
         homeNewBoardMenu.classList.add("visible");
         if (homeFabBtn) homeFabBtn.setAttribute("aria-expanded", "true");
         if (homeFabMobileBtn) homeFabMobileBtn.setAttribute("aria-expanded", "true");
@@ -12046,6 +12342,12 @@
           } catch (err) {
             if (typeof showToast === "function") showToast("Could not create linked board.", { type: "error" });
           }
+        } else if (action === "shared") {
+          try {
+            await createNewSharedBoard();
+          } catch (err) {
+            if (typeof showToast === "function") showToast("Could not create shared board.", { type: "error" });
+          }
         }
       });
       document.addEventListener("click", async (e) => {
@@ -12065,6 +12367,12 @@
             await createNewLinkedBoard();
           } catch (err) {
             if (typeof showToast === "function") showToast("Could not create linked board.", { type: "error" });
+          }
+        } else if (action === "shared") {
+          try {
+            await createNewSharedBoard();
+          } catch (err) {
+            if (typeof showToast === "function") showToast("Could not create shared board.", { type: "error" });
           }
         }
       });
