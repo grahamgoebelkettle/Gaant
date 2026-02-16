@@ -9351,6 +9351,7 @@
           var prevUrl, prevToken;
           try { prevUrl = localStorage.getItem(SHARED_FILE_URL_KEY); prevToken = localStorage.getItem(GITHUB_TOKEN_KEY); } catch (e) {}
           if (selectedType === "github") {
+            if (prevMode === "supabase" && window.ganttStorage?.signOut) { window.ganttStorage.signOut().catch(function () {}); }
             var urlEl = document.getElementById("sharedFileUrl");
             var tokenEl = document.getElementById("sharedFileGitHubToken");
             try {
@@ -9365,8 +9366,10 @@
             if (typeof window.__doLoadFromStoredUrl === "function") window.__doLoadFromStoredUrl();
             else if (typeof window.__fetchSharedUpdates === "function") window.__fetchSharedUpdates();
           } else if (selectedType === "supabase") {
+            setStorageMode("supabase");
             if (typeof applyStorageModeUI === "function") applyStorageModeUI("supabase");
           } else if (selectedType === "local_storage" || selectedType === "local_cache") {
+            if (prevMode === "supabase" && window.ganttStorage?.signOut) { window.ganttStorage.signOut().catch(function () {}); }
             if (selectedType === "local_cache") {
               try { localStorage.removeItem(SHARED_FILE_URL_KEY); localStorage.removeItem(GITHUB_TOKEN_KEY); } catch (e) {}
               if (typeof clearLocalProjectData === "function") clearLocalProjectData();
@@ -9507,6 +9510,7 @@
         var prevUrl, prevToken;
         try { prevUrl = localStorage.getItem(SHARED_FILE_URL_KEY); prevToken = localStorage.getItem(GITHUB_TOKEN_KEY); } catch (e) {}
         if (selectedType === "github") {
+          if (prevMode === "supabase" && window.ganttStorage?.signOut) { window.ganttStorage.signOut().catch(function () {}); }
           var urlEl = document.getElementById("sharedFileUrl");
           var tokenEl = document.getElementById("sharedFileGitHubToken");
           try {
@@ -9521,8 +9525,10 @@
           if (typeof window.__doLoadFromStoredUrl === "function") window.__doLoadFromStoredUrl();
           else if (typeof window.__fetchSharedUpdates === "function") window.__fetchSharedUpdates();
         } else if (selectedType === "supabase") {
+          setStorageMode("supabase");
           if (typeof applyStorageModeUI === "function") applyStorageModeUI("supabase");
         } else if (selectedType === "local_storage" || selectedType === "local_cache") {
+          if (prevMode === "supabase" && window.ganttStorage?.signOut) { window.ganttStorage.signOut().catch(function () {}); }
           if (selectedType === "local_cache") {
             try { localStorage.removeItem(SHARED_FILE_URL_KEY); localStorage.removeItem(GITHUB_TOKEN_KEY); } catch (e) {}
             if (typeof clearLocalProjectData === "function") clearLocalProjectData();
@@ -10042,17 +10048,20 @@
       if (window.ganttStorage?.isCloudEnabled()) {
         await window.ganttStorage.ensureBoardDataLoaded(id);
         const showPresence = UUID_REGEX.test(id);
-        realtimeUnsubscribe = window.ganttStorage.subscribeToBoardRealtime(
-          id,
-          () => {
-            if (currentProjectId !== id) return;
-            applyRealtimeBoardUpdate();
-          },
-          showPresence ? (state) => {
-            if (currentProjectId !== id) return;
-            updateCollaboratorsAvatarBar(state);
-          } : undefined
-        );
+        const subscribe = window.ganttStorage.subscribeToBoardRealtime;
+        if (typeof subscribe === "function") {
+          realtimeUnsubscribe = subscribe(
+            id,
+            () => {
+              if (currentProjectId !== id) return;
+              applyRealtimeBoardUpdate();
+            },
+            showPresence ? (state) => {
+              if (currentProjectId !== id) return;
+              updateCollaboratorsAvatarBar(state);
+            } : undefined
+          );
+        }
       }
       const sameProject = currentProjectId === id;
       currentProjectId = id;
@@ -11062,9 +11071,21 @@
       function authErrorMessage(err) {
         if (!err) return "Something went wrong.";
         const msg = typeof err === "string" ? err : (err && err.message ? err.message : String(err));
-        if (/aborted|cancelled|canceled|timeout/i.test(msg)) return "Request was cancelled or took too long. Clear this site's data (browser settings → Site settings → Clear data) and try again.";
+        const isMobile = /iPhone|iPad|iPod|Android|webOS|Mobile/i.test(navigator.userAgent || "");
+        if (/supabase not configured|not configured/i.test(msg)) {
+          return isMobile
+            ? "Cloud login unavailable. Reload the page — if the Supabase script failed to load (e.g. slow connection), try Wi‑Fi or a different browser."
+            : "Supabase not configured. Check config.js has a valid URL and anon key, or reload if the script failed to load.";
+        }
+        if (/aborted|cancelled|canceled|timeout/i.test(msg)) {
+          return isMobile
+            ? "Login timed out. Try again on Wi‑Fi, or use a different browser (Chrome instead of Safari, or Safari instead of Chrome). If the app is paused in Supabase, restore it first."
+            : "Request was cancelled or took too long. Clear this site's data (browser settings → Site settings → Clear data) and try again.";
+        }
         if (/failed to fetch|network error|connection refused|connection failed|load failed|ERR_CONNECTION|NS_ERROR/i.test(msg)) {
-          return "Connection failed. If you see 'refused to connect', start the server: in a terminal run 'python3 -m http.server 8000' in this folder, then open http://localhost:8000/template.html in Chrome or Safari.";
+          return isMobile
+            ? "Connection failed on mobile. Try: (1) Switch to Wi‑Fi if on cellular. (2) Use Chrome or Safari directly (not in-app browser). (3) Disable private/incognito mode. (4) Ensure the app is served over HTTPS."
+            : "Connection failed. If developing locally, run 'python3 -m http.server 8000' and open http://localhost:8000/template.html. Otherwise ensure the app is served over HTTPS.";
         }
         return msg;
       }
@@ -11269,15 +11290,18 @@
         }
         setAuthLoading("login");
         try {
+          const isMobile = /iPhone|iPad|iPod|Android|webOS|Mobile/i.test(navigator.userAgent || "");
+          const loginTimeout = isMobile ? 90000 : 60000;
           const result = await withTimeout(
             window.ganttStorage.signIn(email, password),
-            60000,
+            loginTimeout,
             "Login timed out. Try: (1) Restore the project in the Supabase dashboard if it's paused. (2) Use the anon key from Settings → API → Legacy API Keys instead of the Publishable key. (3) Check the project URL above is correct. (4) Ensure the app is served over https or localhost."
           );
           if (result && result.error) { showAuthError(result.error); return; }
           try {
             if (rememberCheckbox?.checked) localStorage.setItem(GANTT_AUTH_REMEMBER_EMAIL_KEY, email);
             else localStorage.removeItem(GANTT_AUTH_REMEMBER_EMAIL_KEY);
+            if (typeof setStorageMode === "function") setStorageMode("supabase");
           } catch (e) {}
           overlay.classList.remove("visible");
           if (typeof renderHomeView === "function") renderHomeView();
@@ -11309,12 +11333,15 @@
         }
         setAuthLoading("signup");
         try {
+          const isMobile = /iPhone|iPad|iPod|Android|webOS|Mobile/i.test(navigator.userAgent || "");
+          const signupTimeout = isMobile ? 30000 : 20000;
           const result = await withTimeout(
             window.ganttStorage.signUp(email, password),
-            20000,
+            signupTimeout,
             "Request took too long. Try again or clear this site's data and try again."
           );
           if (result && result.error) { showAuthError(result.error); return; }
+          try { if (typeof setStorageMode === "function") setStorageMode("supabase"); } catch (e) {}
           overlay.classList.remove("visible");
           if (typeof renderHomeView === "function") renderHomeView();
           if (window.ganttStorage?.refreshAuthUI) await window.ganttStorage.refreshAuthUI();
@@ -11523,6 +11550,12 @@
       try {
         if (!getStorageMode() && (localStorage.getItem(SHARED_FILE_URL_KEY) || "").trim()) setStorageMode("github");
       } catch (e) {}
+      if (!getStorageMode() && window.ganttStorage?.isCloudEnabled()) {
+        var existingSession = await window.ganttStorage.getSession();
+        if (existingSession) {
+          try { setStorageMode("supabase"); } catch (e) {}
+        }
+      }
       if (!getStorageMode()) {
         if (landingView) landingView.classList.add("active");
         if (homeViewEl) homeViewEl.classList.remove("active");
@@ -11571,7 +11604,10 @@
       }
       if (window.ganttStorage?.isCloudEnabled()) {
         var session = await window.ganttStorage.getSession();
-        if (session) await window.ganttStorage.ensureBoardsListLoaded();
+        if (session) {
+          try { if (typeof setStorageMode === "function") setStorageMode("supabase"); } catch (e) {}
+          await window.ganttStorage.ensureBoardsListLoaded();
+        }
         if (window.ganttStorage?.refreshAuthUI) window.ganttStorage.refreshAuthUI();
         [100, 350, 800, 1500, 2500].forEach(function (delay) {
           setTimeout(async function () {
