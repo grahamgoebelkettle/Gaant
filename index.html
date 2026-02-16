@@ -11648,15 +11648,15 @@
       var landingView = document.getElementById("landingView");
       var homeViewEl = document.getElementById("homeView");
       var ganttViewEl = document.getElementById("ganttView");
-      try {
-        if (!getStorageMode() && (localStorage.getItem(SHARED_FILE_URL_KEY) || "").trim()) setStorageMode("github");
-      } catch (e) {}
       if (!getStorageMode() && window.ganttStorage?.isCloudEnabled()) {
         var existingSession = await window.ganttStorage.getSession();
         if (existingSession) {
           try { setStorageMode("supabase"); } catch (e) {}
         }
       }
+      try {
+        if (!getStorageMode() && (localStorage.getItem(SHARED_FILE_URL_KEY) || "").trim()) setStorageMode("github");
+      } catch (e) {}
       if (!getStorageMode()) {
         if (landingView) landingView.classList.add("active");
         if (homeViewEl) homeViewEl.classList.remove("active");
@@ -11691,7 +11691,7 @@
         });
         return;
       }
-      if (getStorageMode() !== "github") {
+      if (getStorageMode() !== "github" && !window.ganttStorage?.isCloudEnabled()) {
         window.hasWriteAccess = function () { return true; };
         var sec = document.getElementById("sharedFileSection");
         if (sec) sec.style.display = "none";
@@ -11751,7 +11751,12 @@
           try { var u = localStorage.getItem(SHARED_FILE_URL_KEY); return !!(u && u.trim()); } catch (e) { return false; }
         }
         function hasWriteAccess() {
-          if (window.ganttStorage && window.ganttStorage.isCloudEnabled && window.ganttStorage.isCloudEnabled()) return true;
+          if (window.ganttStorage && window.ganttStorage.isCloudEnabled && window.ganttStorage.isCloudEnabled()) {
+            if (typeof currentProjectId === "undefined" || !currentProjectId) return true;
+            var list = (typeof loadProjectsList === "function" ? loadProjectsList() : []) || [];
+            var p = list.find(function (x) { return x.id === currentProjectId; });
+            return p ? !!p.isOwner : true;
+          }
           if (!isSynced()) return true;
           try { var t = localStorage.getItem(GITHUB_TOKEN_KEY); return !!(t && t.trim()); } catch (e) { return false; }
         }
@@ -11781,7 +11786,10 @@
             }
           }
           var addFab = document.getElementById("addTaskFab");
-          if (addFab) addFab.style.display = canWrite ? "" : "none";
+          if (addFab) {
+            var homeActive = document.getElementById("homeView")?.classList.contains("active");
+            addFab.style.display = (canWrite && !homeActive) ? "" : "none";
+          }
           var settingsBtn = document.getElementById("settingsBtn");
           if (settingsBtn) settingsBtn.style.display = canWrite ? "" : "none";
           var shareBoardBtn = document.getElementById("shareBoardBtn");
