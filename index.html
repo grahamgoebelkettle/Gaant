@@ -11152,6 +11152,7 @@
           } else supabaseLink.href = "https://supabase.com/dashboard";
         }
         wrap?.classList.remove("open");
+        if (show && typeof renderHomeView === "function") renderHomeView();
       }
       window.ganttStorage.onAuthChange(updateAuthUI);
 
