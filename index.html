@@ -21,15 +21,16 @@
       --bg-body: #fafafa;
       --bg-surface: #fff;
       --bg-hover: #f5f5f5;
-      --row-bg-default: #f0f0f0;
-      --row-bg-hover: #e5e5e5;
-      --row-bg-selected: #e0e0e0;
+      --row-bg-default: #ffffff;
+      --row-bg-hover: #fafafa;
+      --row-bg-selected: #fafafa;
       --text-primary: #171717;
       --text-secondary: #525252;
       --text-tertiary: #737373;
       --border-default: #ebebeb;
       --border-strong: #e5e5e5;
       --border-subtle: #f0f0f0;
+      --bg-subtle: #f5f5f5;
       --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
       --shadow-md: 0 4px 12px rgba(0,0,0,0.15);
     }
@@ -41,9 +42,9 @@
         --bg-body: #121212;
         --bg-surface: #1a1a1a;
         --bg-hover: #262626;
-        --row-bg-default: #171717;
-        --row-bg-hover: #1f1f1f;
-        --row-bg-selected: #262626;
+        --row-bg-default: #1a1a1a;
+        --row-bg-hover: #121212;
+        --row-bg-selected: #121212;
         --bg-subtle: #0d0d0d;
         --text-primary: #fafafa;
         --text-secondary: #737373;
@@ -78,7 +79,7 @@
       body { padding-left: 8px; padding-right: 8px; overflow-x: hidden; }
     }
     h1 {
-      font-size: 24px;
+      font-size: 32px;
       font-weight: 700;
       line-height: 1.3;
       letter-spacing: -0.02em;
@@ -89,6 +90,7 @@
       font-weight: 400;
       color: var(--text-secondary);
       margin: 0;
+      max-width:640px;
     }
     .gantt-wrapper {
       position: relative;
@@ -120,17 +122,18 @@
       position: sticky;
       left: 0;
       z-index: 10002;
-      background: inherit;
     }
     .gantt-row:not(.gantt-header) .gantt-cell:nth-child(1) {
-      background: var(--row-bg-default);
+      background-color: var(--row-bg-default, #ffffff);
     }
-    .gantt-header .gantt-cell:nth-child(1) { background: var(--bg-subtle); }
+    .gantt-header .gantt-cell:nth-child(1) {
+      background-color: var(--bg-subtle, #f5f5f5);
+    }
     .phase-header-row > .phase-header-cell:first-child {
       position: sticky;
       left: 0;
       z-index: 10002;
-      background: transparent;
+      background-color: var(--bg-subtle, #f5f5f5);
     }
     .gantt-header {
       background: var(--bg-subtle);
@@ -232,13 +235,15 @@
       min-height: 24px;
     }
     .gantt-row[draggable="true"] { cursor: grab; }
-    .gantt-row:not(.gantt-header):hover .gantt-cell {
+    .gantt-row:not(.gantt-header):hover .gantt-cell,
+    .gantt-row:not(.gantt-header):has(+ .gantt-detail-row:hover) .gantt-cell {
       background: var(--row-bg-hover);
     }
     .gantt-row.selected .gantt-cell {
       background: var(--row-bg-selected);
     }
-    .gantt-row.selected:hover .gantt-cell {
+    .gantt-row.selected:hover .gantt-cell,
+    .gantt-row.selected:has(+ .gantt-detail-row:hover) .gantt-cell {
       background: var(--row-bg-selected);
     }
     .gantt-row.dragging { opacity: 0.5; cursor: grabbing; }
@@ -1160,6 +1165,21 @@
       flex-shrink: 0;
       opacity: 0.9;
     }
+    .fab-phase-menu-item-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex: 1;
+      min-width: 0;
+    }
+    .fab-phase-menu-item-label {
+      font-weight: 500;
+    }
+    .fab-phase-menu-item-desc {
+      font-size: 11px;
+      color: #a3a3a3;
+      font-weight: 400;
+    }
     .fab-phase-menu-item-disabled .fab-phase-menu-item-icon {
       opacity: 0.6;
     }
@@ -1174,6 +1194,56 @@
       font-weight: 400;
       margin-left: auto;
       flex-shrink: 0;
+    }
+    .home-new-board-menu.home-new-board-menu-drop-up {
+      min-width: auto;
+      max-width: none;
+      padding: 8px 0;
+      font-size: 16px;
+    }
+    .home-new-board-menu.home-new-board-menu-drop-up .fab-phase-menu-item {
+      padding: 12px 20px;
+      font-size: 16px;
+      gap: 14px;
+    }
+    .home-new-board-menu.home-new-board-menu-drop-up .fab-phase-menu-item-icon {
+      width: 22px;
+      height: 22px;
+    }
+    .home-new-board-menu.home-new-board-menu-drop-up .fab-phase-menu-item-icon svg {
+      width: 22px;
+      height: 22px;
+    }
+    .home-new-board-menu.home-new-board-menu-drop-up .fab-phase-menu-item-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    .home-new-board-menu.fab-phase-menu {
+      background: #ffffff !important;
+      color: #171717 !important;
+      border: 1px solid #e5e5e5;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    }
+    .home-new-board-menu .fab-phase-menu-item {
+      color: #171717 !important;
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+    .home-new-board-menu .fab-phase-menu-item:hover {
+      background: rgba(0,0,0,0.05) !important;
+    }
+    .home-new-board-menu .fab-phase-menu-item-icon {
+      color: #171717 !important;
+      opacity: 0.9;
+    }
+    .home-new-board-menu .fab-phase-menu-item-desc {
+      color: #525252 !important;
+    }
+    .home-new-board-menu .fab-phase-menu-item-disabled .fab-phase-menu-item-icon {
+      opacity: 0.5;
+    }
+    .home-new-board-menu .fab-phase-menu-badge {
+      color: #737373 !important;
     }
     @media (prefers-color-scheme: dark) {
       .add-task-fab {
@@ -1193,7 +1263,7 @@
       margin-bottom: 8px;
     }
     .home-new-project-btn {
-      padding: 8px 16px;
+      padding: 12px 16px;
       font-size: 14px;
       font-weight: 600;
       border-radius: var(--button-radius);
@@ -1251,6 +1321,35 @@
     }
     .home-readonly-badge.status-syncing .home-readonly-badge-dot { background: #d97706; animation: home-sync-dot-pulse 1.2s ease-in-out infinite; }
     .home-readonly-badge.status-error .home-readonly-badge-dot { background: #dc2626; }
+    .home-mobile-fab-bar {
+      display: none;
+    }
+    @media (max-width: 768px) {
+      .home-header-actions .home-new-project-btn:not(.home-mobile-fab-trigger) {
+        display: none;
+      }
+      .home-mobile-fab-bar {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 16px;
+        background: var(--bg-body);
+        border-top: 1px solid var(--border-default);
+        z-index: 1000;
+        box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
+      }
+      .home-mobile-fab-bar .home-new-project-btn {
+        width: 100%;
+        max-width: 280px;
+        padding: 14px 20px;
+        font-size: 16px;
+      }
+      #homeView.active { padding-bottom: 88px; }
+    }
     @media (prefers-color-scheme: dark) {
       .home-new-project-btn {
         background: #ffffff;
@@ -1500,8 +1599,8 @@
       box-shadow: inset 0 0 0 1px var(--color-general-primary);
     }
     .settings-btn {
-      width: 36px;
-      height: 36px;
+      width: 40px;
+      height: 40px;
       padding: 0;
       border: none;
       background: transparent;
@@ -1583,9 +1682,10 @@
     .settings-tabs {
       display: flex;
       gap: 0;
-      padding: 0 24px;
+      padding:  0px;
       border-bottom: 1px solid var(--border-default);
       flex-shrink: 0;
+      min-height:60px;
       min-width: 0;
     }
     .settings-tab {
@@ -1650,7 +1750,7 @@
       width: 100%;
       padding: 10px 12px;
       border: 1px solid var(--border-strong);
-      background: var(--bg-surface);
+      background-color: transparent;
       color: var(--text-primary);
       border-radius: 6px;
       font-size: 14px;
@@ -1762,23 +1862,26 @@
       flex: 1;
       padding: 8px 14px;
       border: none;
-      background: var(--bg-surface);
+      border-radius: 4px;
+      background: transparent;
       color: var(--text-secondary);
       font-size: 14px;
       font-weight: 500;
       font-family: inherit;
       cursor: pointer;
-      transition: background 0.15s, color 0.15s;
+      transition: background 0.15s, color 0.15s, border 0.15s;
     }
     .settings-segmented-option:hover {
-      background: var(--bg-hover);
+      background: transparent;
       color: var(--text-primary);
     }
     .settings-segmented-option.selected {
-      background: var(--text-primary);
-      color: var(--bg-body);
+      background: transparent;
+      color: var(--text-primary);
+      box-shadow: inset 0 0 0 1px var(--border-strong);
     }
     .settings-hint { display: block; margin-top: 6px; font-size: 12px; color: var(--text-tertiary); }
+    .settings-hint kbd { display: inline-block; padding: 1px 5px; font-size: 11px; font-family: inherit; background: var(--bg-hover); border: 1px solid var(--border-default); border-radius: 4px; }
     .settings-section input:focus,
     .settings-section textarea:focus,
     .settings-section select:focus { outline: none; border-color: var(--color-general-primary); }
@@ -1798,7 +1901,7 @@
       padding: 6px 36px 6px 8px;
       border: 1px solid var(--border-strong);
       border-radius: 6px;
-      background: var(--bg-surface);
+      background: transparent;
       min-height: 36px;
       box-sizing: border-box;
     }
@@ -1851,13 +1954,13 @@
       font-size: 14px;
       color: var(--text-primary);
       border: 1px solid var(--border-strong);
-      background: var(--bg-surface);
+      background: transparent;
       border-radius: 6px;
       cursor: pointer;
       font-family: inherit;
       box-sizing: border-box;
     }
-    .settings-add-phase:hover { background: var(--bg-hover); border-color: var(--border-strong); }
+    .settings-add-phase:hover { background: transparent; border-color: var(--border-strong); }
     .settings-phase-list-header {
       display: none;
       align-items: center;
@@ -1899,7 +2002,7 @@
       font-size: 13px;
       border: 1px solid var(--border-strong);
       border-radius: 6px;
-      background: var(--bg-surface);
+      background: transparent;
       box-sizing: border-box;
       gap: 0;
     }
@@ -1944,19 +2047,20 @@
     .settings-palette-grid {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 8px;
     }
     .settings-palette-option {
       display: flex;
-      flex-direction: column;
-      gap: 8px;
-      padding: 10px 12px;
+      flex-direction: row;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 12px;
       width: 100%;
       box-sizing: border-box;
       border: 1px solid var(--border-strong);
       border-radius: 8px;
       cursor: pointer;
-      background: var(--bg-surface);
+      background: transparent;
       text-align: left;
     }
     .settings-palette-option:hover { border-color: var(--border-default); }
@@ -1970,7 +2074,8 @@
       padding: 10px 40px 10px 12px;
       border: 1px solid var(--border-strong);
       border-radius: 6px;
-      background: var(--bg-surface);
+      background: transparent;
+      background-color: transparent;
       color: var(--text-primary);
       font-size: 14px;
       font-family: inherit;
@@ -2035,21 +2140,32 @@
       display: flex;
       align-items: center;
       gap: 6px;
+      flex: 1;
       min-width: 0;
+      max-width: 100px;
     }
     .settings-palette-option .settings-palette-name-input {
       flex: 1;
       min-width: 0;
+      max-width: 100%;
       font-size: 13px;
       font-weight: 600;
       color: var(--text-primary);
       background: transparent;
-      border: none;
+      border: none !important;
+      box-shadow: none !important;
       padding: 0;
       font-family: inherit;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     .settings-palette-option .settings-palette-name-input:focus {
       outline: none;
+    }
+    .settings-palette-option .settings-palette-name-input:read-only {
+      cursor: default;
+      caret-color: transparent;
     }
     .settings-palette-option .settings-palette-rename-btn {
       flex-shrink: 0;
@@ -2069,27 +2185,17 @@
     .settings-palette-swatches {
       display: flex;
       gap: 4px;
-      width: 100%;
-      min-height: 32px;
+      flex-shrink: 0;
+      align-items: center;
     }
     .settings-palette-swatches span {
-      flex: 1;
-      min-width: 0;
-      border-radius: 6px;
+      width: 20px;
+      height: 20px;
+      min-width: 20px;
+      flex-shrink: 0;
+      border-radius: 4px;
       box-sizing: border-box;
     }
-    .settings-save-palette-btn {
-      margin-top: 10px;
-      padding: 6px 12px;
-      font-size: 13px;
-      color: var(--text-secondary);
-      background: transparent;
-      border: 1px solid var(--border-strong);
-      border: 1px dashed #d4d4d4;
-      border-radius: var(--button-radius);
-      cursor: pointer;
-    }
-    .settings-save-palette-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
     .settings-party-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
     .settings-party-item { display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: var(--bg-hover); border-radius: 6px; font-size: 13px; }
     .settings-party-item span { flex: 1; min-width: 0; }
@@ -2125,6 +2231,20 @@
       flex-shrink: 0;
       background: var(--bg-surface);
     }
+    @media (prefers-color-scheme: dark) {
+      .settings-sidebar {
+        background: #141414;
+      }
+      .settings-drawer-header,
+      .settings-drawer-footer,
+      .settings-tab.active {
+        background: #141414;
+      }
+      .app-views-wrap.settings-sidebar-open .settings-sidebar {
+        border-left-color: #1f1f1f;
+        box-shadow: -4px 0 20px rgba(0,0,0,0.4);
+      }
+    }
     @media (max-width: 900px), (max-height: 700px) {
       .settings-sidebar { inset: 0; left: auto; }
       .settings-drawer { max-height: 100%; }
@@ -2139,6 +2259,21 @@
       .settings-drawer-footer { padding-left: 16px; padding-right: 16px; }
       .settings-tabs { padding: 0 16px; }
       .settings-tab { padding: 12px 14px; font-size: 13px; }
+    }
+    .settings-cancel-btn {
+      padding: 8px 20px;
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: var(--button-radius);
+      border: 0px solid var(--border-strong);
+      background: transparent;
+      color: var(--text-primary);
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .settings-cancel-btn:hover {
+      background: var(--bg-hover);
+      border-color: var(--border-default);
     }
     .settings-save-btn {
       padding: 8px 20px;
@@ -2740,15 +2875,196 @@
       z-index: 1;
     }
     #landingView {
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
+      align-items: stretch;
+      justify-content: stretch;
+      padding: 0;
       overflow-y: auto;
     }
+    @media (min-width: 769px) {
+      #landingView {
+        flex-direction: row;
+        align-items: stretch;
+        gap: 0;
+        padding: 0;
+      }
+      .landing-layout {
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+        flex: 1;
+        width: 100%;
+        min-height: 100%;
+        max-width: none;
+        margin: 0;
+        gap: 0;
+      }
+      .landing-sidebar {
+        flex: 1 1 50%;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 48px 56px;
+        background: var(--bg-surface);
+        border-right: 1px solid var(--border-default);
+      }
+      .landing-main {
+        flex: 1 1 50%;
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 48px 56px;
+        background: var(--bg-body);
+      }
+    }
+    @media (max-width: 768px) {
+      #landingView {
+        padding: 24px 20px;
+      }
+      .landing-layout {
+        display: flex;
+        flex-direction: column;
+        gap: 32px;
+        max-width: 480px;
+        width: 100%;
+        margin: 0 auto;
+      }
+      .landing-sidebar {
+        order: 1;
+        padding: 0;
+      }
+      .landing-main {
+        order: 2;
+      }
+    }
+    .landing-sidebar {
+      text-align: left;
+    }
+    .landing-sidebar-visual {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 24px;
+      width: 220px;
+    }
+    .landing-sidebar-visual .landing-sidebar-bar {
+      height: 12px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+    .landing-sidebar-visual .landing-sidebar-bar.bar-1 {
+      width: 40px;
+      background: #6366f1;
+      margin-left: 0;
+    }
+    .landing-sidebar-visual .landing-sidebar-bar.bar-2 {
+      width: 56px;
+      background: #8b5cf6;
+      margin-left: 40px;
+      animation: home-empty-bar2-pulse 5.4s ease-in-out infinite;
+    }
+    .landing-sidebar-visual .landing-sidebar-bar.bar-3 {
+      width: 52px;
+      background: #a78bfa;
+      margin-left: 96px;
+      animation: home-empty-bar3-pulse 5.4s ease-in-out infinite;
+    }
+    .landing-sidebar-visual .landing-sidebar-bar.bar-4 {
+      width: 28px;
+      background: #c4b5fd;
+      margin-left: 148px;
+      animation: home-empty-bar4-shift 5.4s ease-in-out infinite;
+    }
+    .landing-sidebar-visual .landing-sidebar-line {
+      width: 100%;
+      height: 2px;
+      background: var(--text-tertiary);
+      opacity: 0.2;
+      border-radius: 1px;
+    }
+    @media (prefers-color-scheme: dark) {
+      .landing-sidebar-visual .landing-sidebar-bar.bar-1 { background: #818cf8; }
+      .landing-sidebar-visual .landing-sidebar-bar.bar-2 { background: #a78bfa; }
+      .landing-sidebar-visual .landing-sidebar-bar.bar-3 { background: #c4b5fd; }
+      .landing-sidebar-visual .landing-sidebar-bar.bar-4 { background: #ddd6fe; }
+    }
+    .landing-hero-title {
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--color-general-primary);
+      margin: 0 0 8px 0;
+      line-height: 1.25;
+      letter-spacing: -0.02em;
+    }
+    @media (min-width: 769px) {
+      .landing-hero-title {
+        font-size: 32px;
+      }
+    }
+    .landing-hero-subtitle {
+      font-size: 16px;
+      color: var(--text-secondary);
+      margin: 0 0 28px 0;
+      line-height: 1.45;
+    }
+    .landing-features {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .landing-feature {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .landing-feature:last-child {
+      margin-bottom: 0;
+    }
+    .landing-feature-icon {
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      color: var(--color-general-primary);
+      margin-top: 2px;
+    }
+    .landing-feature-icon svg {
+      width: 100%;
+      height: 100%;
+    }
+    .landing-feature-text {
+      font-size: 15px;
+      color: var(--text-primary);
+      line-height: 1.4;
+    }
+    @media (prefers-color-scheme: dark) {
+      .landing-sidebar {
+        background: var(--bg-subtle, #0d0d0d);
+      }
+      .landing-sidebar .landing-hero-title { color: #a3a3a3; }
+      .landing-sidebar .landing-hero-subtitle { color: #737373; }
+      .landing-sidebar .landing-feature-icon { color: #8c8c8c; }
+      .landing-sidebar .landing-feature-text { color: #8c8c8c; }
+    }
     .landing-inner {
-      max-width: 480px;
+      max-width: 360px;
       width: 100%;
       text-align: center;
+    }
+    @media (min-width: 769px) {
+      .landing-inner {
+        max-width: 360px;
+        text-align: left;
+      }
+    }
+    .landing-step-indicator {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-tertiary);
+      margin-bottom: 8px;
+      letter-spacing: 0.02em;
     }
     .landing-title {
       font-size: 22px;
@@ -2776,7 +3092,7 @@
       font-size: 15px;
       font-weight: 600;
       color: var(--color-general-primary);
-      background: var(--bg-surface);
+      background: transparent;
       border: 1px solid var(--border-default);
       border-radius: var(--button-radius);
       cursor: pointer;
@@ -2784,8 +3100,6 @@
     }
     .landing-option:hover {
       border-color: var(--border-strong);
-      background: var(--bg-hover);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     }
     .landing-option-desc {
       font-size: 13px;
@@ -2844,7 +3158,22 @@
     .home-shared-file-input { flex: 1; min-width: 200px; padding: 8px 10px; font-size: 13px; border: 1px solid var(--border-default); border-radius: 6px; font-family: inherit; }
     .home-shared-file-btn { padding: 8px 12px; font-size: 13px; border-radius: var(--button-radius); border: 1px solid var(--border-strong); background: var(--bg-surface); color: var(--text-primary); cursor: pointer; font-family: inherit; }
     .home-shared-file-btn:hover { background: var(--bg-hover); }
-    .home-settings-icon-btn { width: 36px; height: 36px; padding: 0; display: flex; align-items: center; justify-content: center; min-width: 36px; border: none; }
+    .home-settings-icon-btn {
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 36px;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+    }
+    .home-settings-icon-btn:hover {
+      background: transparent;
+      color: var(--text-primary);
+    }
     .home-settings-icon-btn svg { width: 18px; height: 18px; transition: transform 0.3s ease; }
     .home-settings-icon-btn:hover svg { transform: rotate(90deg); }
     .home-shared-file-push { margin-top: 12px; }
@@ -2921,14 +3250,14 @@
       padding: 12px 14px;
       text-align: left;
       font-family: inherit;
-      background: var(--bg-surface);
+      background: transparent;
       border: 1px solid var(--border-default);
       border-radius: 8px;
       cursor: pointer;
       transition: border-color var(--motion-duration-normal) var(--motion-easing), background var(--motion-duration-normal) var(--motion-easing);
       box-sizing: border-box;
     }
-    .storage-type-tile:hover { border-color: var(--border-strong); background: var(--bg-hover); }
+    .storage-type-tile:hover { border-color: var(--border-strong); background: transparent; }
     .storage-type-tile:focus { outline: none; }
     .storage-type-tile:focus-visible { outline: 1px solid rgba(99, 102, 241, 0.4); outline-offset: 1px; }
     .storage-type-tile.selected {
@@ -2959,7 +3288,7 @@
     .storage-type-tile-content .shared-file-modal-status-dot.none,
     .storage-type-tile-content .shared-file-modal-status-dot.local { background: var(--stroke-default); }
     .storage-type-tile-content label { display: block; font-size: 12px; font-weight: 500; color: var(--text-secondary); margin-bottom: 4px; }
-    .storage-type-tile-content .shared-file-input-wrap { display: flex; align-items: stretch; border: 1px solid var(--border-strong); border-radius: 6px; background: var(--bg-surface); transition: box-shadow var(--motion-duration-fast) var(--motion-easing); }
+    .storage-type-tile-content .shared-file-input-wrap { display: flex; align-items: stretch; border: 1px solid var(--border-strong); border-radius: 6px; background: transparent; transition: box-shadow var(--motion-duration-fast) var(--motion-easing); }
     .storage-type-tile-content .shared-file-input-wrap:focus-within { box-shadow: 0 0 0 1px var(--color-general-primary); outline: none; }
     .storage-type-tile-content .shared-file-input-wrap input { flex: 1; min-width: 0; padding: 10px 12px; border: none; border-radius: 6px 0 0 6px; font-size: 14px; box-sizing: border-box; background: transparent; color: var(--text-primary); font-family: inherit; }
     .storage-type-tile-content .shared-file-input-icons { display: flex; align-items: center; gap: 2px; padding: 0 6px 0 8px; flex-shrink: 0; border-left: 1px solid var(--border-subtle); }
@@ -2985,17 +3314,17 @@
       padding: 16px 18px;
       text-align: left;
       font-family: inherit;
-      background: var(--bg-surface);
+      background: transparent;
       border: 1px solid var(--border-default);
       border-radius: 10px;
       cursor: pointer;
       transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
       box-sizing: border-box;
     }
-    .storage-local-tile:hover { border-color: var(--border-strong); background: var(--bg-hover); }
+    .storage-local-tile:hover { border-color: var(--border-strong); background: transparent; }
     .storage-local-tile.selected {
       border: 1px solid #059669;
-      background: rgba(5, 150, 105, 0.16);
+      background: transparent;
       box-shadow: none;
     }
     .storage-local-tile.selected .storage-local-tile-title { color: var(--text-primary); font-weight: 600; }
@@ -3299,6 +3628,131 @@
         color: #171717;
       }
     }
+    .home-empty-state-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      align-items: stretch;
+      margin-top: 20px;
+    }
+    .home-empty-state-action-btn {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 18px;
+      text-align: left;
+      border: none;
+      border-radius: 10px;
+      background: transparent;
+      color: var(--text-primary);
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.2s, border-color 0.2s;
+      min-width: 0;
+      max-width: 220px;
+    }
+    .home-empty-state-action-btn:hover {
+      background: transparent;
+      opacity: 0.85;
+    }
+    .home-empty-state-action-icon {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      opacity: 0.9;
+    }
+    .home-empty-state-action-icon svg {
+      width: 20px;
+      height: 20px;
+    }
+    .home-empty-state-action-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+    .home-empty-state-action-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .home-empty-state-action-desc {
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-weight: 400;
+      line-height: 1.35;
+    }
+    @media (min-width: 769px) {
+      .home-empty-state-visual {
+        display: none;
+      }
+      .home-empty-state-actions {
+        flex-direction: column;
+        width: 100%;
+        max-width: 320px;
+        margin-top: 24px;
+        padding: 0;
+        background: transparent;
+        border: 1px solid var(--border-default);
+        border-radius: 10px;
+      }
+      .home-empty-state-action-btn {
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid var(--border-default);
+        color: var(--text-primary);
+        padding: 14px 18px;
+        border-radius: 0;
+        max-width: none;
+        gap: 14px;
+      }
+      .home-empty-state-action-btn:first-child {
+        border-radius: 10px 10px 0 0;
+      }
+      .home-empty-state-action-btn:last-child {
+        border-bottom: none;
+        border-radius: 0 0 10px 10px;
+      }
+      .home-empty-state-action-btn:hover {
+        background: transparent;
+        opacity: 0.85;
+      }
+      .home-empty-state-action-icon {
+        color: var(--text-primary);
+        opacity: 0.9;
+      }
+      .home-empty-state-action-icon svg {
+        stroke: currentColor;
+      }
+      .home-empty-state-action-label {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+      .home-empty-state-action-desc {
+        font-size: 13px;
+        color: var(--text-secondary);
+      }
+    }
+    @media (max-width: 768px) {
+      .home-empty-state-action-btn {
+        border-bottom: 1px solid var(--border-default);
+      }
+      .home-empty-state-action-btn:last-child {
+        border-bottom: none;
+      }
+    }
+    @media (max-width: 480px) {
+      .home-empty-state-actions {
+        flex-direction: column;
+        width: 100%;
+        max-width: 280px;
+      }
+      .home-empty-state-action-btn {
+        max-width: none;
+      }
+    }
     .home-empty-state-line {
       width: 100%;
       height: 2px;
@@ -3421,6 +3875,13 @@
     }
     .home-project-timeline-preview.home-timeline-empty {
       background: transparent;
+    }
+    .home-project-timeline-preview.home-timeline-empty .home-timeline-preview-caption {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      text-align: center;
+      padding: 0 16px;
+      line-height: 1.4;
     }
     .home-project-timeline-preview .home-timeline-svg {
       width: 100%;
@@ -3665,17 +4126,53 @@
   </div>
   <div class="home-new-board-menu fab-phase-menu" id="homeNewBoardMenu" role="menu" aria-label="New board options">
     <div class="fab-phase-menu-list">
-      <button type="button" class="fab-phase-menu-item" data-action="scratch" role="menuitem"><span class="fab-phase-menu-item-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg></span>Start from Scratch</button>
-      <button type="button" class="fab-phase-menu-item" data-action="linked" role="menuitem"><span class="fab-phase-menu-item-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"/></svg></span>Linked board</button>
-      <button type="button" class="fab-phase-menu-item fab-phase-menu-item-disabled" data-action="templates" role="menuitem" disabled><span class="fab-phase-menu-item-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"/></svg></span>Templates <span class="fab-phase-menu-badge">soon</span></button>
-      <button type="button" class="fab-phase-menu-item fab-phase-menu-item-disabled" data-action="excel" role="menuitem" disabled><span class="fab-phase-menu-item-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 8.25H7.5a2.25 2.25 0 0 0-2.25 2.25v9a2.25 2.25 0 0 0 2.25 2.25h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25H15M9 12l3 3m0 0 3-3m-3 3V2.25"/></svg></span>Upload from Excel <span class="fab-phase-menu-badge">soon</span></button>
+      <button type="button" class="fab-phase-menu-item" data-action="scratch" role="menuitem"><span class="fab-phase-menu-item-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg></span><span class="fab-phase-menu-item-text"><span class="fab-phase-menu-item-label">Empty</span><span class="fab-phase-menu-item-desc">Blank canvas for your project</span></span></button>
+      <button type="button" class="fab-phase-menu-item" data-action="linked" role="menuitem"><span class="fab-phase-menu-item-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"/></svg></span><span class="fab-phase-menu-item-text"><span class="fab-phase-menu-item-label">Linked</span><span class="fab-phase-menu-item-desc">Start with some connected tasks</span></span></button>
+      <button type="button" class="fab-phase-menu-item fab-phase-menu-item-disabled" data-action="templates" role="menuitem" disabled><span class="fab-phase-menu-item-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"/></svg></span><span class="fab-phase-menu-item-text"><span class="fab-phase-menu-item-label">Templates</span><span class="fab-phase-menu-item-desc">Select from common projects</span></span><span class="fab-phase-menu-badge">soon</span></button>
+      <button type="button" class="fab-phase-menu-item fab-phase-menu-item-disabled" data-action="excel" role="menuitem" disabled><span class="fab-phase-menu-item-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 8.25H7.5a2.25 2.25 0 0 0-2.25 2.25v9a2.25 2.25 0 0 0 2.25 2.25h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25H15M9 12l3 3m0 0 3-3m-3 3V2.25"/></svg></span><span class="fab-phase-menu-item-text"><span class="fab-phase-menu-item-label">Sync</span><span class="fab-phase-menu-item-desc">Upload an excel file</span></span><span class="fab-phase-menu-badge">soon</span></button>
     </div>
   </div>
   <div class="app-views-wrap" id="appViewsWrap">
   <div class="app-views-inner">
   <div id="landingView" class="app-view">
-    <div class="landing-inner">
-      <h1 class="landing-title">Choose how to store your data</h1>
+    <div class="landing-layout">
+      <aside class="landing-sidebar">
+        <div class="landing-sidebar-visual" aria-hidden="true">
+          <span class="landing-sidebar-bar bar-1"></span>
+          <span class="landing-sidebar-bar bar-2"></span>
+          <span class="landing-sidebar-bar bar-3"></span>
+          <span class="landing-sidebar-bar bar-4"></span>
+          <div class="landing-sidebar-line"></div>
+        </div>
+        <h1 class="landing-hero-title">Manage your tasks as they transform</h1>
+        <p class="landing-hero-subtitle">Interactive gaant styles project boards that evolve with your project.</p>
+        <ul class="landing-features">
+          <li class="landing-feature">
+            <span class="landing-feature-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 8.25V6ZM3.75 15.75a2.25 2.25 0 0 1 2.25-2.25h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25a2.25 2.25 0 0 1-2.25-2.25v-2.25Z"/></svg></span>
+            <span class="landing-feature-text">Define project phases</span>
+          </li>
+          <li class="landing-feature">
+            <span class="landing-feature-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"/></svg></span>
+            <span class="landing-feature-text">Link dependent tasks</span>
+          </li>
+          <li class="landing-feature">
+            <span class="landing-feature-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4.098 19.902a3.75 3.75 0 0 0 5.304 0l6.401-6.402M6.75 21A3.75 3.75 0 0 1 3 17.25V4.125C3 3.504 3.504 3 4.125 3H5.25a3 3 0 0 1 3 3v3.75M6.75 21a3.75 3.75 0 0 0 3.75-3.75V12m-1.5-9H6.75A2.25 2.25 0 0 0 4.5 5.25v1.5M12 21a3.75 3.75 0 0 1-.75-7.5v-3.75m9 0V9A2.25 2.25 0 0 0 18.75 6.75h-1.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg></span>
+            <span class="landing-feature-text">Customize your color theme</span>
+          </li>
+          <li class="landing-feature">
+            <span class="landing-feature-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z"/></svg></span>
+            <span class="landing-feature-text">Work alone or with your team</span>
+          </li>
+          <li class="landing-feature">
+            <span class="landing-feature-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/></svg></span>
+            <span class="landing-feature-text">Set your view preferences</span>
+          </li>
+        </ul>
+      </aside>
+      <div class="landing-main">
+    <div class="landing-inner" data-step="1" data-total-steps="1">
+      <div class="landing-step-indicator" id="landingStepIndicator">Step 1 of 1</div>
+      <h2 class="landing-title">Choose how to store your data</h2>
       <p class="landing-subtitle">Pick one option to get started. You can continue with full editing in all modes.</p>
       <div class="landing-options">
         <button type="button" class="landing-option" id="landingOptionGitHub">
@@ -3691,6 +4188,8 @@
           <div class="landing-option-desc">Rely only on browser cache. No file backup; data can be lost if cache is cleared.</div>
           <div class="landing-option-badge">Not recommended</div>
         </button>
+      </div>
+    </div>
       </div>
     </div>
   </div>
@@ -3734,6 +4233,9 @@
       <p class="home-subtitle" id="homePageDescription">Create and open boards. Each board has its own tasks and settings.</p>
     </div>
     <div class="home-project-list" id="homeProjectList"></div>
+    <div class="home-mobile-fab-bar" id="homeMobileFabBar" aria-hidden="true">
+      <button type="button" class="home-new-project-btn home-mobile-fab-trigger" id="homeFabMobile" aria-label="New board" data-tooltip-disabled="Read-only: add an access token in Sync Settings to create boards.">+ New board</button>
+    </div>
   </div>
 
   <div id="ganttView" class="app-view">
@@ -3902,6 +4404,25 @@
               <input type="date" id="settingsProjectEndDate">
               <small class="settings-hint">When set, the timeline is capped at this date; the board won't extend beyond it.</small>
             </div>
+            <div class="settings-section">
+              <div class="settings-toggle-row">
+                <label for="settingsShowDurationOnBar" class="settings-toggle-label">Always show days on bar</label>
+                <label class="settings-toggle-switch" aria-hidden="true">
+                  <input type="checkbox" id="settingsShowDurationOnBar">
+                  <span class="settings-toggle-slider"></span>
+                </label>
+              </div>
+              <small class="settings-hint">When enabled, the task duration (e.g. 7 days) is shown on every bar instead of only on hover.</small>
+            </div>
+            <div class="settings-section">
+              <label>View</label>
+              <select id="settingsRowAppearance" class="settings-select">
+                <option value="compact">Compact</option>
+                <option value="default">Default</option>
+                <option value="fill">Fill</option>
+              </select>
+              <small class="settings-hint">Row density and how the task bar area is displayed. Press <kbd>c</kbd>, <kbd>d</kbd>, or <kbd>f</kbd> to cycle through Compact, Default, and Fill.</small>
+            </div>
           </div>
         </div>
         <div class="settings-tab-panel" id="settingsTabDetails">
@@ -3990,25 +4511,6 @@
         </div>
         <div class="settings-tab-panel" id="settingsTabStyle">
           <div class="settings-section">
-            <div class="settings-toggle-row">
-              <label for="settingsShowDurationOnBar" class="settings-toggle-label">Always show days on bar</label>
-              <label class="settings-toggle-switch" aria-hidden="true">
-                <input type="checkbox" id="settingsShowDurationOnBar">
-                <span class="settings-toggle-slider"></span>
-              </label>
-            </div>
-            <small class="settings-hint">When enabled, the task duration (e.g. 7 days) is shown on every bar instead of only on hover.</small>
-          </div>
-          <div class="settings-section">
-            <label>View</label>
-            <select id="settingsRowAppearance" class="settings-select">
-              <option value="compact">Compact</option>
-              <option value="default">Default</option>
-              <option value="fill">Fill</option>
-            </select>
-            <small class="settings-hint">Row density and how the task bar area is displayed.</small>
-          </div>
-          <div class="settings-section">
             <label>Bar style</label>
             <div class="settings-segmented" id="settingsBarStyle" role="group" aria-label="Bar style">
               <button type="button" class="settings-segmented-option" data-value="fill">Fill</button>
@@ -4018,7 +4520,6 @@
           <div class="settings-section">
             <label>Color Palette</label>
             <div class="settings-palette-grid" id="settingsPaletteGrid"></div>
-            <button type="button" class="settings-save-palette-btn" id="settingsSavePalette">Save current colors as palette</button>
           </div>
         </div>
         <div class="settings-tab-panel" id="settingsTabStorage">
@@ -4107,6 +4608,7 @@
         </div>
       </div>
       <div class="settings-drawer-footer">
+        <button type="button" class="settings-cancel-btn" id="settingsCancel">Cancel</button>
         <button type="button" class="settings-save-btn" id="settingsSave">Save</button>
       </div>
     </div>
@@ -4633,7 +5135,7 @@
       } else if (idx === custom.length - 1) {
         opt = document.createElement("button");
         opt.type = "button";
-        opt.className = "settings-palette-option selected";
+        opt.className = "settings-palette-option editable selected";
         opt.dataset.index = String(gridIndex);
         opt.dataset.colors = JSON.stringify(colors);
         const nameWrap = document.createElement("div");
@@ -8573,7 +9075,8 @@
       allPalettes.forEach((pal, i) => {
         const opt = document.createElement("button");
         opt.type = "button";
-        opt.className = "settings-palette-option" + (i === paletteIdx ? " selected" : "");
+        const isEditable = i >= COLOR_PALETTES.length;
+        opt.className = "settings-palette-option" + (isEditable ? " editable" : "") + (i === paletteIdx ? " selected" : "");
         opt.dataset.index = String(i);
         opt.dataset.colors = JSON.stringify(pal.colors || []);
         const nameWrap = document.createElement("div");
@@ -8630,72 +9133,6 @@
         });
         paletteGrid.appendChild(opt);
       });
-      document.getElementById("settingsSavePalette").onclick = () => {
-        const colors = [...document.querySelectorAll(".settings-phase-item")].map(item => {
-          const colorInp = item.querySelector('input[type="color"]');
-          return colorInp?.value || "#737373";
-        }).filter(Boolean);
-        if (colors.length === 0) return;
-        const name = prompt("Palette name", "My palette")?.trim() || "My palette";
-        const custom = loadCustomPalettes();
-        custom.push({ name, colors });
-        saveCustomPalettes(custom);
-        const newIdx = paletteGrid.querySelectorAll(".settings-palette-option").length;
-        const opt = document.createElement("button");
-        opt.type = "button";
-        opt.className = "settings-palette-option selected";
-        opt.dataset.index = String(newIdx);
-        opt.dataset.colors = JSON.stringify(colors);
-        const nameWrap = document.createElement("div");
-        nameWrap.className = "settings-palette-name-wrap";
-        const nameInput = document.createElement("input");
-        nameInput.type = "text";
-        nameInput.className = "settings-palette-name-input";
-        nameInput.value = name;
-        nameInput.readOnly = false;
-        nameInput.addEventListener("click", (e) => e.stopPropagation());
-        nameInput.addEventListener("focus", (e) => e.stopPropagation());
-        const renameBtn = document.createElement("button");
-        renameBtn.type = "button";
-        renameBtn.className = "settings-palette-rename-btn";
-        renameBtn.textContent = "Rename";
-        renameBtn.addEventListener("click", (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          const newName = prompt("Palette name", nameInput.value?.trim() || "My palette")?.trim();
-          if (newName == null || newName === nameInput.value) return;
-          const custom = loadCustomPalettes();
-          const customIdx = custom.length - 1;
-          if (customIdx >= 0 && custom[customIdx]) {
-            custom[customIdx].name = newName;
-            saveCustomPalettes(custom);
-            nameInput.value = newName;
-          }
-        });
-        nameWrap.appendChild(nameInput);
-        nameWrap.appendChild(renameBtn);
-        opt.appendChild(nameWrap);
-        const strokePreview = document.querySelector("#settingsBarStyle .settings-segmented-option[data-value='stroke']")?.classList.contains("selected");
-        const swatchesEl = document.createElement("div");
-        swatchesEl.className = "settings-palette-swatches";
-        colors.forEach(c => {
-          const span = document.createElement("span");
-          applyPaletteSwatchStyle(span, c, strokePreview);
-          swatchesEl.appendChild(span);
-        });
-        opt.appendChild(swatchesEl);
-        opt.addEventListener("click", () => {
-          paletteGrid.querySelectorAll(".settings-palette-option").forEach(o => o.classList.remove("selected"));
-          opt.classList.add("selected");
-          document.querySelectorAll(".settings-phase-item").forEach((item, i) => {
-            const colorInp = item.querySelector('input[type="color"]');
-            if (colorInp && colors[i]) colorInp.value = colors[i];
-          });
-        });
-        paletteGrid.querySelectorAll(".settings-palette-option").forEach(o => o.classList.remove("selected"));
-        paletteGrid.appendChild(opt);
-        opt.classList.add("selected");
-      };
       document.getElementById("appViewsWrap")?.classList.add("settings-sidebar-open");
       const addFab = document.getElementById("addTaskFab");
       if (addFab) addFab.style.display = "none";
@@ -9147,8 +9584,10 @@
         emptyWrap.className = "home-empty-state";
         emptyWrap.setAttribute("aria-live", "polite");
         const canWrite = typeof window.hasWriteAccess === "function" && window.hasWriteAccess();
-        const createBtn = canWrite ? '<button type="button" class="home-empty-state-create-btn home-empty-state-new-btn" aria-label="Create my first board">Create my first board</button>' : "";
-        emptyWrap.innerHTML = '<div class="home-empty-state-visual"><span class="home-empty-state-bar bar-1" aria-hidden="true"></span><span class="home-empty-state-bar bar-2" aria-hidden="true"></span><span class="home-empty-state-bar bar-3" aria-hidden="true"></span><span class="home-empty-state-bar bar-4" aria-hidden="true"></span><div class="home-empty-state-line" aria-hidden="true"></div></div><h2 class="home-empty-state-title">Transform the way you work</h2><p class="home-empty-state-subtitle">Spend 10 minutes now to save 10 hours later.</p>' + createBtn;
+        const emptyIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>';
+        const linkedIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"/></svg>';
+        const actionBtns = canWrite ? '<div class="home-empty-state-actions"><button type="button" class="home-empty-state-action-btn" data-action="scratch" aria-label="Empty board"><span class="home-empty-state-action-icon" aria-hidden="true">' + emptyIcon + '</span><span class="home-empty-state-action-text"><span class="home-empty-state-action-label">Empty</span><span class="home-empty-state-action-desc">Blank canvas for your project</span></span></button><button type="button" class="home-empty-state-action-btn" data-action="linked" aria-label="Linked board"><span class="home-empty-state-action-icon" aria-hidden="true">' + linkedIcon + '</span><span class="home-empty-state-action-text"><span class="home-empty-state-action-label">Linked</span><span class="home-empty-state-action-desc">Start with some connected tasks</span></span></button></div>' : "";
+        emptyWrap.innerHTML = '<div class="home-empty-state-visual"><span class="home-empty-state-bar bar-1" aria-hidden="true"></span><span class="home-empty-state-bar bar-2" aria-hidden="true"></span><span class="home-empty-state-bar bar-3" aria-hidden="true"></span><span class="home-empty-state-bar bar-4" aria-hidden="true"></span><div class="home-empty-state-line" aria-hidden="true"></div></div><h2 class="home-empty-state-title">You don\'t have any boards</h2><p class="home-empty-state-subtitle">Create your first one to start tracking</p>' + actionBtns;
         listEl.appendChild(emptyWrap);
         return;
       }
@@ -9167,7 +9606,12 @@
         if (showPreviews) {
           const previewWrap = document.createElement("div");
           previewWrap.className = "home-project-timeline-preview" + (isEditMode ? " home-timeline-empty" : "");
-          if (!isEditMode) {
+          if (isEditMode) {
+            const caption = document.createElement("span");
+            caption.className = "home-timeline-preview-caption";
+            caption.textContent = "Preview will load once tasks have been added.";
+            previewWrap.appendChild(caption);
+          } else {
             const loadPreview = () => renderHomeTimelinePreview(p.id, previewWrap);
             if (window.ganttStorage?.isCloudEnabled()) {
               window.ganttStorage.ensureBoardDataLoaded(p.id).then(() => {
@@ -10682,6 +11126,7 @@
     function initSettingsSidebar() {
       document.getElementById("homeSettingsBtn")?.addEventListener("click", openHomeSettings);
       document.getElementById("settingsClose")?.addEventListener("click", closeSettingsModal);
+      document.getElementById("settingsCancel")?.addEventListener("click", closeSettingsModal);
       document.getElementById("settingsSave")?.addEventListener("click", saveSettingsFromModal);
       document.getElementById("settingsSupabaseAuthBtn")?.addEventListener("click", function () {
         closeSettingsModal();
@@ -10908,6 +11353,10 @@
           var canWrite = hasWriteAccess();
           var fab = document.getElementById("homeFab");
           if (fab) fab.style.display = canWrite ? "" : "none";
+          var fabMobile = document.getElementById("homeFabMobile");
+          if (fabMobile) fabMobile.style.display = canWrite ? "" : "none";
+          var mobileFabBar = document.getElementById("homeMobileFabBar");
+          if (mobileFabBar) mobileFabBar.style.display = canWrite ? "" : "none";
           var readonlyBadge = document.getElementById("homeReadonlyBadge");
           var badgeText = document.getElementById("homeReadonlyBadgeText");
           var synced = typeof isSynced === "function" && isSynced();
@@ -11526,16 +11975,19 @@
         });
       }
       const homeFabBtn = document.getElementById("homeFab");
+      const homeFabMobileBtn = document.getElementById("homeFabMobile");
       const homeNewBoardMenu = document.getElementById("homeNewBoardMenu");
       function closeHomeNewBoardMenu() {
         if (!homeNewBoardMenu) return;
         homeNewBoardMenu.classList.remove("visible");
+        homeNewBoardMenu.classList.remove("home-new-board-menu-drop-up");
         if (homeFabBtn) homeFabBtn.setAttribute("aria-expanded", "false");
+        if (homeFabMobileBtn) homeFabMobileBtn.setAttribute("aria-expanded", "false");
         document.removeEventListener("click", homeNewBoardMenu._outsideClick);
         document.removeEventListener("keydown", homeNewBoardMenu._escapeKey);
       }
       document.addEventListener("click", async (e) => {
-        var trigger = e.target.closest("#homeFab, .home-empty-state-new-btn");
+        var trigger = e.target.closest("#homeFab, #homeFabMobile");
         if (!trigger) return;
         const homeView = document.getElementById("homeView");
         if (!homeView?.classList.contains("active")) return;
@@ -11545,15 +11997,27 @@
           closeHomeNewBoardMenu();
           return;
         }
-        const triggerEl = trigger.id === "homeFab" ? homeFabBtn : trigger;
+        const triggerEl = trigger.id === "homeFab" ? homeFabBtn : (trigger.id === "homeFabMobile" ? document.getElementById("homeFabMobile") : trigger);
         const rect = triggerEl ? triggerEl.getBoundingClientRect() : null;
-        const rightOffset = rect ? Math.max(12, window.innerWidth - rect.right) : 12;
-        homeNewBoardMenu.style.right = rightOffset + "px";
-        homeNewBoardMenu.style.left = "auto";
-        homeNewBoardMenu.style.top = (rect ? rect.bottom + 8 : 88) + "px";
-        homeNewBoardMenu.style.bottom = "auto";
+        const isMobile = window.matchMedia("(max-width: 768px)").matches;
+        homeNewBoardMenu.classList.toggle("home-new-board-menu-drop-up", isMobile);
+        if (isMobile && rect) {
+          homeNewBoardMenu.style.left = rect.left + "px";
+          homeNewBoardMenu.style.right = (window.innerWidth - rect.right) + "px";
+          homeNewBoardMenu.style.width = "auto";
+          homeNewBoardMenu.style.bottom = (window.innerHeight - rect.top + 8) + "px";
+          homeNewBoardMenu.style.top = "auto";
+        } else {
+          const rightOffset = rect ? Math.max(12, window.innerWidth - rect.right) : 12;
+          homeNewBoardMenu.style.right = rightOffset + "px";
+          homeNewBoardMenu.style.left = "auto";
+          homeNewBoardMenu.style.bottom = "auto";
+          homeNewBoardMenu.style.top = (rect ? rect.bottom + 8 : 88) + "px";
+          homeNewBoardMenu.style.bottom = "auto";
+        }
         homeNewBoardMenu.classList.add("visible");
         if (homeFabBtn) homeFabBtn.setAttribute("aria-expanded", "true");
+        if (homeFabMobileBtn) homeFabMobileBtn.setAttribute("aria-expanded", "true");
         homeNewBoardMenu._outsideClick = (ev) => {
           if (homeNewBoardMenu.contains(ev.target) || (triggerEl && triggerEl.contains(ev.target))) return;
           closeHomeNewBoardMenu();
@@ -11569,6 +12033,26 @@
         if (!item || item.disabled) return;
         const action = item.dataset.action;
         closeHomeNewBoardMenu();
+        if (action === "scratch") {
+          try {
+            await createNewProject();
+          } catch (err) {
+            if (typeof showToast === "function") showToast("Could not create project.", { type: "error" });
+          }
+        } else if (action === "linked") {
+          try {
+            await createNewLinkedBoard();
+          } catch (err) {
+            if (typeof showToast === "function") showToast("Could not create linked board.", { type: "error" });
+          }
+        }
+      });
+      document.addEventListener("click", async (e) => {
+        const actionBtn = e.target.closest(".home-empty-state-action-btn[data-action]");
+        if (!actionBtn) return;
+        const homeView = document.getElementById("homeView");
+        if (!homeView?.classList.contains("active")) return;
+        const action = actionBtn.dataset.action;
         if (action === "scratch") {
           try {
             await createNewProject();
