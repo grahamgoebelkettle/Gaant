@@ -4327,10 +4327,12 @@
       <h2 class="landing-title">Choose how to store your data</h2>
       <p class="landing-subtitle">Pick one option to get started. You can continue with full editing in all modes.</p>
       <div class="landing-options">
+        <!-- GITHUB_STORAGE_DISABLED: restore to re-enable GitHub storage option on landing
         <button type="button" class="landing-option" id="landingOptionGitHub">
           Sync with GitHub
           <div class="landing-option-desc">Load and push a gantt-data.json file to a GitHub repo. Share with others and keep a remote backup.</div>
         </button>
+        -->
         <button type="button" class="landing-option" id="landingOptionSupabase">
           Save to Supabase (cloud)
           <div class="landing-option-desc">Cloud save with login. Boards sync across devices.</div>
@@ -4707,6 +4709,7 @@
             <label>Where data is stored</label>
             <div class="storage-type-picker" role="group" aria-label="Storage type">
               <div class="storage-type-tiles" id="storageTypeTiles">
+                <!-- GITHUB_STORAGE_DISABLED: restore to re-enable GitHub sync tile in Settings > Storage
                 <div class="storage-type-tile" data-value="github" role="button" tabindex="0">
                   <div class="storage-type-tile-heading">
                     <span class="storage-type-tile-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 7.5h-.15A4.5 4.5 0 1 0 7.5 16.5h9a4.5 4.5 0 1 0-.15-9h-.15M12 12v9m0-9l3 3m-3-3l-3 3"/></svg></span>
@@ -4747,6 +4750,7 @@
                     <div class="storage-github-error" id="storageGitHubError" role="alert"></div>
                   </div>
                 </div>
+                -->
                 <div class="storage-type-tile" data-value="supabase" role="button" tabindex="0">
                   <div class="storage-type-tile-heading">
                     <span class="storage-type-tile-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg></span>
@@ -4952,7 +4956,6 @@
       } catch (e) {}
     }
     const SHARED_FILE_POLL_MS = 30000;
-    const EXAMPLE_SHARED_FILE_URL = "https://raw.githubusercontent.com/grahamgoebelkettle/Gaant/main/gantt-data.json";
     function getCustomPalettesKey() {
       return "gantt-custom-palettes-" + (currentProjectId || "default");
     }
@@ -9431,6 +9434,7 @@
           var prevMode = typeof getStorageMode === "function" ? getStorageMode() : null;
           var prevUrl, prevToken;
           try { prevUrl = localStorage.getItem(SHARED_FILE_URL_KEY); prevToken = localStorage.getItem(GITHUB_TOKEN_KEY); } catch (e) {}
+          /* GITHUB_STORAGE_DISABLED: restore this block to re-enable saving GitHub as selected storage
           if (selectedType === "github") {
             if (prevMode === "supabase" && window.ganttStorage?.signOut) { window.ganttStorage.signOut().catch(function () {}); }
             var urlEl = document.getElementById("sharedFileUrl");
@@ -9446,7 +9450,8 @@
             if (typeof handleRoute === "function") handleRoute();
             if (typeof window.__doLoadFromStoredUrl === "function") window.__doLoadFromStoredUrl();
             else if (typeof window.__fetchSharedUpdates === "function") window.__fetchSharedUpdates();
-          } else if (selectedType === "supabase") {
+          } else */
+          if (selectedType === "supabase") {
             setStorageMode("supabase");
             if (typeof applyStorageModeUI === "function") applyStorageModeUI("supabase");
           } else if (selectedType === "local_storage" || selectedType === "local_cache") {
@@ -9590,6 +9595,7 @@
         var prevMode = typeof getStorageMode === "function" ? getStorageMode() : null;
         var prevUrl, prevToken;
         try { prevUrl = localStorage.getItem(SHARED_FILE_URL_KEY); prevToken = localStorage.getItem(GITHUB_TOKEN_KEY); } catch (e) {}
+        /* GITHUB_STORAGE_DISABLED: restore this block to re-enable saving GitHub as selected storage
         if (selectedType === "github") {
           if (prevMode === "supabase" && window.ganttStorage?.signOut) { window.ganttStorage.signOut().catch(function () {}); }
           var urlEl = document.getElementById("sharedFileUrl");
@@ -9605,7 +9611,8 @@
           if (typeof handleRoute === "function") handleRoute();
           if (typeof window.__doLoadFromStoredUrl === "function") window.__doLoadFromStoredUrl();
           else if (typeof window.__fetchSharedUpdates === "function") window.__fetchSharedUpdates();
-        } else if (selectedType === "supabase") {
+        } else */
+        if (selectedType === "supabase") {
           setStorageMode("supabase");
           if (typeof applyStorageModeUI === "function") applyStorageModeUI("supabase");
         } else if (selectedType === "local_storage" || selectedType === "local_cache") {
@@ -11445,6 +11452,8 @@
     }
 
     function applyStorageModeUI(mode) {
+      /* GITHUB_STORAGE_DISABLED: treat github as local_storage so shared file section is not shown */
+      if (mode === "github") mode = "local_storage";
       var sec = document.getElementById("sharedFileSection");
       var backupSec = document.getElementById("localBackupSection");
       var storageBtn = document.getElementById("homeSettingsBtn");
@@ -11539,8 +11548,9 @@
           if (panel) panel.classList.add("active");
           if (tabId === "tasks" && typeof updateAutoPopulateSectionVisibility === "function") updateAutoPopulateSectionVisibility();
           if (tabId === "storage" && typeof window.switchStorageType === "function") {
-            var mode = typeof getStorageMode === "function" ? getStorageMode() : "github";
-            var type = (window.ganttStorage?.isCloudEnabled && window.ganttStorage.isCloudEnabled()) ? "supabase" : (mode === "local_cache" ? "local_cache" : (mode === "local_storage" ? "local_storage" : "github"));
+            /* GITHUB_STORAGE_DISABLED: default to local_storage instead of github */
+            var mode = typeof getStorageMode === "function" ? getStorageMode() : "local_storage";
+            var type = (window.ganttStorage?.isCloudEnabled && window.ganttStorage.isCloudEnabled()) ? "supabase" : (mode === "local_cache" ? "local_cache" : (mode === "local_storage" || mode === "github" ? "local_storage" : "github"));
             window.switchStorageType(type);
           }
           if (tabId === "function") {
@@ -11560,22 +11570,26 @@
       (function setupStorageTypePicker() {
         var tiles = document.querySelectorAll(".storage-type-tile");
         function getCurrentStorageType() {
-          var mode = getStorageMode() || "github";
+          /* GITHUB_STORAGE_DISABLED: default to local_storage instead of github */
+          var mode = getStorageMode() || "local_storage";
           if (window.ganttStorage?.isCloudEnabled && window.ganttStorage.isCloudEnabled()) return "supabase";
-          return mode;
+          return (mode === "github" ? "local_storage" : mode);
         }
         function switchStorageType(type) {
           tiles.forEach(function (t) {
             t.classList.toggle("selected", t.dataset.value === type);
           });
           if (type === "local_storage" && typeof initLocalBackupHandlers === "function") initLocalBackupHandlers();
+          /* GITHUB_STORAGE_DISABLED: commented out so GitHub tab is not inited
           if (type === "github") {
             if (typeof initSharedFile === "function") initSharedFile();
             if (typeof updateModalStatus === "function") updateModalStatus();
           }
+          */
         }
         window.switchStorageTab = function (tab) {
-          if (tab === "external") switchStorageType("github");
+          /* GITHUB_STORAGE_DISABLED: "external" now selects supabase or local_storage, not github */
+          if (tab === "external") switchStorageType(window.ganttStorage?.isCloudEnabled?.() ? "supabase" : "local_storage");
           else if (tab === "local") switchStorageType(getStorageMode() === "local_cache" ? "local_cache" : "local_storage");
         };
         window.switchStorageType = switchStorageType;
@@ -11648,6 +11662,10 @@
       var landingView = document.getElementById("landingView");
       var homeViewEl = document.getElementById("homeView");
       var ganttViewEl = document.getElementById("ganttView");
+      // Restore Supabase session from storage so refresh doesn't kick user out (e.g. in Cursor browser)
+      if (window.ganttStorage?.isCloudEnabled() && typeof window.ganttStorage.ensureSessionRestored === "function") {
+        await window.ganttStorage.ensureSessionRestored();
+      }
       if (!getStorageMode() && window.ganttStorage?.isCloudEnabled()) {
         var existingSession = await window.ganttStorage.getSession();
         if (existingSession) {
@@ -11655,12 +11673,15 @@
         }
       }
       try {
+        /* GITHUB_STORAGE_DISABLED: do not auto-select github when shared file URL is set
         if (!getStorageMode() && (localStorage.getItem(SHARED_FILE_URL_KEY) || "").trim()) setStorageMode("github");
+        */
       } catch (e) {}
       if (!getStorageMode()) {
         if (landingView) landingView.classList.add("active");
         if (homeViewEl) homeViewEl.classList.remove("active");
         if (ganttViewEl) ganttViewEl.classList.remove("active");
+        /* GITHUB_STORAGE_DISABLED: landing GitHub option is commented out in HTML; handler restored when re-enabling
         document.getElementById("landingOptionGitHub")?.addEventListener("click", function () {
           setStorageMode("github");
           if (landingView) landingView.classList.remove("active");
@@ -11673,6 +11694,7 @@
           var openBtn = document.getElementById("sharedFileOpenModal");
           if (openBtn) openBtn.click();
         });
+        */
         document.getElementById("landingOptionSupabase")?.addEventListener("click", function () {
           setStorageMode("supabase");
           if (landingView) landingView.classList.remove("active");
@@ -11738,7 +11760,7 @@
         var closeModalBtn = document.getElementById("sharedFileModalClose");
         var tokenInput = document.getElementById("sharedFileGitHubToken");
         try {
-          if (urlInput) urlInput.value = localStorage.getItem(SHARED_FILE_URL_KEY) || EXAMPLE_SHARED_FILE_URL;
+          if (urlInput) urlInput.value = localStorage.getItem(SHARED_FILE_URL_KEY) || "";
         } catch (e) {}
         function getSharedFileStatus(url) {
           var u = (url && url.trim()) || "";
@@ -11848,9 +11870,10 @@
         }
         function openSharedFileModal() {
           if (typeof window.openStorageModal === "function") window.openStorageModal();
-          if (window.switchStorageTab) window.switchStorageTab("github");
+          /* GITHUB_STORAGE_DISABLED: open to external (supabase or local_storage) instead of github */
+          if (window.switchStorageTab) window.switchStorageTab("external");
           try {
-            if (urlInput) urlInput.value = localStorage.getItem(SHARED_FILE_URL_KEY) || EXAMPLE_SHARED_FILE_URL;
+            if (urlInput) urlInput.value = localStorage.getItem(SHARED_FILE_URL_KEY) || "";
             if (tokenInput) tokenInput.value = localStorage.getItem(GITHUB_TOKEN_KEY) || "";
           } catch (e) {}
           updateModalStatus();
@@ -12565,7 +12588,8 @@
         });
       })();
       await handleRoute();
-      if (getStorageMode() === "github" || getStorageMode() === "supabase") initSharedFile();
+      /* GITHUB_STORAGE_DISABLED: only init shared file UI for Supabase; restore "|| getStorageMode() === \"github\"" to re-enable */
+      if (getStorageMode() === "supabase") initSharedFile();
       if (typeof window.updateWriteAccessUI === "function") window.updateWriteAccessUI();
       if (typeof window.__doLoadFromStoredUrl === "function") window.__doLoadFromStoredUrl();
       else if (typeof window.__fetchSharedUpdates === "function") window.__fetchSharedUpdates();
