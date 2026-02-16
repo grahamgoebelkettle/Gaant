@@ -4103,6 +4103,21 @@
       height: 100%;
       object-fit: cover;
     }
+    .collaborators-avatar-bar-invite {
+      margin-left: auto;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--color-general-primary);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-family: inherit;
+    }
+    .collaborators-avatar-bar-invite:hover {
+      background: var(--bg-hover);
+    }
     .gantt-wrapper {
       display: flex;
       flex-direction: column;
@@ -4341,6 +4356,7 @@
     <div class="collaborators-avatar-bar" id="collaboratorsAvatarBar" style="display:none" aria-label="Collaborators on this board">
       <span class="collaborators-avatar-bar-label">Working on this board:</span>
       <div class="collaborators-avatar-list" id="collaboratorsAvatarList"></div>
+      <button type="button" class="collaborators-avatar-bar-invite" id="collaboratorsInviteBtn" style="display:none">Invite</button>
     </div>
     <header class="page-header">
       <div class="page-header-title-wrap">
@@ -5434,7 +5450,7 @@
       }
     }
 
-    function updateCollaboratorsAvatarBar(presenceState) {
+    function updateCollaboratorsAvatarBar(presenceState, fallbackCurrentUser) {
       const bar = document.getElementById("collaboratorsAvatarBar");
       const list = document.getElementById("collaboratorsAvatarList");
       if (!bar || !list) return;
@@ -5451,11 +5467,18 @@
           });
         });
       }
+      if (users.length === 0 && fallbackCurrentUser) {
+        users.push(fallbackCurrentUser);
+      }
       if (users.length === 0) {
         bar.style.display = "none";
+        var inviteBtn = document.getElementById("collaboratorsInviteBtn");
+        if (inviteBtn) inviteBtn.style.display = "none";
         return;
       }
       bar.style.display = "flex";
+      var inviteBtn = document.getElementById("collaboratorsInviteBtn");
+      if (inviteBtn) inviteBtn.style.display = (typeof window.hasWriteAccess === "function" && window.hasWriteAccess()) ? "" : "none";
       list.innerHTML = users.map((u) => {
         const title = (u.email || "Collaborator").replace(/"/g, "&quot;");
         const safeUrl = (u.avatar_url && typeof u.avatar_url === "string" && u.avatar_url.startsWith("https://")) ? u.avatar_url.replace(/"/g, "&quot;") : null;
@@ -10062,6 +10085,16 @@
             } : undefined
           );
         }
+        if (showPresence) {
+          var session = await window.ganttStorage.getSession();
+          if (session && session.user) {
+            var u = session.user;
+            var email = u.email || "";
+            var parts = (email.split("@")[0] || "").match(/[a-zA-Z]+/g) || [];
+            var initials = ((parts[0]?.[0] || "") + (parts[1]?.[0] || parts[0]?.[1] || "") || "?").toUpperCase();
+            updateCollaboratorsAvatarBar(null, { user_id: u.id, email: email, initials: initials, avatar_url: u.user_metadata?.avatar_url || u.user_metadata?.picture || null });
+          }
+        }
       }
       const sameProject = currentProjectId === id;
       currentProjectId = id;
@@ -11388,7 +11421,9 @@
           if (!currentProjectId || !window.ganttStorage?.isCloudEnabled()) return;
           var result = await window.ganttStorage.createBoardInviteLink(currentProjectId, 168);
           if (result && result.error) {
-            if (typeof showToast === "function") showToast(result.error.message || "Could not create link", { type: "error" });
+            var msg = result.error && result.error.message ? result.error.message : (result.error && typeof result.error === "string" ? result.error : "Could not create link");
+            if (msg === "not_owner") msg = "Only the board owner can invite people.";
+            if (typeof showToast === "function") showToast(msg, { type: "error" });
             return;
           }
           var base = (typeof location !== "undefined" && location.origin) ? location.origin + (location.pathname || "") : "";
@@ -11413,6 +11448,9 @@
         });
         overlay?.addEventListener("click", function (e) {
           if (e.target === overlay) overlay.style.display = "none";
+        });
+        document.getElementById("collaboratorsInviteBtn")?.addEventListener("click", function () {
+          document.getElementById("shareBoardBtn")?.click();
         });
       })();
       document.getElementById("settingsCancel")?.addEventListener("click", closeSettingsModal);
@@ -12455,7 +12493,7 @@
         });
       })();
       await handleRoute();
-      if (getStorageMode() === "github") initSharedFile();
+      if (getStorageMode() === "github" || getStorageMode() === "supabase") initSharedFile();
       if (typeof window.updateWriteAccessUI === "function") window.updateWriteAccessUI();
       if (typeof window.__doLoadFromStoredUrl === "function") window.__doLoadFromStoredUrl();
       else if (typeof window.__fetchSharedUpdates === "function") window.__fetchSharedUpdates();
