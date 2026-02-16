@@ -12122,21 +12122,35 @@
           if (typeof showToast === "function") showToast("Log in to create shared boards that sync in realtime.", { type: "error" });
           return;
         }
+        let session = null;
+        try {
+          session = await window.ganttStorage.getSession();
+        } catch (e) {}
+        if (!session) {
+          if (typeof showToast === "function") showToast("Session expired or not logged in. Please log in again.", { type: "error" });
+          if (typeof window.openGanttAuthModal === "function") window.openGanttAuthModal();
+          return;
+        }
         const name = getUniqueProjectName("Shared Board");
         let newId;
         try {
           newId = await window.ganttStorage.createBoard(name);
         } catch (err) {
-          if (typeof showToast === "function") showToast("Could not create shared board. Try again or log out and back in.", { type: "error" });
+          if (typeof showToast === "function") showToast("Could not create shared board. If you were logged out, try logging in again (Settings → Clear saved session if login fails).", { type: "error" });
           return;
         }
         if (newId) {
-          ensureProjectInList(newId, name);
-          location.hash = "#/project/" + newId;
-          if (typeof handleRoute === "function") handleRoute();
-          if (typeof showToast === "function") showToast("Shared board created. Use the Share button (↑) to invite collaborators.");
+          try {
+            ensureProjectInList(newId, name);
+            location.hash = "#/project/" + newId;
+            if (typeof handleRoute === "function") await handleRoute();
+            if (typeof showToast === "function") showToast("Shared board created. Use the Share button (↑) to invite collaborators.");
+          } catch (navErr) {
+            if (typeof showToast === "function") showToast("Board created but navigation failed. Open it from your boards list.", { type: "error" });
+            if (typeof renderHomeView === "function") renderHomeView();
+          }
         } else {
-          if (typeof showToast === "function") showToast("Could not create shared board. Check connection or try logging out and back in.", { type: "error" });
+          if (typeof showToast === "function") showToast("Could not create shared board. Try logging in again (Settings → Storage → Clear saved session if needed).", { type: "error" });
         }
       }
       async function createNewProject() {
