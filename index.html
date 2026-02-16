@@ -4665,8 +4665,7 @@
 
   <!-- Load config from config.js (copy config.example.js to config.js and add your Supabase URL + anon key) -->
   <script src="config.js"></script>
-  <!-- Supabase paused: uncomment the next line to enable cloud save / login -->
-  <!-- <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script> -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="supabase-storage.js"></script>
   <script>
     (function initCustomTooltips() {
@@ -11013,9 +11012,11 @@
       if (testConnBtn && testResultEl) testConnBtn.addEventListener("click", async function () {
         testResultEl.textContent = "Testing…";
         testResultEl.className = "auth-test-result";
-        var cfg = window.ganttStorage && window.ganttStorage.getSavedConfig();
+        var cfg = (configUrlInput?.value?.trim() && configAnonInput?.value?.trim())
+          ? { url: configUrlInput.value.trim(), anonKey: configAnonInput.value.trim() }
+          : (window.ganttStorage && window.ganttStorage.getSavedConfig());
         if (!cfg || !cfg.url || !cfg.anonKey) {
-          testResultEl.textContent = "Save project URL and key first.";
+          testResultEl.textContent = "Enter project URL and key above, or save first.";
           testResultEl.className = "auth-test-result fail";
           return;
         }
