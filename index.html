@@ -6,6 +6,15 @@
   <title>Adjustable Gantt Chart</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    /* TEMPORARY: test font TT Norms® Pro Regular — replace with production font when final typeface is chosen */
+    @font-face {
+      font-family: 'TT Norms Pro';
+      font-style: normal;
+      font-weight: 400;
+      font-display: swap;
+      src: url('TT Norms Pro Trial 4-000/TTNormsPro-Regular.woff2') format('woff2'),
+           url('TT Norms Pro Trial 4-000/TTNormsPro-Regular.woff') format('woff');
+    }
     :root {
       /* Motion — reusable across pages and elements */
       --motion-duration-fast: 150ms;
@@ -78,6 +87,15 @@
     @media (max-width: 480px) {
       body { padding-left: 8px; padding-right: 8px; overflow-x: hidden; }
     }
+    body.gantt-view-active { padding-left: 0; padding-right: 0; }
+    #ganttView.active { width: 100%; display: flex; flex-direction: column; }
+    #ganttView.active .page-header,
+    #ganttView.active .home-back-link { padding-left: 24px; padding-right: 24px; }
+    #ganttView.active .collaborators-avatar-bar { padding-left: 24px; padding-right: 24px; }
+    /* TEMPORARY: headers use TT Norms Pro (test font) */
+    h1, h2 {
+      font-family: 'TT Norms Pro', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    }
     h1 {
       font-size: 32px;
       font-weight: 400;
@@ -97,9 +115,11 @@
       background: var(--bg-surface);
       border-radius: 8px;
       box-shadow: var(--shadow-sm);
-      overflow: auto;
+      overflow: hidden;
       flex: 1;
       min-height: 0;
+      min-width: 0;
+      width: 100%;
       container-type: inline-size;
       container-name: gantt;
       display: flex;
@@ -108,6 +128,7 @@
     .gantt-grid {
       display: flex;
       flex-direction: column;
+      width: 100%;
     }
     .gantt-cell {
       padding: 10px 8px;
@@ -129,17 +150,17 @@
       background-color: var(--row-bg-default, #ffffff);
     }
     .gantt-header .gantt-cell:nth-child(1) {
-      background-color: transparent;
+      background-color: var(--bg-subtle, #f5f5f5);
     }
     .phase-header-row > .phase-header-cell:first-child {
       position: sticky;
       left: 0;
       z-index: 10002;
-      background-color: var(--bg-subtle, #f5f5f5);
+      background-color: transparent;
     }
     .gantt-header {
-      background: transparent;
-      color: #ffffff;
+      background: var(--bg-subtle, #f5f5f5);
+      color: var(--text-primary, #171717);
       font-weight: 600;
       font-size: 12px;
       letter-spacing: -0.01em;
@@ -147,7 +168,11 @@
     }
     .gantt-header .gantt-cell {
       border-color: var(--border-subtle);
-      color: #ffffff;
+      color: var(--text-primary, #171717);
+      visibility: visible;
+    }
+    .gantt-header .gantt-cell.week-label {
+      color: var(--text-secondary, #525252);
     }
     .gantt-header .gantt-cell:nth-child(2),
     .gantt-header .gantt-cell:nth-child(3),
@@ -157,6 +182,9 @@
     }
     /* Week divider lines only in table body, not in date header */
     .gantt-header .gantt-cell:nth-child(n+6) { border-right: none; }
+    #ganttHeaderRow.gantt-header {
+      grid-template-columns: 200px 100px 140px 120px 88px repeat(var(--gantt-weeks, 8), var(--gantt-week-width, 1fr));
+    }
     .gantt-row {
       display: grid;
       grid-template-columns: 200px 100px 140px 120px 88px repeat(var(--gantt-weeks, 8), var(--gantt-week-width, 1fr));
@@ -1379,9 +1407,10 @@
       }
       .home-readonly-badge:hover { background: var(--bg-hover); }
     }
-    .week-label { 
+    .week-label {
       font-weight: 500;
-      color: var(--text-secondary);
+      color: var(--text-secondary, #525252);
+      visibility: visible;
     }
     .gantt-phase-cell {
       display: flex;
@@ -2393,30 +2422,59 @@
     }
     .chart-controls select:focus { outline: none; border-color: var(--color-general-primary); }
     .gantt-header-sticky {
+      position: sticky;
+      top: 0;
+      z-index: 10;
       flex-shrink: 0;
       display: flex;
       flex-direction: column;
+      min-height: 0;
+      width: 100%;
+      background: var(--bg-surface, #fff);
+    }
+    .gantt-header-sticky .gantt-header {
+      flex-shrink: 0;
+      min-height: 40px;
+      visibility: visible;
+      display: grid;
     }
     .phase-header-row {
       display: grid;
-      grid-template-columns: 200px 140px 120px 88px repeat(var(--gantt-weeks, 8), var(--gantt-week-width, 1fr));
+      grid-template-columns: 200px 100px 140px 120px 88px repeat(var(--gantt-weeks, 8), var(--gantt-week-width, 1fr));
       width: 100%;
+      min-height: 44px;
       border-bottom: 1px solid var(--border-default);
       flex-shrink: 0;
     }
     .phase-header-timeline {
-      grid-column: 5 / -1;
+      grid-column: 6 / -1;
       display: flex;
       position: relative;
       z-index: 2;
     }
+    .phase-header-timeline-dynamic {
+      display: block;
+    }
+    .phase-header-timeline-dynamic .phase-header-cell-dynamic {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      box-sizing: border-box;
+      min-width: 0;
+    }
     .phase-header-cell {
-      padding: 12px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 10px 12px;
       font-size: 12px;
       font-weight: 600;
+      line-height: 1.25;
       text-align: center;
       color: var(--text-primary);
       border-right: 1px solid rgba(0,0,0,0.06);
+      box-sizing: border-box;
     }
     @media (prefers-color-scheme: dark) {
       .phase-header-cell {
@@ -2783,18 +2841,16 @@
       .gantt-header-sticky .phase-header-row {
         display: none !important;
       }
-      .gantt-row {
+      .gantt-row:not(.gantt-header) {
         grid-template-columns: minmax(0, 1fr) minmax(72px, max-content);
         min-width: 0;
         max-width: 100%;
-      }
-      .gantt-row:not(.gantt-header) {
         min-height: 52px;
       }
-      .gantt-row .gantt-cell:nth-child(n+3) {
+      .gantt-row:not(.gantt-header) .gantt-cell:nth-child(n+3) {
         display: none !important;
       }
-      .gantt-row .gantt-cell:first-child {
+      .gantt-row:not(.gantt-header) .gantt-cell:first-child {
         grid-column: 1;
         min-width: 0;
         max-width: 100%;
@@ -2802,8 +2858,8 @@
         overflow: visible;
         padding: 14px 10px;
       }
-      .gantt-row .gantt-cell:nth-child(2),
-      .gantt-row .gantt-status-cell {
+      .gantt-row:not(.gantt-header) .gantt-cell:nth-child(2),
+      .gantt-row:not(.gantt-header) .gantt-status-cell {
         display: flex !important;
         grid-column: 2;
         align-items: center;
@@ -2876,14 +2932,14 @@
       }
     }
     @media (max-width: 768px) {
-      .gantt-row {
+      .gantt-row:not(.gantt-header) {
         grid-template-columns: minmax(0, 1fr) minmax(72px, max-content);
       }
-      .gantt-row .gantt-cell:nth-child(n+3) {
+      .gantt-row:not(.gantt-header) .gantt-cell:nth-child(n+3) {
         display: none !important;
       }
-      .gantt-row .gantt-cell:nth-child(2),
-      .gantt-row .gantt-status-cell {
+      .gantt-row:not(.gantt-header) .gantt-cell:nth-child(2),
+      .gantt-row:not(.gantt-header) .gantt-status-cell {
         display: flex !important;
         grid-column: 2;
       }
@@ -4212,17 +4268,32 @@
       display: flex;
       flex-direction: column;
       min-height: 0;
+      overflow: hidden;
+    }
+    .gantt-chart-scroll {
+      flex: 1 1 0;
+      min-height: 0;
+      min-width: 0;
+      width: 100%;
       overflow: auto;
+      display: flex;
+      flex-direction: column;
     }
     .gantt-wrapper .gantt-grid {
       flex: 1 0 auto;
       min-height: 0;
+      min-width: 100%;
+      width: 100%;
+    }
+    .gantt-wrapper:has(#ganttEmptyState:not(.hidden)) .gantt-chart-scroll {
+      flex: 0 0 auto;
     }
     .gantt-wrapper:has(#ganttEmptyState:not(.hidden)) .gantt-grid {
       flex: 0 0 auto;
     }
     @media (max-width: 480px) {
       .gantt-wrapper { overflow: visible; flex: 0 1 auto; }
+      .gantt-chart-scroll { overflow: visible; flex: 0 1 auto; }
       .gantt-wrapper .gantt-grid { flex: 0 1 auto; }
     }
     .gantt-empty-state {
@@ -4545,7 +4616,7 @@
   </div>
   <div class="gantt-drag-guide" id="ganttDragGuide" aria-hidden="true"></div>
   <div class="gantt-wrapper" id="ganttWrapper">
-    <div class="gantt-grid" id="ganttGrid">
+    <div class="gantt-chart-scroll" id="ganttChartScroll">
       <div class="gantt-header-sticky">
         <!-- Phase header: dynamic spans based on task duration (populated by JS) -->
         <div class="phase-header-row" id="phaseHeaderRow"></div>
@@ -4559,8 +4630,10 @@
           <!-- Week labels populated by JS -->
         </div>
       </div>
-      <svg class="gantt-dependency-line gantt-all-dependency-lines" id="ganttAllDependencyLines" aria-hidden="true"></svg>
-      <!-- Data rows populated by JS -->
+      <div class="gantt-grid" id="ganttGrid">
+        <svg class="gantt-dependency-line gantt-all-dependency-lines" id="ganttAllDependencyLines" aria-hidden="true"></svg>
+        <!-- Data rows populated by JS -->
+      </div>
     </div>
     <div class="gantt-empty-state hidden" id="ganttEmptyState" aria-live="polite">
       <span class="empty-title">No tasks yet</span>
@@ -4573,6 +4646,10 @@
         <button type="button" class="btn-empty-primary" id="ganttEmptyPopulate">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0 1 18 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.25m-8.25-3 1.5 1.5 3-3.75"/></svg>
           Add sample tasks
+        </button>
+        <button type="button" class="btn-empty-secondary" id="ganttEmptyExcelSync">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 8.25H7.5a2.25 2.25 0 0 0-2.25 2.25v9a2.25 2.25 0 0 0 2.25 2.25h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25H15M9 12l3 3m0 0 3-3m-3 3V2.25"/></svg>
+          Excel sync
         </button>
       </div>
     </div>
@@ -4716,6 +4793,14 @@
               </div>
               <small class="settings-hint">When enabled, dependent tasks can have their own start date and phase instead of following the parent. The link remains for tracking; dates are not auto-adjusted.</small>
             </div>
+            <div class="settings-toggle-row" style="margin-top: 12px;">
+              <label for="settingsLinkAllTasks" class="settings-toggle-label">Link all tasks</label>
+              <label class="settings-toggle-switch" aria-hidden="true">
+                <input type="checkbox" id="settingsLinkAllTasks">
+                <span class="settings-toggle-slider"></span>
+              </label>
+            </div>
+            <small class="settings-hint">When enabled, every task depends on the one before it (first task has no dependency). The board stays dynamic: moving one task shifts the rest. Turn off to clear all dependency links.</small>
           </div>
           <div class="settings-section">
             <div class="settings-toggle-row" data-tooltip="When enabled (fixed phases only), increasing a phase's sprint count will shift later tasks so they stay after the extended phase.">
@@ -5554,6 +5639,14 @@
       }
     }
 
+    function applyLinkAllTasks() {
+      if (!Array.isArray(tasks)) return;
+      tasks.forEach((t, i) => { t.dependsOn = i === 0 ? null : i - 1; });
+    }
+    function clearAllTaskDependencies() {
+      if (!Array.isArray(tasks)) return;
+      tasks.forEach(t => { t.dependsOn = null; });
+    }
     function saveTasks() {
       if (typeof window.hasWriteAccess === "function" && !window.hasWriteAccess()) return;
       const toSave = tasks.map(t => ({
@@ -5561,6 +5654,7 @@
         phase: t.phase,
         phaseSecondary: t.phaseSecondary || null,
         party: t.party,
+        status: t.status || "Not started",
         start: t.start,
         end: t.end,
         startDate: t.startDate ? t.startDate.toISOString() : null,
@@ -5664,6 +5758,7 @@
         phase: t.phase,
         phaseSecondary: t.phaseSecondary || null,
         party: t.party,
+        status: t.status || "Not started",
         start: t.start,
         end: t.end,
         startDate: t.startDate ? t.startDate.toISOString() : null,
@@ -8311,6 +8406,16 @@
       return Math.max(1, Math.floor((maxEnd - minStart) / WEEK_MS) + 1);
     }
 
+    /** In dynamic mode: week offset (from chart start) where this phase's tasks start. Used to align phase header bar with timeline. */
+    function getPhaseStartWeekOffsetForDisplay(phaseId) {
+      const s = loadProjectSettings();
+      if (s?.phaseDurationMode !== "dynamic") return null;
+      const phaseTasks = tasks.filter(t => t.phase === phaseId && t.startDate && t.endDate);
+      if (phaseTasks.length === 0) return 0;
+      const offsets = phaseTasks.map(t => dateToOffset(t.startDate));
+      return Math.max(0, Math.min(...offsets));
+    }
+
     function getPhaseDateRange(phaseIndex, baseDate) {
       if (phaseIndex < 0 || phaseIndex >= PHASES.length) return null;
       const startWeekOffset = getPhaseStartWeekOffset(phaseIndex);
@@ -8322,17 +8427,32 @@
 
     function renderPhaseHeaders() {
       if (PHASES.length === 0) {
-        const html = '<div class="phase-header-cell" style="grid-column:1/span 4"></div><div class="phase-header-timeline"><div class="phase-header-cell phase-header-empty" style="flex:1;background:var(--bg-hover);color:var(--text-tertiary);font-size:12px;">Add phases in Board settings</div></div>';
+        const html = '<div class="phase-header-cell" style="grid-column:1/span 5"></div><div class="phase-header-timeline"><div class="phase-header-cell phase-header-empty" style="flex:1;background:var(--bg-hover);color:var(--text-tertiary);font-size:12px;">Add phases in Board settings</div></div>';
         document.getElementById("phaseHeaderRow").innerHTML = html;
         return;
       }
-      const spans = PHASES.map(p => getPhaseWeekSpan(p.id));
-      const phaseCells = PHASES.map((p, i) => {
-        const borderColor = getContrastColor(p.color);
-        return '<div class="phase-header-cell" data-phase-id="' + p.id + '" style="flex:' + spans[i] + ';background:' + p.color + ';color:' + borderColor + '">' + p.name + '</div>';
-      }).join("");
-      const html = '<div class="phase-header-cell" style="grid-column:1/span 4"></div>' +
-        '<div class="phase-header-timeline">' + phaseCells + '</div>';
+      const s = loadProjectSettings();
+      const isDynamic = s?.phaseDurationMode === "dynamic";
+      let phaseCells;
+      if (isDynamic && typeof WEEKS === "number" && WEEKS > 0) {
+        phaseCells = PHASES.map((p, i) => {
+          const borderColor = getContrastColor(p.color);
+          const startOffset = getPhaseStartWeekOffsetForDisplay(p.id);
+          const spanWeeks = getPhaseWeekSpan(p.id);
+          const leftPct = Math.max(0, (startOffset / WEEKS) * 100);
+          const widthPct = Math.min(100 - leftPct, (spanWeeks / WEEKS) * 100);
+          return '<div class="phase-header-cell phase-header-cell-dynamic" data-phase-id="' + p.id + '" style="left:' + leftPct + '%;width:' + widthPct + '%;background:' + p.color + ';color:' + borderColor + '">' + p.name + '</div>';
+        }).join("");
+      } else {
+        const spans = PHASES.map(p => getPhaseWeekSpan(p.id));
+        phaseCells = PHASES.map((p, i) => {
+          const borderColor = getContrastColor(p.color);
+          return '<div class="phase-header-cell" data-phase-id="' + p.id + '" style="flex:' + spans[i] + ';background:' + p.color + ';color:' + borderColor + '">' + p.name + '</div>';
+        }).join("");
+      }
+      const timelineClass = "phase-header-timeline" + (isDynamic ? " phase-header-timeline-dynamic" : "");
+      const html = '<div class="phase-header-cell" style="grid-column:1/span 5"></div>' +
+        '<div class="' + timelineClass + '">' + phaseCells + '</div>';
       document.getElementById("phaseHeaderRow").innerHTML = html;
       
       // Add hover listeners to phase headers
@@ -8607,6 +8727,14 @@
           inp.addEventListener("blur", () => {
             const v = inp.value.trim();
             t.party = v || "Unassigned";
+            if (v) {
+              const s = loadProjectSettings() || {};
+              const list = Array.isArray(s.responsibleParties) ? s.responsibleParties : [];
+              if (list.indexOf(v) === -1) {
+                list.push(v);
+                saveProjectSettings({ ...s, responsibleParties: list });
+              }
+            }
             partyCell.replaceChild(createPartyDropdown(t), inp);
             saveTasks();
           });
@@ -8935,33 +9063,49 @@
       const wrapper = document.querySelector(".gantt-wrapper");
       const gridEl = document.getElementById("ganttGrid");
       if (!wrapper || !gridEl) return;
+      const scrollEl = document.getElementById("ganttChartScroll");
+      const ganttView = document.getElementById("ganttView");
       const visibleWeeks = getVisibleWeeks();
       const containerWidth = wrapper.offsetWidth || wrapper.parentElement?.offsetWidth || 1200;
       const weekWidth = Math.max(48, (containerWidth - LEFT_COLS) / visibleWeeks);
       wrapper.style.setProperty("--gantt-weeks", WEEKS);
       wrapper.style.setProperty("--gantt-week-width", weekWidth + "px");
-      gridEl.style.minWidth = (LEFT_COLS + WEEKS * weekWidth) + "px";
+      const minContentWidth = (LEFT_COLS + WEEKS * weekWidth) + "px";
+      gridEl.style.minWidth = minContentWidth;
+      const headerSticky = wrapper.querySelector(".gantt-header-sticky");
+      if (headerSticky) headerSticky.style.minWidth = minContentWidth;
+      // #region agent log
+      requestAnimationFrame(function() {
+        var bodyStyle = document.body && window.getComputedStyle(document.body);
+        var bodyPaddingLeft = bodyStyle ? parseInt(bodyStyle.paddingLeft, 10) || 0 : 0;
+        var bodyPaddingRight = bodyStyle ? parseInt(bodyStyle.paddingRight, 10) || 0 : 0;
+        fetch('http://127.0.0.1:7245/ingest/dd0ecab6-6439-4f49-9fa5-d5cd82409225',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'template.html:updateWeekWidth',message:'layout dimensions',data:{wrapperWidth:wrapper?wrapper.offsetWidth:null,ganttViewWidth:ganttView?ganttView.offsetWidth:null,scrollElClientWidth:scrollEl?scrollEl.clientWidth:null,scrollElScrollWidth:scrollEl?scrollEl.scrollWidth:null,gridOffsetWidth:gridEl?gridEl.offsetWidth:null,bodyPaddingLeft:bodyPaddingLeft,bodyPaddingRight:bodyPaddingRight,windowInnerWidth:window.innerWidth,containerWidthUsed:containerWidth},timestamp:Date.now(),hypothesisId:'H1-H5'})}).catch(function(){});
+      });
+      // #endregion
     }
 
     let scrollSaveTid = null;
     function saveScrollPosition() {
-      const wrapper = document.querySelector(".gantt-wrapper");
-      if (!wrapper) return;
+      const scrollEl = document.getElementById("ganttChartScroll");
+      if (!scrollEl) return;
       const s = loadProjectSettings() || {};
-      saveProjectSettings({ ...s, scrollPosition: { scrollTop: wrapper.scrollTop, scrollLeft: wrapper.scrollLeft } });
+      saveProjectSettings({ ...s, scrollPosition: { scrollTop: scrollEl.scrollTop, scrollLeft: scrollEl.scrollLeft } });
     }
     function restoreScrollPosition() {
-      const wrapper = document.querySelector(".gantt-wrapper");
+      const scrollEl = document.getElementById("ganttChartScroll");
       const pos = loadProjectSettings()?.scrollPosition;
-      if (!wrapper || !pos || typeof pos.scrollTop !== "number" || typeof pos.scrollLeft !== "number") return;
-      wrapper.scrollTop = Math.max(0, pos.scrollTop);
-      wrapper.scrollLeft = Math.max(0, pos.scrollLeft);
+      if (!scrollEl || !pos || typeof pos.scrollTop !== "number" || typeof pos.scrollLeft !== "number") return;
+      scrollEl.scrollTop = Math.max(0, pos.scrollTop);
+      scrollEl.scrollLeft = Math.max(0, pos.scrollLeft);
     }
 
     function updateChartRange() {
       computeChartRange();
       const wrapper = document.querySelector(".gantt-wrapper");
       if (wrapper) wrapper.style.setProperty("--gantt-weeks", WEEKS);
+      // #region agent log
+      fetch('http://127.0.0.1:7245/ingest/dd0ecab6-6439-4f49-9fa5-d5cd82409225',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'template.html:updateChartRange',message:'after set --gantt-weeks',data:{WEEKS:typeof WEEKS!=='undefined'?WEEKS:null,wrapperExists:!!wrapper},timestamp:Date.now(),hypothesisId:'H4'})}).catch(()=>{});
+      // #endregion
       updateWeekWidth();
       renderWeekLabels();
       renderPhaseHeaders();
@@ -9205,6 +9349,9 @@
 
     function renderWeekLabels() {
       const headerRow = document.getElementById("ganttHeaderRow");
+      // #region agent log
+      fetch('http://127.0.0.1:7245/ingest/dd0ecab6-6439-4f49-9fa5-d5cd82409225',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'template.html:renderWeekLabels',message:'renderWeekLabels entry',data:{headerRowExists:!!headerRow,WEEKS:typeof WEEKS!=='undefined'?WEEKS:null,WEEK_START:typeof WEEK_START!=='undefined'&&WEEK_START?WEEK_START.toISOString():null},timestamp:Date.now(),hypothesisId:'H1-H2'})}).catch(()=>{});
+      // #endregion
       if (!headerRow) return;
       const existing = headerRow.querySelectorAll(".week-label, .gantt-header-delete-cell");
       existing.forEach(el => el.remove());
@@ -9218,6 +9365,15 @@
       const deletePlaceholder = document.createElement("div");
       deletePlaceholder.className = "gantt-cell gantt-header-delete-cell";
       headerRow.appendChild(deletePlaceholder);
+      // #region agent log
+      (function(){
+        var r=headerRow.getBoundingClientRect();
+        var weekLabels=headerRow.querySelectorAll(".week-label");
+        var wrapper=document.querySelector(".gantt-wrapper");
+        var ganttWeeks=wrapper?window.getComputedStyle(wrapper).getPropertyValue("--gantt-weeks").trim():null;
+        fetch('http://127.0.0.1:7245/ingest/dd0ecab6-6439-4f49-9fa5-d5cd82409225',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'template.html:renderWeekLabels:exit',message:'after week labels rendered',data:{weekLabelCount:weekLabels.length,headerRect:{top:r.top,left:r.left,width:r.width,height:r.height},ganttWeeksCSS:ganttWeeks,headerDisplay:window.getComputedStyle(headerRow).display,headerVisibility:window.getComputedStyle(headerRow).visibility},timestamp:Date.now(),hypothesisId:'H2-H5'})}).catch(()=>{});
+      })();
+      // #endregion
     }
 
     function applyRowAppearance() {
@@ -9387,6 +9543,8 @@
       if (moveTasksEl) moveTasksEl.checked = !!s?.moveTasksWhenSprintExtended;
       const indepEl = document.getElementById("settingsIndependentDependencies");
       if (indepEl) indepEl.checked = !!s?.allowIndependentDependencies;
+      const linkAllEl = document.getElementById("settingsLinkAllTasks");
+      if (linkAllEl) linkAllEl.checked = !!s?.linkAllTasks;
       const dependentTriggerEl = document.getElementById("settingsDependentTrigger");
       if (dependentTriggerEl) dependentTriggerEl.disabled = !!indepEl?.checked;
       const showDurationEl = document.getElementById("settingsShowDurationOnBar");
@@ -9747,16 +9905,25 @@
       const rowAppearance = document.getElementById("settingsRowAppearance")?.value || "default";
       const barStyleSelected = document.querySelector("#settingsBarStyle .settings-segmented-option.selected");
       const strokeMode = barStyleSelected?.dataset.value === "stroke";
+      const s = loadProjectSettings() || {};
+      /* Capture project start/end from form or existing settings before any other saves (e.g. saveTasks after link-all-tasks) so they are not overwritten. */
       const projectStartDateRaw = document.getElementById("settingsProjectStartDate")?.value?.trim();
-      const projectStartDate = projectStartDateRaw || null;
+      const projectStartDate = projectStartDateRaw ? projectStartDateRaw : (s.projectStartDate || null);
       const projectEndDateRaw = document.getElementById("settingsProjectEndDate")?.value?.trim();
-      const projectEndDate = projectEndDateRaw || null;
+      const projectEndDate = projectEndDateRaw ? projectEndDateRaw : (s.projectEndDate || null);
       const phaseDurationMode = document.getElementById("settingsPhaseDurationMode")?.value === "fixed" ? "fixed" : "dynamic";
       const snapToSprint = !!document.getElementById("settingsSnapToSprint")?.checked;
       const moveTasksWhenSprintExtended = !!document.getElementById("settingsMoveTasksWhenSprintExtended")?.checked;
       const allowIndependentDependencies = !!document.getElementById("settingsIndependentDependencies")?.checked;
+      const linkAllTasks = !!document.getElementById("settingsLinkAllTasks")?.checked;
       const showDurationOnBar = !!document.getElementById("settingsShowDurationOnBar")?.checked;
-      const s = loadProjectSettings() || {};
+      if (linkAllTasks && typeof applyLinkAllTasks === "function") {
+        applyLinkAllTasks();
+        if (typeof saveTasks === "function") saveTasks();
+      } else if (!linkAllTasks && typeof clearAllTaskDependencies === "function") {
+        clearAllTaskDependencies();
+        if (typeof saveTasks === "function") saveTasks();
+      }
       // When project start date changes, shift all tasks by the same delta so they stay relative to phases
       const oldProjectStart = getProjectStartDate();
       const newProjectStart = (function() {
@@ -9833,7 +10000,7 @@
         const spans = partyListContainer.querySelectorAll(".settings-party-item span");
         responsibleParties = [...spans].map(function(sp) { return (sp.textContent || "").trim(); }).filter(Boolean);
       }
-      saveProjectSettings({ ...s, title, description: desc, phases, paletteIndex, dependencyGapDays, rowAppearance, strokeMode, showDurationOnBar, projectStartDate, projectEndDate, phaseDurationMode, snapToSprint, moveTasksWhenSprintExtended, allowIndependentDependencies, responsibleParties, emptyStateDismissed: true });
+      saveProjectSettings({ ...s, title, description: desc, phases, paletteIndex, dependencyGapDays, rowAppearance, strokeMode, showDurationOnBar, projectStartDate, projectEndDate, phaseDurationMode, snapToSprint, moveTasksWhenSprintExtended, allowIndependentDependencies, linkAllTasks, responsibleParties, emptyStateDismissed: true });
       if (currentProjectId) ensureProjectInList(currentProjectId, title);
       applyRowAppearance();
       if (typeof updateEmptyState === "function") updateEmptyState();
@@ -10117,8 +10284,10 @@
         const emptyIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>';
         const linkedIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"/></svg>';
         const sharedIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z"/></svg>';
+        const excelIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 8.25H7.5a2.25 2.25 0 0 0-2.25 2.25v9a2.25 2.25 0 0 0 2.25 2.25h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25H15M9 12l3 3m0 0 3-3m-3 3V2.25"/></svg>';
         const sharedBtn = (canWrite && cloudEnabled) ? '<button type="button" class="home-empty-state-action-btn" data-action="shared" aria-label="Shared board"><span class="home-empty-state-action-icon" aria-hidden="true">' + sharedIcon + '</span><span class="home-empty-state-action-text"><span class="home-empty-state-action-label">Shared</span><span class="home-empty-state-action-desc">Collaborate in realtime with your team</span></span></button>' : '';
-        const actionBtns = canWrite ? '<div class="home-empty-state-actions"><button type="button" class="home-empty-state-action-btn" data-action="scratch" aria-label="Empty board"><span class="home-empty-state-action-icon" aria-hidden="true">' + emptyIcon + '</span><span class="home-empty-state-action-text"><span class="home-empty-state-action-label">Empty</span><span class="home-empty-state-action-desc">Blank canvas for your project</span></span></button>' + sharedBtn + '<button type="button" class="home-empty-state-action-btn" data-action="linked" aria-label="Linked board"><span class="home-empty-state-action-icon" aria-hidden="true">' + linkedIcon + '</span><span class="home-empty-state-action-text"><span class="home-empty-state-action-label">Linked</span><span class="home-empty-state-action-desc">Start with some connected tasks</span></span></button></div>' : "";
+        const excelBtn = '<button type="button" class="home-empty-state-action-btn" data-action="excel" aria-label="Excel sync"><span class="home-empty-state-action-icon" aria-hidden="true">' + excelIcon + '</span><span class="home-empty-state-action-text"><span class="home-empty-state-action-label">Excel sync</span><span class="home-empty-state-action-desc">Import from spreadsheet to jumpstart timeline</span></span></button>';
+        const actionBtns = canWrite ? '<div class="home-empty-state-actions"><button type="button" class="home-empty-state-action-btn" data-action="scratch" aria-label="Empty board"><span class="home-empty-state-action-icon" aria-hidden="true">' + emptyIcon + '</span><span class="home-empty-state-action-text"><span class="home-empty-state-action-label">Empty</span><span class="home-empty-state-action-desc">Blank canvas for your project</span></span></button>' + sharedBtn + '<button type="button" class="home-empty-state-action-btn" data-action="linked" aria-label="Linked board"><span class="home-empty-state-action-icon" aria-hidden="true">' + linkedIcon + '</span><span class="home-empty-state-action-text"><span class="home-empty-state-action-label">Linked</span><span class="home-empty-state-action-desc">Start with some connected tasks</span></span></button>' + excelBtn + '</div>' : "";
         emptyWrap.innerHTML = '<div class="home-empty-state-visual"><span class="home-empty-state-bar bar-1" aria-hidden="true"></span><span class="home-empty-state-bar bar-2" aria-hidden="true"></span><span class="home-empty-state-bar bar-3" aria-hidden="true"></span><span class="home-empty-state-bar bar-4" aria-hidden="true"></span><div class="home-empty-state-line" aria-hidden="true"></div></div><h2 class="home-empty-state-title">You don\'t have any boards</h2><p class="home-empty-state-subtitle">Create your first one to start tracking</p>' + actionBtns;
         listEl.appendChild(emptyWrap);
         return;
@@ -10373,6 +10542,7 @@
           requestAnimationFrame(() => {
             if (homeView) homeView.classList.add("active");
             if (ganttView) ganttView.classList.remove("active");
+            if (document.body) document.body.classList.remove("gantt-view-active");
           });
         });
         return;
@@ -10398,10 +10568,16 @@
       ensureProjectInList(id);
       if (homeView) homeView.classList.remove("active");
       if (ganttView) ganttView.classList.add("active");
+      if (document.body) document.body.classList.add("gantt-view-active");
       if (!sameProject) initGantt();
       if (window.ganttStorage?.isCloudEnabled()) {
         await window.ganttStorage.ensureBoardDataLoaded(id);
         tasks = loadTasks();
+        const linkAllSetting = (typeof loadProjectSettings === "function" && loadProjectSettings())?.linkAllTasks;
+        if (linkAllSetting && typeof applyLinkAllTasks === "function") {
+          applyLinkAllTasks();
+          if (typeof saveTasks === "function") saveTasks();
+        }
         if (typeof updateEmptyState === "function") updateEmptyState();
         if (typeof updateChartRange === "function") updateChartRange();
         const showPresence = UUID_REGEX.test(id);
@@ -10672,6 +10848,11 @@
       document.body.appendChild(addBtn);
       tasks = loadTasks();
       addedPlaceholderThisSession = false;
+      const linkAll = (typeof loadProjectSettings === "function" && loadProjectSettings())?.linkAllTasks;
+      if (linkAll && typeof applyLinkAllTasks === "function") {
+        applyLinkAllTasks();
+        if (typeof saveTasks === "function") saveTasks();
+      }
       if (typeof computeChartRange === "function") computeChartRange();
       tasks.forEach((_, i) => { if (tasks.some(t => t.dependsOn === i)) propagateDependencyChanges(i); });
       if (tasks.some(function (t) { return t.dependsOn != null; }) && typeof showLinkedTasksToast === "function") showLinkedTasksToast();
@@ -10680,6 +10861,8 @@
       if (emptyConfigureBtn) emptyConfigureBtn.onclick = openSettingsModal;
       const emptyPopulateBtn = document.getElementById("ganttEmptyPopulate");
       if (emptyPopulateBtn) emptyPopulateBtn.onclick = runSamplePopulate;
+      const emptyExcelBtn = document.getElementById("ganttEmptyExcelSync");
+      if (emptyExcelBtn) emptyExcelBtn.onclick = function () { if (window.openExcelSyncModal) window.openExcelSyncModal(); else if (typeof openExcelSyncModal === "function") openExcelSyncModal(); };
       const viewSelect = document.getElementById("viewMode");
       if (viewSelect) {
         const saved = getSavedView();
@@ -11934,6 +12117,7 @@
         if (landingView) landingView.classList.add("active");
         if (homeViewEl) homeViewEl.classList.remove("active");
         if (ganttViewEl) ganttViewEl.classList.remove("active");
+        if (document.body) document.body.classList.remove("gantt-view-active");
         document.getElementById("landingOptionGitHub")?.addEventListener("click", function () {
           setStorageMode("github");
           if (landingView) landingView.classList.remove("active");
@@ -12705,33 +12889,129 @@
         });
       }
       function smartMapColumns(headers) {
-        var normalized = headers.map(function (h) { return (h == null ? "" : String(h)).toLowerCase().replace(/\s+/g, " ").trim(); });
-        var map = { task: null, start: null, end: null, party: null, phase: null };
+        if (!headers) return { task: 0, start: null, end: null, party: null, phase: null, status: null };
+        var normalized = headers.map(function (h) {
+          if (h instanceof Date) return "";
+          return (h == null ? "" : String(h)).toLowerCase().replace(/\s+/g, " ").trim();
+        });
+        var map = { task: null, start: null, end: null, party: null, phase: null, status: null };
+        /* Reference layout: Col A = Phase, B = Task, C = Status, D = Start date, E = (e.g. Duration), F = End date. Mapping is by header text. */
         var taskPatterns = ["task", "name", "title", "activity", "item", "description", "work package", "wbs", "summary"];
         var startPatterns = ["start", "begin", "from", "planned start", "start date", "started", "baseline start"];
         var endPatterns = ["end", "finish", "to", "due", "deadline", "planned end", "end date", "completed", "finish date", "target end"];
         var partyPatterns = ["assignee", "owner", "responsible", "person", "team", "who", "resource", "member"];
-        var phasePatterns = ["phase", "status", "stage", "category", "state", "type", "priority"];
+        var phasePatterns = ["phase", "stage", "category", "milestone"];
+        var statusPatterns = ["status", "state", "progress", "completion", "stats"];
+        function headerMatches(n, patterns) {
+          if (!n) return false;
+          for (var p = 0; p < patterns.length; p++) {
+            if (n.indexOf(patterns[p]) !== -1 || patterns[p].indexOf(n) !== -1) return true;
+          }
+          return false;
+        }
         function bestMatch(patterns) {
           for (var i = 0; i < normalized.length; i++) {
-            var n = normalized[i];
-            if (!n) continue;
-            for (var p = 0; p < patterns.length; p++) {
-              if (n.indexOf(patterns[p]) !== -1 || patterns[p].indexOf(n) !== -1) return i;
-            }
+            if (headerMatches(normalized[i], patterns)) return i;
           }
           return null;
         }
-        map.task = bestMatch(taskPatterns);
-        map.start = bestMatch(startPatterns);
-        map.end = bestMatch(endPatterns);
-        map.party = bestMatch(partyPatterns);
-        map.party = map.party !== null ? map.party : (map.task !== 0 ? 0 : null);
-        map.phase = bestMatch(phasePatterns);
+        for (var i = 0; i < normalized.length; i++) {
+          var n = normalized[i];
+          if (!n) continue;
+          if (map.phase === null && headerMatches(n, phasePatterns)) map.phase = i;
+          else if (map.task === null && headerMatches(n, taskPatterns)) map.task = i;
+          else if (map.status === null && headerMatches(n, statusPatterns)) map.status = i;
+          else if (map.start === null && headerMatches(n, startPatterns)) map.start = i;
+          else if (map.end === null && headerMatches(n, endPatterns)) map.end = i;
+          else if (map.party === null && headerMatches(n, partyPatterns)) map.party = i;
+        }
+        if (map.phase === null) map.phase = bestMatch(phasePatterns);
+        if (map.task === null) map.task = bestMatch(taskPatterns);
+        if (map.status === null) map.status = bestMatch(statusPatterns);
+        if (map.start === null) map.start = bestMatch(startPatterns);
+        if (map.end === null) map.end = bestMatch(endPatterns);
+        if (map.party === null) map.party = bestMatch(partyPatterns);
+        /* Do not fallback party to column 0 — if no assignee column is detected, leave null so rows get "Unassigned" and phase content is not used as team member. */
         if (map.task === null && headers.length > 0) map.task = 0;
         return map;
       }
+      function normalizeExcelStatus(val) {
+        if (val == null || val === "") return "Not started";
+        var s = String(val).trim().toLowerCase();
+        if (s === "complete" || s === "completed" || s === "done" || s === "finished") return "Done";
+        if (s === "in progress" || s === "in-progress" || s === "inprogress") return "In progress";
+        if (s === "blocked") return "Blocked";
+        if (s === "not started" || s === "pending") return "Not started";
+        return "Not started";
+      }
+      function scoreHeaderRow(candidateHeaders) {
+        var normalized = candidateHeaders.map(function (h) { return (h == null ? "" : String(h)).toLowerCase().replace(/\s+/g, " ").trim(); });
+        var map = smartMapColumns(candidateHeaders);
+        var score = 0;
+        if (map.task != null) score += 2;
+        if (map.start != null) score += 1;
+        if (map.end != null) score += 1;
+        if (map.phase != null) score += 1;
+        if (map.status != null) score += 1;
+        if (map.party != null) score += 1;
+        var refPhase = normalized[0] && (normalized[0].indexOf("phase") !== -1 || normalized[0].indexOf("stage") !== -1);
+        var refTask = normalized[1] && (normalized[1].indexOf("task") !== -1 || normalized[1].indexOf("name") !== -1 || normalized[1].indexOf("title") !== -1);
+        var refStatus = normalized[2] && (normalized[2].indexOf("status") !== -1 || normalized[2].indexOf("state") !== -1 || normalized[2].indexOf("stats") !== -1);
+        var refStart = normalized[3] && (normalized[3].indexOf("start") !== -1 || normalized[3].indexOf("begin") !== -1);
+        var refEnd = (normalized[4] && (normalized[4].indexOf("end") !== -1 || normalized[4].indexOf("finish") !== -1)) || (normalized[5] && (normalized[5].indexOf("end") !== -1 || normalized[5].indexOf("finish") !== -1));
+        if (refPhase && refTask && (refStatus || refStart)) score += 4;
+        return score;
+      }
+      function detectExcelHeaderRow(aoa) {
+        var maxScore = 0;
+        var bestRow = 0;
+        var maxRowsToTry = Math.min(15, aoa.length - 1);
+        for (var r = 0; r <= maxRowsToTry; r++) {
+          var row = aoa[r];
+          if (!row || !row.length) continue;
+          var headers = row.map(function (c) { return c != null ? String(c).trim() : ""; });
+          var score = scoreHeaderRow(headers);
+          if (score > maxScore) {
+            maxScore = score;
+            bestRow = r;
+          }
+        }
+        return bestRow;
+      }
       var EXCEL_PHASE_COLORS = ["#EAB308", "#0D9488", "#0284C7", "#14B8A6", "#6366F1", "#F97316", "#E11D48", "#7C3AED"];
+      function isExcelDateLike(val) {
+        if (val == null || val === "") return false;
+        if (val instanceof Date) return true;
+        if (typeof val === "number" && val > 1000) return true;
+        var s = String(val).trim();
+        if (/^(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\s/i.test(s)) return true;
+        if (/^\d{4}-\d{2}-\d{2}/.test(s) || /^\d{1,2}\/\d{1,2}\/\d{4}/.test(s)) return true;
+        if (/^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{1,2}/i.test(s)) return true;
+        return false;
+      }
+      function isExcelTaskRow(row, columnMap) {
+        if (columnMap.task == null) return true;
+        var cell = row[columnMap.task];
+        if (cell instanceof Date) return false;
+        if (cell == null || cell === "") return true;
+        var s = String(cell).trim();
+        if (!s) return true;
+        if (isExcelDateLike(cell)) return false;
+        if (/^[MTWFS]$/i.test(s) || s === "TH" || /^[MTWTFSS]\s*$/i.test(s)) return false;
+        return true;
+      }
+      function excelCellEmpty(val) {
+        if (val == null || val === "") return true;
+        if (typeof val === "string" && val.trim() === "") return true;
+        return false;
+      }
+      function isExcelRowEmpty(row, columnMap) {
+        var taskEmpty = columnMap.task == null || excelCellEmpty(row[columnMap.task]);
+        var phaseEmpty = columnMap.phase == null || excelCellEmpty(row[columnMap.phase]);
+        var startEmpty = columnMap.start == null || excelCellEmpty(row[columnMap.start]);
+        var endEmpty = columnMap.end == null || excelCellEmpty(row[columnMap.end]);
+        return taskEmpty && phaseEmpty && startEmpty && endEmpty;
+      }
       function buildPhasesFromExcelRows(rows, columnMap) {
         var phaseCol = columnMap.phase;
         var seen = {};
@@ -12739,6 +13019,7 @@
         if (phaseCol != null && rows.length > 0) {
           for (var r = 0; r < rows.length; r++) {
             var val = rows[r][phaseCol];
+            if (val instanceof Date || isExcelDateLike(val)) continue;
             var name = (val != null && val !== "") ? String(val).trim() : "";
             if (name && !seen[name.toLowerCase()]) {
               seen[name.toLowerCase()] = true;
@@ -12770,38 +13051,89 @@
         if (m) return new Date(parseInt(m[3], 10), parseInt(m[1], 10) - 1, parseInt(m[2], 10));
         m = s.match(/^(\d{1,2})-(\d{1,2})-(\d{4})/);
         if (m) return new Date(parseInt(m[3], 10), parseInt(m[2], 10) - 1, parseInt(m[1], 10));
+        m = s.match(/^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+(\d{1,2})(?:\s|$|,)/i);
+        if (m) {
+          var months = { jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11 };
+          var mon = months[m[1].toLowerCase().substring(0, 3)];
+          var day = parseInt(m[2], 10);
+          var year = (baseDate && baseDate.getFullYear) ? baseDate.getFullYear() : new Date().getFullYear();
+          return new Date(year, mon, day);
+        }
         var parsed = Date.parse(s);
         return isNaN(parsed) ? null : new Date(parsed);
       }
       function excelRowsToTasks(rows, columnMap, phases) {
-        var baseDate = new Date();
+        var today = new Date();
+        today.setHours(0, 0, 0, 0);
+        var fileMinDate = null;
+        var fileMaxDate = null;
+        var fileYear = null;
+        for (var r = 0; r < rows.length; r++) {
+          if (typeof isExcelTaskRow === "function" && !isExcelTaskRow(rows[r], columnMap)) continue;
+          if (typeof isExcelRowEmpty === "function" && isExcelRowEmpty(rows[r], columnMap)) continue;
+          var s = columnMap.start != null ? parseExcelDate(rows[r][columnMap.start], today) : null;
+          var e = columnMap.end != null ? parseExcelDate(rows[r][columnMap.end], today) : null;
+          if (s) { fileMinDate = fileMinDate == null ? s : (s < fileMinDate ? s : fileMinDate); fileMaxDate = fileMaxDate == null ? s : (s > fileMaxDate ? s : fileMaxDate); if (fileYear == null) fileYear = s.getFullYear(); }
+          if (e) { fileMinDate = fileMinDate == null ? e : (e < fileMinDate ? e : fileMinDate); fileMaxDate = fileMaxDate == null ? e : (e > fileMaxDate ? e : fileMaxDate); if (fileYear == null) fileYear = e.getFullYear(); }
+        }
+        var baseDate = (fileMinDate && fileMinDate.getTime()) ? new Date(fileMinDate.getTime()) : new Date(today.getTime());
         baseDate.setHours(0, 0, 0, 0);
-        var phaseIds = phases.map(function (p) { return p.id; });
+        if (fileYear != null) baseDate.setFullYear(fileYear);
         var phaseByName = {};
         phases.forEach(function (p) { phaseByName[p.name.toLowerCase().trim()] = p.id; });
-        return rows.map(function (row, idx) {
-          var taskName = (columnMap.task != null && row[columnMap.task] != null) ? String(row[columnMap.task]).trim() : "";
-          if (!taskName) taskName = "Task " + (idx + 1);
+        var lastPhaseId = (phases[0] && phases[0].id) || "discovery";
+        var taskIndex = 0;
+        var defaultStart = fileMinDate ? new Date(fileMinDate.getTime()) : new Date(today.getTime());
+        defaultStart.setHours(0, 0, 0, 0);
+        return rows.reduce(function (acc, row, idx) {
+          if (typeof isExcelTaskRow === "function" && !isExcelTaskRow(row, columnMap)) return acc;
+          if (typeof isExcelRowEmpty === "function" && isExcelRowEmpty(row, columnMap)) return acc;
+          taskIndex += 1;
+          var rawTask = columnMap.task != null ? row[columnMap.task] : null;
+          var taskName = (rawTask != null && !(rawTask instanceof Date)) ? String(rawTask).trim() : "";
+          if (isExcelDateLike(taskName)) taskName = "";
+          if (!taskName) taskName = "Task " + taskIndex;
           var startDate = columnMap.start != null ? parseExcelDate(row[columnMap.start], baseDate) : null;
           var endDate = columnMap.end != null ? parseExcelDate(row[columnMap.end], baseDate) : null;
           if (!startDate && endDate) startDate = new Date(endDate.getTime());
           if (startDate && !endDate) endDate = new Date(startDate.getTime() + 7 * 24 * 60 * 60 * 1000);
           if (!startDate) {
-            startDate = new Date(baseDate.getTime() + idx * 7 * 24 * 60 * 60 * 1000);
+            startDate = new Date(defaultStart.getTime() + (acc.length * 7) * 24 * 60 * 60 * 1000);
             endDate = new Date(startDate.getTime() + 7 * 24 * 60 * 60 * 1000 - 1);
           }
-          var party = (columnMap.party != null && row[columnMap.party] != null) ? String(row[columnMap.party]).trim() : "Unassigned";
-          var phaseVal = (columnMap.phase != null && row[columnMap.phase] != null) ? String(row[columnMap.phase]).trim() : "";
-          var phaseId = phaseByName[phaseVal.toLowerCase()] || (phases[0] && phases[0].id) || "discovery";
+          var phaseValCell = columnMap.phase != null ? row[columnMap.phase] : null;
+          if (phaseValCell instanceof Date || isExcelDateLike(phaseValCell)) phaseValCell = null;
+          var phaseVal = (phaseValCell != null && phaseValCell !== "") ? String(phaseValCell).trim() : "";
+          var rawParty = (columnMap.party != null && row[columnMap.party] != null) ? String(row[columnMap.party]).trim() : "";
+          /* Never use phase content as team member: if party value matches this row's phase or any known phase name, treat as empty. */
+          var party = "Unassigned";
+          if (rawParty) {
+            var rawLower = rawParty.toLowerCase();
+            var isPhaseName = phaseVal && rawLower === phaseVal.toLowerCase();
+            if (!isPhaseName && phases.length) {
+              for (var pi = 0; pi < phases.length; pi++) {
+                if (phases[pi].name && rawLower === String(phases[pi].name).trim().toLowerCase()) { isPhaseName = true; break; }
+              }
+            }
+            if (!isPhaseName) party = rawParty;
+          }
+          if (phaseVal) {
+            var resolved = phaseByName[phaseVal.toLowerCase()];
+            if (resolved) lastPhaseId = resolved;
+          }
+          var phaseId = phaseVal ? (phaseByName[phaseVal.toLowerCase()] || lastPhaseId) : lastPhaseId;
+          var statusVal = (columnMap.status != null && row[columnMap.status] != null) ? String(row[columnMap.status]).trim() : "";
+          var status = typeof normalizeExcelStatus === "function" ? normalizeExcelStatus(statusVal) : "Not started";
           startDate.setHours(0, 0, 0, 0);
           endDate.setHours(23, 59, 59, 999);
           var startStr = (startDate.getMonth() + 1) + "/" + startDate.getDate();
           var endStr = (endDate.getMonth() + 1) + "/" + endDate.getDate();
-          return {
+          acc.push({
             task: taskName,
             phase: phaseId,
             phaseSecondary: null,
             party: party,
+            status: status,
             start: startStr,
             end: endStr,
             startDate: startDate.toISOString(),
@@ -12812,16 +13144,48 @@
             blockers: [],
             links: [],
             dependsOn: null
-          };
-        });
+          });
+          return acc;
+        }, []);
+      }
+      function toYYYYMMDDFromTask(dateVal) {
+        if (!dateVal) return null;
+        var d = typeof dateVal === "string" ? new Date(dateVal) : dateVal;
+        if (isNaN(d.getTime())) return null;
+        var y = d.getFullYear();
+        var m = String(d.getMonth() + 1).padStart(2, "0");
+        var day = String(d.getDate()).padStart(2, "0");
+        return y + "-" + m + "-" + day;
       }
       async function createNewBoardFromExcel(toSave, phasesFromExcel, boardNameFromFile) {
-        if (typeof window.hasWriteAccess === "function" && !window.hasWriteAccess()) return;
+        if (typeof window.hasWriteAccess === "function" && !window.hasWriteAccess()) return null;
         var defaultPhases = phasesFromExcel && phasesFromExcel.length > 0
           ? phasesFromExcel.map(function (p) { return { id: p.id, name: p.name, color: p.color || "#737373", sprints: p.sprints != null ? p.sprints : 2 }; })
           : (typeof DEFAULT_PHASES !== "undefined" ? DEFAULT_PHASES : []).map(function (p) { return { id: p.id, name: p.name, color: p.color || "#737373", sprints: 2 }; });
         if (defaultPhases.length === 0) defaultPhases = [{ id: "discovery", name: "Discovery", color: "#EAB308", sprints: 2 }];
         var baseName = (boardNameFromFile && String(boardNameFromFile).trim()) ? String(boardNameFromFile).trim().replace(/\.(xlsx|xls|csv)$/i, "") : "From Excel";
+        var projectStartDate = null;
+        var projectEndDate = null;
+        if (toSave && toSave.length > 0) {
+          var minStart = null;
+          var maxEnd = null;
+          for (var i = 0; i < toSave.length; i++) {
+            var t = toSave[i];
+            if (t.startDate) {
+              var sd = typeof t.startDate === "string" ? new Date(t.startDate) : t.startDate;
+              if (!isNaN(sd.getTime())) { minStart = minStart ? (sd.getTime() < minStart.getTime() ? sd : minStart) : new Date(sd.getTime()); }
+            }
+            if (t.endDate) {
+              var ed = typeof t.endDate === "string" ? new Date(t.endDate) : t.endDate;
+              if (!isNaN(ed.getTime())) { maxEnd = maxEnd ? (ed.getTime() > maxEnd.getTime() ? ed : maxEnd) : new Date(ed.getTime()); }
+            }
+          }
+          projectStartDate = toYYYYMMDDFromTask(minStart);
+          projectEndDate = toYYYYMMDDFromTask(maxEnd);
+        }
+        var initialSettings = { phases: defaultPhases, phaseDurationMode: "dynamic" };
+        if (projectStartDate) initialSettings.projectStartDate = projectStartDate;
+        if (projectEndDate) initialSettings.projectEndDate = projectEndDate;
         if (window.ganttStorage && window.ganttStorage.isCloudEnabled()) {
           var name = getUniqueProjectName(baseName);
           var newId;
@@ -12829,38 +13193,27 @@
             newId = await window.ganttStorage.createBoard(name);
           } catch (err) {
             if (typeof showToast === "function") showToast("Could not create project. Try again or log out and back in.", { type: "error" });
-            return;
+            return null;
           }
           if (newId) {
             try {
               await window.ganttStorage.saveTasks(newId, toSave);
-              if (typeof window.ganttStorage.saveSettings === "function") window.ganttStorage.saveSettings(newId, { phases: defaultPhases });
+              if (typeof window.ganttStorage.saveSettings === "function") window.ganttStorage.saveSettings(newId, initialSettings);
             } catch (e) { console.warn("Could not save tasks:", e); }
             ensureProjectInList(newId, name);
-            homeEditProjectId = newId;
-            renderHomeView();
-            requestAnimationFrame(function () {
-              var card = document.querySelector(".home-project-card.edit-mode");
-              if (card) card.scrollIntoView({ behavior: "smooth", block: "nearest" });
-            });
-          } else {
-            if (typeof showToast === "function") showToast("Could not create project.", { type: "error" });
+            return newId;
           }
-          return;
+          if (typeof showToast === "function") showToast("Could not create project.", { type: "error" });
+          return null;
         }
         var newId = "p-" + Date.now();
         try {
           localStorage.setItem("gantt-tasks-" + newId, JSON.stringify(toSave));
-          localStorage.setItem("gantt-settings-" + newId, JSON.stringify({ phases: defaultPhases }));
+          localStorage.setItem("gantt-settings-" + newId, JSON.stringify(initialSettings));
           if (window.notifySharedDataChanged) window.notifySharedDataChanged();
         } catch (e) { console.warn("Could not save:", e); }
         ensureProjectInList(newId, getUniqueProjectName(baseName));
-        homeEditProjectId = newId;
-        renderHomeView();
-        requestAnimationFrame(function () {
-          var card = document.querySelector(".home-project-card.edit-mode");
-          if (card) card.scrollIntoView({ behavior: "smooth", block: "nearest" });
-        });
+        return newId;
       }
       var excelSyncModalData = { rows: null, headers: null, columnMap: null, fileName: null };
       function openExcelSyncModal() {
@@ -12939,8 +13292,8 @@
                   headers.forEach(function (h, j) { row[j] = cells[j] !== undefined ? cells[j] : ""; });
                   rows.push(row);
                 }
-                excelSyncModalData.headers = headers.map(function (_, i) { return String(i); });
-                excelSyncModalData.rows = rows.map(function (r) { var o = {}; headers.forEach(function (h, i) { o[i] = r[i]; }); return o; });
+                excelSyncModalData.headers = headers.slice();
+                excelSyncModalData.rows = rows;
               } else {
                 if (typeof XLSX === "undefined") { showError("Excel library not loaded. Refresh the page."); return; }
                 wb = XLSX.read(data, { type: "binary", cellDates: true });
@@ -12949,11 +13302,16 @@
                 var sheet = wb.Sheets[firstSheet];
                 var aoa = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
                 if (!aoa.length) { showError("Sheet is empty."); return; }
-                var headers = aoa[0].map(function (c) { return c != null ? String(c) : ""; });
+                var headerRowIndex = typeof detectExcelHeaderRow === "function" ? detectExcelHeaderRow(aoa) : 0;
+                var headerRow = aoa[headerRowIndex];
+                var headers = (headerRow || []).map(function (c) {
+                  if (c instanceof Date) return "";
+                  return c != null ? String(c).trim() : "";
+                });
                 var rows = [];
-                for (var r = 1; r < aoa.length; r++) {
+                for (var r = headerRowIndex + 1; r < aoa.length; r++) {
                   var row = {};
-                  aoa[r].forEach(function (cell, c) { row[c] = cell; });
+                  (aoa[r] || []).forEach(function (cell, c) { row[c] = cell; });
                   rows.push(row);
                 }
                 excelSyncModalData.headers = headers;
@@ -12969,16 +13327,27 @@
               if (map.end != null) parts.push("End \u2192 " + (excelSyncModalData.headers[map.end] || "col " + map.end));
               if (map.party != null) parts.push("Assignee \u2192 " + (excelSyncModalData.headers[map.party] || "col " + map.party));
               if (map.phase != null) parts.push("Phase \u2192 " + (excelSyncModalData.headers[map.phase] || "col " + map.phase));
+              if (map.status != null) parts.push("Status \u2192 " + (excelSyncModalData.headers[map.status] || "col " + map.status));
               if (rowCountEl) rowCountEl.textContent = excelSyncModalData.rows.length;
               if (mappingSummaryEl) mappingSummaryEl.textContent = parts.length ? parts.join("; ") : "Auto-detected.";
               if (previewTable) {
+                var headersForPreview = excelSyncModalData.headers;
+                var numCols = headersForPreview.length;
+                if (numCols === 0 && excelSyncModalData.rows.length > 0 && excelSyncModalData.rows[0]) {
+                  var keys = Object.keys(excelSyncModalData.rows[0]).filter(function (k) { return /^\d+$/.test(k); }).sort(function (a, b) { return parseInt(a, 10) - parseInt(b, 10); });
+                  numCols = keys.length;
+                  headersForPreview = keys.map(function (k) { return "Col " + k; });
+                }
                 var thead = "<tr>";
-                excelSyncModalData.headers.forEach(function (h) { thead += "<th>" + (h != null ? String(h).replace(/</g, "&lt;") : "") + "</th>"; });
+                for (var hi = 0; hi < numCols; hi++) {
+                  var h = headersForPreview[hi];
+                  thead += "<th>" + (h != null && h !== "" ? String(h).replace(/</g, "&lt;") : "") + "</th>";
+                }
                 thead += "</tr>";
                 var tbody = "";
                 for (var i = 0; i < Math.min(5, excelSyncModalData.rows.length); i++) {
                   tbody += "<tr>";
-                  for (var j = 0; j < excelSyncModalData.headers.length; j++) {
+                  for (var j = 0; j < numCols; j++) {
                     var cell = excelSyncModalData.rows[i][j];
                     tbody += "<td>" + (cell != null && cell !== "" ? String(cell).replace(/</g, "&lt;").substring(0, 40) : "\u2014") + "</td>";
                   }
@@ -13001,9 +13370,7 @@
             onFileChosen(f);
           });
         }
-        if (document.querySelector(".excel-sync-file-label")) {
-          document.querySelector(".excel-sync-file-label").addEventListener("click", function () { fileInput && fileInput.click(); });
-        }
+        /* Do not add a click handler on the label: the label's for="excelSyncFileInput" already triggers the input once; a second click() would open the file dialog twice. */
         if (chooseAnother) chooseAnother.addEventListener("click", function () {
           stepPreview.style.display = "none";
           stepUpload.style.display = "";
@@ -13017,9 +13384,17 @@
           var toSave = excelRowsToTasks(rows, columnMap, phases);
           var boardName = excelSyncModalData.fileName ? String(excelSyncModalData.fileName).trim().replace(/\.(xlsx|xls|csv)$/i, "").trim() : null;
           try {
-            await createNewBoardFromExcel(toSave, phases, boardName);
+            var newId = await createNewBoardFromExcel(toSave, phases, boardName);
             closeExcelSyncModal();
-            if (typeof showToast === "function") showToast("Board created from Excel.", { type: "success" });
+            if (newId) {
+              if (typeof location !== "undefined") location.hash = "#/project/" + newId;
+              if (typeof handleRoute === "function") await handleRoute();
+              var taskCount = toSave ? toSave.length : 0;
+              var msg = taskCount === 1
+                ? "Board created from Excel. 1 task imported."
+                : "Board created from Excel. " + taskCount + " tasks imported.";
+              if (typeof showToast === "function") showToast(msg, { type: "success" });
+            }
           } catch (err) {
             showError(err && err.message ? err.message : "Could not create board.");
           }
@@ -13155,6 +13530,13 @@
             await createNewSharedBoard();
           } catch (err) {
             if (typeof showToast === "function") showToast("Could not create shared board.", { type: "error" });
+          }
+        } else if (action === "excel") {
+          try {
+            if (window.openExcelSyncModal) window.openExcelSyncModal();
+            else if (typeof openExcelSyncModal === "function") openExcelSyncModal();
+          } catch (err) {
+            if (typeof showToast === "function") showToast("Could not open Excel sync.", { type: "error" });
           }
         }
       });
