@@ -129,7 +129,7 @@
       background-color: var(--row-bg-default, #ffffff);
     }
     .gantt-header .gantt-cell:nth-child(1) {
-      background-color: var(--bg-subtle, #f5f5f5);
+      background-color: transparent;
     }
     .phase-header-row > .phase-header-cell:first-child {
       position: sticky;
@@ -138,8 +138,8 @@
       background-color: var(--bg-subtle, #f5f5f5);
     }
     .gantt-header {
-      background: var(--bg-subtle);
-      color: var(--text-secondary);
+      background: transparent;
+      color: #ffffff;
       font-weight: 600;
       font-size: 12px;
       letter-spacing: -0.01em;
@@ -147,17 +147,19 @@
     }
     .gantt-header .gantt-cell {
       border-color: var(--border-subtle);
+      color: #ffffff;
     }
     .gantt-header .gantt-cell:nth-child(2),
     .gantt-header .gantt-cell:nth-child(3),
-    .gantt-header .gantt-cell:nth-child(4) {
+    .gantt-header .gantt-cell:nth-child(4),
+    .gantt-header .gantt-cell:nth-child(5) {
       text-align: center;
     }
     /* Week divider lines only in table body, not in date header */
-    .gantt-header .gantt-cell:nth-child(n+5) { border-right: none; }
+    .gantt-header .gantt-cell:nth-child(n+6) { border-right: none; }
     .gantt-row {
       display: grid;
-      grid-template-columns: 200px 140px 120px 88px repeat(var(--gantt-weeks, 8), var(--gantt-week-width, 1fr));
+      grid-template-columns: 200px 100px 140px 120px 88px repeat(var(--gantt-weeks, 8), var(--gantt-week-width, 1fr));
       width: 100%;
       min-height: 36px;
       flex-shrink: 0;
@@ -210,13 +212,15 @@
       flex-shrink: 0;
     }
     .gantt-wrapper[data-row-appearance="fill"] .gantt-row:not(.gantt-header) .gantt-phase-cell,
-    .gantt-wrapper[data-row-appearance="fill"] .gantt-row:not(.gantt-header) .gantt-party-cell {
+    .gantt-wrapper[data-row-appearance="fill"] .gantt-row:not(.gantt-header) .gantt-party-cell,
+    .gantt-wrapper[data-row-appearance="fill"] .gantt-row:not(.gantt-header) .gantt-status-cell {
       display: flex;
       align-items: center;
       justify-content: center;
     }
     .gantt-wrapper[data-row-appearance="fill"] .gantt-row:not(.gantt-header) .gantt-phase-cell .gantt-phase-dropdown,
-    .gantt-wrapper[data-row-appearance="fill"] .gantt-row:not(.gantt-header) .gantt-party-cell .gantt-party-dropdown {
+    .gantt-wrapper[data-row-appearance="fill"] .gantt-row:not(.gantt-header) .gantt-party-cell .gantt-party-dropdown,
+    .gantt-wrapper[data-row-appearance="fill"] .gantt-row:not(.gantt-header) .gantt-status-cell .gantt-party-dropdown {
       flex: 1;
       min-height: 0;
     }
@@ -878,6 +882,15 @@
       font-size: 12px;
       user-select: none;
     }
+    .gantt-status-cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-primary);
+      font-size: 13px;
+    }
+    .gantt-status-cell .gantt-party-dropdown { flex: 1; min-width: 0; }
+    .gantt-status-cell .gantt-party-dropdown-trigger { justify-content: center; text-align: center; }
     .gantt-party-cell {
       display: flex;
       align-items: center;
@@ -2790,7 +2803,7 @@
         padding: 14px 10px;
       }
       .gantt-row .gantt-cell:nth-child(2),
-      .gantt-row .gantt-phase-cell {
+      .gantt-row .gantt-status-cell {
         display: flex !important;
         grid-column: 2;
         align-items: center;
@@ -2870,7 +2883,7 @@
         display: none !important;
       }
       .gantt-row .gantt-cell:nth-child(2),
-      .gantt-row .gantt-phase-cell {
+      .gantt-row .gantt-status-cell {
         display: flex !important;
         grid-column: 2;
       }
@@ -3300,6 +3313,20 @@
     .shared-file-modal-token-row .shared-file-input-wrap { margin-bottom: 0; }
     .shared-file-modal .shared-file-modal-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
     .shared-file-modal .shared-file-modal-section { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-default); }
+    .excel-sync-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100010; display: none; align-items: center; justify-content: center; padding: 24px; }
+    .excel-sync-modal-overlay.visible { display: flex; }
+    .excel-sync-modal-overlay .excel-sync-modal { max-height: 85vh; overflow-y: auto; }
+    .excel-sync-step { margin-top: 0; }
+    .excel-sync-file-label { display: inline-flex; align-items: center; justify-content: center; padding: 12px 20px; border: 1px dashed var(--border-strong); border-radius: var(--button-radius); background: var(--bg-subtle); color: var(--text-secondary); cursor: pointer; font-size: 14px; font-weight: 500; transition: border-color var(--motion-duration-fast) var(--motion-easing), background var(--motion-duration-fast) var(--motion-easing); }
+    .excel-sync-file-label:hover { border-color: var(--color-general-primary); background: var(--bg-hover); color: var(--text-primary); }
+    .excel-sync-hint { font-size: 12px; color: var(--text-tertiary); margin: 8px 0 0 0; }
+    .excel-sync-preview-table-wrap { max-height: 200px; overflow: auto; margin: 12px 0; border: 1px solid var(--border-default); border-radius: 6px; }
+    .excel-sync-preview-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .excel-sync-preview-table th, .excel-sync-preview-table td { padding: 6px 10px; text-align: left; border-bottom: 1px solid var(--border-subtle); }
+    .excel-sync-preview-table th { background: var(--bg-subtle); font-weight: 600; color: var(--text-secondary); position: sticky; top: 0; }
+    .excel-sync-preview-table tr:last-child td { border-bottom: none; }
+    .excel-sync-error { margin-top: 12px; padding: 10px 12px; border-radius: 6px; background: #fef2f2; color: #991b1b; font-size: 13px; }
+    @media (prefers-color-scheme: dark) { .excel-sync-error { background: rgba(127,29,29,0.3); color: #fca5a5; } }
     .storage-modal-tabs { display: flex; gap: 0; margin: 0 0 20px 0; border-bottom: 1px solid var(--border-default); }
     .storage-modal-tab { padding: 10px 16px; font-size: 13px; font-weight: 500; color: var(--text-secondary); background: none; border: none; border-bottom: 1px solid transparent; margin-bottom: -1px; cursor: pointer; font-family: inherit; }
     .storage-modal-tab:hover { color: var(--text-primary); }
@@ -4301,7 +4328,7 @@
       <button type="button" class="fab-phase-menu-item fab-phase-menu-item-cloud-only" id="homeNewBoardSharedItem" data-action="shared" role="menuitem" style="display:none"><span class="fab-phase-menu-item-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z"/></svg></span><span class="fab-phase-menu-item-text"><span class="fab-phase-menu-item-label">Shared</span><span class="fab-phase-menu-item-desc">Collaborate in realtime with your team</span></span></button>
       <button type="button" class="fab-phase-menu-item" data-action="linked" role="menuitem"><span class="fab-phase-menu-item-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"/></svg></span><span class="fab-phase-menu-item-text"><span class="fab-phase-menu-item-label">Linked</span><span class="fab-phase-menu-item-desc">Start with some connected tasks</span></span></button>
       <button type="button" class="fab-phase-menu-item fab-phase-menu-item-disabled" data-action="templates" role="menuitem" disabled><span class="fab-phase-menu-item-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"/></svg></span><span class="fab-phase-menu-item-text"><span class="fab-phase-menu-item-label">Templates</span><span class="fab-phase-menu-item-desc">Select from common projects</span></span><span class="fab-phase-menu-badge">soon</span></button>
-      <button type="button" class="fab-phase-menu-item fab-phase-menu-item-disabled" data-action="excel" role="menuitem" disabled><span class="fab-phase-menu-item-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 8.25H7.5a2.25 2.25 0 0 0-2.25 2.25v9a2.25 2.25 0 0 0 2.25 2.25h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25H15M9 12l3 3m0 0 3-3m-3 3V2.25"/></svg></span><span class="fab-phase-menu-item-text"><span class="fab-phase-menu-item-label">Sync</span><span class="fab-phase-menu-item-desc">Upload an excel file</span></span><span class="fab-phase-menu-badge">soon</span></button>
+      <button type="button" class="fab-phase-menu-item" id="homeNewBoardExcelItem" data-action="excel" role="menuitem"><span class="fab-phase-menu-item-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 8.25H7.5a2.25 2.25 0 0 0-2.25 2.25v9a2.25 2.25 0 0 0 2.25 2.25h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25H15M9 12l3 3m0 0 3-3m-3 3V2.25"/></svg></span><span class="fab-phase-menu-item-text"><span class="fab-phase-menu-item-label">Excel sync</span><span class="fab-phase-menu-item-desc">Upload Excel to jumpstart timeline</span></span></button>
     </div>
   </div>
   <div class="app-views-wrap" id="appViewsWrap">
@@ -4347,12 +4374,10 @@
       <h2 class="landing-title">Choose how to store your data</h2>
       <p class="landing-subtitle">Pick one option to get started. You can continue with full editing in all modes.</p>
       <div class="landing-options">
-        <!-- GITHUB_STORAGE_DISABLED: restore to re-enable GitHub storage option on landing
         <button type="button" class="landing-option" id="landingOptionGitHub">
           Sync with GitHub
           <div class="landing-option-desc">Load and push a gantt-data.json file to a GitHub repo. Share with others and keep a remote backup.</div>
         </button>
-        -->
         <button type="button" class="landing-option" id="landingOptionSupabase">
           Save to Supabase (cloud)
           <div class="landing-option-desc">Cloud save with login. Boards sync across devices.</div>
@@ -4482,6 +4507,10 @@
       <span class="gantt-bar-tooltip-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg></span>
       <span class="gantt-bar-tooltip-text"></span>
     </div>
+    <div class="gantt-bar-tooltip-row gantt-bar-tooltip-status">
+      <span class="gantt-bar-tooltip-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>
+      <span class="gantt-bar-tooltip-text"></span>
+    </div>
     <div class="gantt-bar-tooltip-row gantt-bar-tooltip-party">
       <span class="gantt-bar-tooltip-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
       <span class="gantt-bar-tooltip-text"></span>
@@ -4523,6 +4552,7 @@
         <!-- Main header row -->
         <div class="gantt-row gantt-header" id="ganttHeaderRow" style="cursor:default">
           <div class="gantt-cell">Task</div>
+          <div class="gantt-cell">Status</div>
           <div class="gantt-cell">Phase</div>
           <div class="gantt-cell">Responsible</div>
           <div class="gantt-cell">Date</div>
@@ -4729,7 +4759,6 @@
             <label>Where data is stored</label>
             <div class="storage-type-picker" role="group" aria-label="Storage type">
               <div class="storage-type-tiles" id="storageTypeTiles">
-                <!-- GITHUB_STORAGE_DISABLED: restore to re-enable GitHub sync tile in Settings > Storage
                 <div class="storage-type-tile" data-value="github" role="button" tabindex="0">
                   <div class="storage-type-tile-heading">
                     <span class="storage-type-tile-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 7.5h-.15A4.5 4.5 0 1 0 7.5 16.5h9a4.5 4.5 0 1 0-.15-9h-.15M12 12v9m0-9l3 3m-3-3l-3 3"/></svg></span>
@@ -4770,7 +4799,6 @@
                     <div class="storage-github-error" id="storageGitHubError" role="alert"></div>
                   </div>
                 </div>
-                -->
                 <div class="storage-type-tile" data-value="supabase" role="button" tabindex="0">
                   <div class="storage-type-tile-heading">
                     <span class="storage-type-tile-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg></span>
@@ -4867,8 +4895,37 @@
     </div>
   </div>
 
+  <div class="excel-sync-modal-overlay" id="excelSyncModalOverlay" role="dialog" aria-labelledby="excelSyncModalTitle" aria-modal="true" aria-hidden="true">
+    <div class="excel-sync-modal shared-file-modal">
+      <div class="shared-file-modal-header">
+        <h3 id="excelSyncModalTitle">Excel sync</h3>
+        <button type="button" class="shared-file-modal-close" id="excelSyncModalClose" aria-label="Close">&times;</button>
+      </div>
+      <div class="excel-sync-step excel-sync-step-upload" id="excelSyncStepUpload">
+        <p class="storage-modal-panel-desc">Upload an Excel or CSV file. We’ll detect task names, dates, assignees, and phases from column headers — no need for exact names.</p>
+        <label for="excelSyncFileInput" class="excel-sync-file-label">
+          <span class="excel-sync-file-label-inner">Choose file</span>
+          <input type="file" id="excelSyncFileInput" accept=".xlsx,.xls,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv" style="display:none">
+        </label>
+        <p class="excel-sync-hint" id="excelSyncFileHint">.xlsx, .xls, or .csv</p>
+      </div>
+      <div class="excel-sync-step excel-sync-step-preview" id="excelSyncStepPreview" style="display:none">
+        <p class="storage-modal-panel-desc" id="excelSyncPreviewDesc">Found <strong id="excelSyncRowCount">0</strong> rows. Mapped columns: <span id="excelSyncMappingSummary"></span></p>
+        <div class="excel-sync-preview-table-wrap">
+          <table class="excel-sync-preview-table" id="excelSyncPreviewTable" aria-label="Preview of first rows"></table>
+        </div>
+        <div class="shared-file-modal-actions">
+          <button type="button" class="home-shared-file-btn" id="excelSyncChooseAnother">Choose another file</button>
+          <button type="button" class="home-shared-file-open-btn" id="excelSyncCreateBoard">Create board</button>
+        </div>
+      </div>
+      <div class="excel-sync-error" id="excelSyncError" role="alert" style="display:none"></div>
+    </div>
+  </div>
+
   <!-- Load config from config.js (copy config.example.js to config.js and add your Supabase URL + anon key) -->
   <script src="config.js"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="supabase-storage.js"></script>
   <script>
@@ -6263,6 +6320,7 @@
 
     const FIELD_ICONS = {
       overview: '<svg class="field-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>',
+      status: '<svg class="field-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
       tasks: '<svg class="field-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>',
       subTasks: '<svg class="field-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>',
       blockers: '<svg class="field-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
@@ -6402,6 +6460,11 @@
         descRow.innerHTML = "<span class=\"gantt-bar-tooltip-icon\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"/><path d=\"M14 2v6h6\"/><path d=\"M16 13H8\"/><path d=\"M16 17H8\"/><path d=\"M10 9H8\"/></svg></span><span class=\"gantt-bar-tooltip-text\"></span>";
         descRow.querySelector(".gantt-bar-tooltip-text").textContent = (task.overview || "").trim() || "\u2014";
         inner.appendChild(descRow);
+        var statusRow = document.createElement("div");
+        statusRow.className = "gantt-bar-tooltip-row gantt-bar-tooltip-status";
+        statusRow.innerHTML = "<span class=\"gantt-bar-tooltip-icon\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M12 6v6l4 2\"/></svg></span><span class=\"gantt-bar-tooltip-text\"></span>";
+        statusRow.querySelector(".gantt-bar-tooltip-text").textContent = task.status || "Not started";
+        inner.appendChild(statusRow);
         var partyRow = document.createElement("div");
         partyRow.className = "gantt-bar-tooltip-row gantt-bar-tooltip-party";
         partyRow.innerHTML = "<span class=\"gantt-bar-tooltip-icon\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2\"/><circle cx=\"12\" cy=\"7\" r=\"4\"/></svg></span><span class=\"gantt-bar-tooltip-text\"></span>";
@@ -6725,6 +6788,32 @@
       overviewField.appendChild(overviewInput);
       container.appendChild(overviewField);
 
+      const statusField = document.createElement("div");
+      statusField.className = "task-detail-field";
+      statusField.innerHTML = '<label>' + FIELD_ICONS.status + '<span>Status</span></label>';
+      const statusDetailSelect = document.createElement("select");
+      ["Not started", "In progress", "Done", "Blocked"].forEach(opt => {
+        const o = document.createElement("option");
+        o.value = opt;
+        o.textContent = opt;
+        if ((task.status || "Not started") === opt) o.selected = true;
+        statusDetailSelect.appendChild(o);
+      });
+      statusDetailSelect.addEventListener("change", () => {
+        task.status = statusDetailSelect.value;
+        saveTasks();
+        const statusWrap = detailRow?.previousElementSibling?.querySelector(".gantt-status-cell .gantt-party-dropdown");
+        if (statusWrap) {
+          const label = statusWrap.querySelector(".gantt-party-dropdown-trigger span");
+          if (label) label.textContent = task.status;
+          statusWrap.querySelectorAll(".gantt-party-dropdown-option").forEach(o => {
+            o.classList.toggle("selected", o.textContent === task.status);
+          });
+        }
+      });
+      statusField.appendChild(statusDetailSelect);
+      container.appendChild(statusField);
+
       const dependsOnField = document.createElement("div");
       dependsOnField.className = "task-detail-field task-detail-field-depends-on";
       dependsOnField.innerHTML = '<label>' + FIELD_ICONS.dependsOn + '<span>Depends on</span></label>';
@@ -6871,9 +6960,12 @@
       const partyText = partyRow?.querySelector(".gantt-bar-tooltip-text");
       const descRow = tooltipEl.querySelector(".gantt-bar-tooltip-desc");
       const descText = descRow?.querySelector(".gantt-bar-tooltip-text");
+      const statusRow = tooltipEl.querySelector(".gantt-bar-tooltip-status");
+      const statusText = statusRow?.querySelector(".gantt-bar-tooltip-text");
       const datesRow = tooltipEl.querySelector(".gantt-bar-tooltip-dates");
       const datesText = datesRow?.querySelector(".gantt-bar-tooltip-text");
       if (titleEl) titleEl.textContent = (task.star ? "★ " : "") + (task.task || "Task");
+      if (statusRow && statusText) statusText.textContent = task.status || "Not started";
       if (partyRow && partyText) {
         partyText.textContent = task.party || "";
         partyRow.style.display = task.party ? "" : "none";
@@ -7409,6 +7501,18 @@
       }
     }
 
+    function closeAllGanttDropdowns() {
+      document.querySelectorAll(".gantt-phase-dropdown.open").forEach(w => {
+        w.classList.remove("open");
+      });
+      document.querySelectorAll(".gantt-phase-dropdown-list").forEach(list => {
+        if (list.parentNode) list.remove();
+      });
+      document.querySelectorAll(".gantt-party-dropdown.open").forEach(w => {
+        w.classList.remove("open");
+      });
+    }
+
     function createPhaseSelect(task, bar, phaseDotEl, taskIndex) {
       const wrap = document.createElement("div");
       wrap.className = "gantt-phase-dropdown-wrap";
@@ -7498,10 +7602,12 @@
           if (id === sid) o.classList.add("phase-secondary");
         });
       }
+      wrap.addEventListener("click", (e) => e.stopPropagation());
+      wrap.addEventListener("mousedown", (e) => e.stopPropagation());
       trigger.addEventListener("click", (e) => {
         e.stopPropagation();
         const wasOpen = primaryWrap.classList.contains("open");
-        document.querySelectorAll(".gantt-phase-dropdown-list").forEach(el => { if (el !== list) el.remove(); });
+        closeAllGanttDropdowns();
         primaryWrap.classList.toggle("open");
         if (!wasOpen && primaryWrap.classList.contains("open")) {
           updateListOptionStates();
@@ -7610,6 +7716,7 @@
       trigger.addEventListener("click", (e) => {
         e.stopPropagation();
         const wasOpen = wrap.classList.contains("open");
+        closeAllGanttDropdowns();
         wrap.classList.toggle("open");
         if (!wasOpen && wrap.classList.contains("open")) {
           document.body.appendChild(list);
@@ -8279,7 +8386,8 @@
       const taskText = document.createElement("span");
       taskText.className = "task-text";
       taskText.contentEditable = "false";
-      taskText.textContent = (task.star ? "★ " : "") + task.task;
+      const taskLabel = (task.task != null && String(task.task).trim() !== "") ? String(task.task).trim() : "Task " + (i + 1);
+      taskText.textContent = (task.star ? "★ " : "") + taskLabel;
       nameWrap.appendChild(taskText);
       taskCell.appendChild(nameWrap);
       const phasePill = document.createElement("span");
@@ -8362,6 +8470,7 @@
             task: (task.task || "").trim() ? (task.task || "").trim() + " copy" : "copy",
             phase: task.phase,
             party: task.party,
+            status: task.status || "Not started",
             start: task.start,
             end: task.end,
             startDate: task.startDate ? new Date(task.startDate) : null,
@@ -8382,6 +8491,68 @@
       taskActions.appendChild(duplicateBtn);
       taskActions.appendChild(deleteBtn);
       taskCell.appendChild(taskActions);
+      const STATUS_OPTIONS = ["Not started", "In progress", "Done", "Blocked"];
+      const statusCell = document.createElement("div");
+      statusCell.className = "gantt-cell gantt-status-cell";
+
+      function createStatusDropdown(t) {
+        const wrap = document.createElement("div");
+        wrap.className = "gantt-party-dropdown";
+        const trigger = document.createElement("button");
+        trigger.type = "button";
+        trigger.className = "gantt-party-dropdown-trigger";
+        const label = document.createElement("span");
+        label.textContent = t.status || "Not started";
+        const chevron = document.createElement("span");
+        chevron.className = "party-chevron";
+        chevron.textContent = "\u25BC";
+        trigger.appendChild(label);
+        trigger.appendChild(chevron);
+        const list = document.createElement("div");
+        list.className = "gantt-party-dropdown-list";
+        STATUS_OPTIONS.forEach(opt => {
+          const optBtn = document.createElement("button");
+          optBtn.type = "button";
+          optBtn.className = "gantt-party-dropdown-option";
+          if (opt === (t.status || "Not started")) optBtn.classList.add("selected");
+          optBtn.textContent = opt;
+          optBtn.addEventListener("click", () => {
+            t.status = opt;
+            label.textContent = opt;
+            list.querySelectorAll(".gantt-party-dropdown-option").forEach(o => o.classList.remove("selected"));
+            optBtn.classList.add("selected");
+            wrap.classList.remove("open");
+            saveTasks();
+          });
+          list.appendChild(optBtn);
+        });
+        trigger.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const wasOpen = wrap.classList.contains("open");
+          closeAllGanttDropdowns();
+          wrap.classList.toggle("open");
+          if (!wasOpen && wrap.classList.contains("open")) {
+            const cell = trigger.closest(".gantt-status-cell");
+            const r = cell ? cell.getBoundingClientRect() : trigger.getBoundingClientRect();
+            list.style.left = r.left + "px";
+            list.style.top = r.bottom + "px";
+            list.style.right = "auto";
+            list.style.minWidth = Math.max(r.width, 120) + "px";
+            requestAnimationFrame(() => {
+              const lr = list.getBoundingClientRect();
+              if (lr.right > window.innerWidth) list.style.left = (window.innerWidth - lr.width - 8) + "px";
+              if (lr.left < 8) list.style.left = "8px";
+            });
+          }
+        });
+        document.addEventListener("click", (e) => {
+          if (!wrap.contains(e.target)) wrap.classList.remove("open");
+        });
+        wrap.appendChild(trigger);
+        wrap.appendChild(list);
+        return wrap;
+      }
+      statusCell.appendChild(createStatusDropdown(task));
       const phaseCell = document.createElement("div");
       phaseCell.className = "gantt-cell gantt-phase-cell";
       const partyCell = document.createElement("div");
@@ -8448,6 +8619,7 @@
         trigger.addEventListener("click", (e) => {
           e.stopPropagation();
           const wasOpen = wrap.classList.contains("open");
+          closeAllGanttDropdowns();
           wrap.classList.toggle("open");
           if (!wasOpen && wrap.classList.contains("open")) {
           const cell = trigger.closest(".gantt-party-cell");
@@ -8563,6 +8735,7 @@
         sel.addRange(range);
       });
       row.appendChild(taskCell);
+      row.appendChild(statusCell);
       row.appendChild(phaseCell);
       row.appendChild(partyCell);
       row.appendChild(dateCell);
@@ -8571,7 +8744,7 @@
       row.addEventListener("click", (e) => {
         const isReadOnly = typeof window.hasWriteAccess === "function" && !window.hasWriteAccess();
         const onBar = e.target.closest(".gantt-bar");
-        if (e.target.closest(".gantt-delete-btn") || e.target.closest(".gantt-duplicate-btn") || (onBar && !isReadOnly) || e.target.closest(".resize-handle") || e.target.closest(".gantt-phase-cell") || e.target.closest(".gantt-party-cell") || e.target.closest(".gantt-date-cell")) return;
+        if (e.target.closest(".gantt-delete-btn") || e.target.closest(".gantt-duplicate-btn") || (onBar && !isReadOnly) || e.target.closest(".resize-handle") || e.target.closest(".gantt-phase-cell") || e.target.closest(".gantt-phase-dropdown") || e.target.closest(".gantt-phase-dropdown-list") || e.target.closest(".gantt-party-cell") || e.target.closest(".gantt-party-dropdown-list") || e.target.closest(".gantt-status-cell") || e.target.closest(".gantt-date-cell")) return;
         document.querySelectorAll(".gantt-row.selected").forEach(r => r.classList.remove("selected"));
         row.classList.add("selected");
         const idx = parseInt(row.dataset.index, 10);
@@ -8588,7 +8761,7 @@
           e.preventDefault();
           return;
         }
-        if (e.target.closest(".gantt-bar") || e.target.closest(".gantt-timeline-cell") || e.target.closest(".gantt-party-cell")) {
+        if (e.target.closest(".gantt-bar") || e.target.closest(".gantt-timeline-cell") || e.target.closest(".gantt-party-cell") || e.target.closest(".gantt-status-cell")) {
           e.preventDefault();
           return;
         }
@@ -8663,7 +8836,7 @@
         startDate = new Date(defaultBase.getFullYear(), defaultBase.getMonth(), defaultBase.getDate());
         endDate = new Date(startDate.getTime() + 6 * 24 * 60 * 60 * 1000);
       }
-      const newTask = { task: "New task", phase: resolvedPhaseId, party: "Unassigned", start: "", end: "", startDate, endDate, star: false, overview: "", subTasks: [], blockers: [], links: [], dependsOn: null };
+      const newTask = { task: "New task", phase: resolvedPhaseId, party: "Unassigned", status: "Not started", start: "", end: "", startDate, endDate, star: false, overview: "", subTasks: [], blockers: [], links: [], dependsOn: null };
       newTask.start = formatDate(newTask.startDate);
       newTask.end = formatDate(newTask.endDate);
       tasks.push(newTask);
@@ -9491,7 +9664,6 @@
           var prevMode = typeof getStorageMode === "function" ? getStorageMode() : null;
           var prevUrl, prevToken;
           try { prevUrl = localStorage.getItem(SHARED_FILE_URL_KEY); prevToken = localStorage.getItem(GITHUB_TOKEN_KEY); } catch (e) {}
-          /* GITHUB_STORAGE_DISABLED: restore this block to re-enable saving GitHub as selected storage
           if (selectedType === "github") {
             if (prevMode === "supabase" && window.ganttStorage?.signOut) { window.ganttStorage.signOut().catch(function () {}); }
             var urlEl = document.getElementById("sharedFileUrl");
@@ -9507,8 +9679,7 @@
             if (typeof handleRoute === "function") handleRoute();
             if (typeof window.__doLoadFromStoredUrl === "function") window.__doLoadFromStoredUrl();
             else if (typeof window.__fetchSharedUpdates === "function") window.__fetchSharedUpdates();
-          } else */
-          if (selectedType === "supabase") {
+          } else if (selectedType === "supabase") {
             setStorageMode("supabase");
             if (typeof applyStorageModeUI === "function") applyStorageModeUI("supabase");
           } else if (selectedType === "local_storage" || selectedType === "local_cache") {
@@ -9686,7 +9857,6 @@
         var prevMode = typeof getStorageMode === "function" ? getStorageMode() : null;
         var prevUrl, prevToken;
         try { prevUrl = localStorage.getItem(SHARED_FILE_URL_KEY); prevToken = localStorage.getItem(GITHUB_TOKEN_KEY); } catch (e) {}
-        /* GITHUB_STORAGE_DISABLED: restore this block to re-enable saving GitHub as selected storage
         if (selectedType === "github") {
           if (prevMode === "supabase" && window.ganttStorage?.signOut) { window.ganttStorage.signOut().catch(function () {}); }
           var urlEl = document.getElementById("sharedFileUrl");
@@ -9702,8 +9872,7 @@
           if (typeof handleRoute === "function") handleRoute();
           if (typeof window.__doLoadFromStoredUrl === "function") window.__doLoadFromStoredUrl();
           else if (typeof window.__fetchSharedUpdates === "function") window.__fetchSharedUpdates();
-        } else */
-        if (selectedType === "supabase") {
+        } else if (selectedType === "supabase") {
           setStorageMode("supabase");
           if (typeof applyStorageModeUI === "function") applyStorageModeUI("supabase");
         } else if (selectedType === "local_storage" || selectedType === "local_cache") {
@@ -10290,6 +10459,7 @@
           task: sampleTaskNames[i],
           phase: PHASES[phaseIdx].id,
           party: "Unassigned",
+          status: "Not started",
           star: false,
           overview: "",
           subTasks: [],
@@ -10448,6 +10618,7 @@
             task: sampleTaskNames[i],
             phase: PHASES[phaseIdx].id,
             party: "Unassigned",
+            status: "Not started",
             star: false,
             overview: "",
             subTasks: [],
@@ -11543,8 +11714,6 @@
     }
 
     function applyStorageModeUI(mode) {
-      /* GITHUB_STORAGE_DISABLED: treat github as local_storage so shared file section is not shown */
-      if (mode === "github") mode = "local_storage";
       var sec = document.getElementById("sharedFileSection");
       var backupSec = document.getElementById("localBackupSection");
       var storageBtn = document.getElementById("homeSettingsBtn");
@@ -11639,9 +11808,8 @@
           if (panel) panel.classList.add("active");
           if (tabId === "tasks" && typeof updateAutoPopulateSectionVisibility === "function") updateAutoPopulateSectionVisibility();
           if (tabId === "storage" && typeof window.switchStorageType === "function") {
-            /* GITHUB_STORAGE_DISABLED: default to local_storage instead of github */
             var mode = typeof getStorageMode === "function" ? getStorageMode() : "local_storage";
-            var type = (window.ganttStorage?.isCloudEnabled && window.ganttStorage.isCloudEnabled()) ? "supabase" : (mode === "local_cache" ? "local_cache" : (mode === "local_storage" || mode === "github" ? "local_storage" : "github"));
+            var type = (window.ganttStorage?.isCloudEnabled && window.ganttStorage.isCloudEnabled()) ? "supabase" : (mode === "local_cache" ? "local_cache" : (mode === "local_storage" || mode === "github" ? mode : "github"));
             window.switchStorageType(type);
           }
           if (tabId === "function") {
@@ -11661,26 +11829,22 @@
       (function setupStorageTypePicker() {
         var tiles = document.querySelectorAll(".storage-type-tile");
         function getCurrentStorageType() {
-          /* GITHUB_STORAGE_DISABLED: default to local_storage instead of github */
           var mode = getStorageMode() || "local_storage";
           if (window.ganttStorage?.isCloudEnabled && window.ganttStorage.isCloudEnabled()) return "supabase";
-          return (mode === "github" ? "local_storage" : mode);
+          return mode;
         }
         function switchStorageType(type) {
           tiles.forEach(function (t) {
             t.classList.toggle("selected", t.dataset.value === type);
           });
           if (type === "local_storage" && typeof initLocalBackupHandlers === "function") initLocalBackupHandlers();
-          /* GITHUB_STORAGE_DISABLED: commented out so GitHub tab is not inited
           if (type === "github") {
             if (typeof initSharedFile === "function") initSharedFile();
             if (typeof updateModalStatus === "function") updateModalStatus();
           }
-          */
         }
         window.switchStorageTab = function (tab) {
-          /* GITHUB_STORAGE_DISABLED: "external" now selects supabase or local_storage, not github */
-          if (tab === "external") switchStorageType(window.ganttStorage?.isCloudEnabled?.() ? "supabase" : "local_storage");
+          if (tab === "external") switchStorageType(getStorageMode() === "github" ? "github" : (window.ganttStorage?.isCloudEnabled?.() ? "supabase" : "local_storage"));
           else if (tab === "local") switchStorageType(getStorageMode() === "local_cache" ? "local_cache" : "local_storage");
         };
         window.switchStorageType = switchStorageType;
@@ -11764,15 +11928,12 @@
         }
       }
       try {
-        /* GITHUB_STORAGE_DISABLED: do not auto-select github when shared file URL is set
         if (!getStorageMode() && (localStorage.getItem(SHARED_FILE_URL_KEY) || "").trim()) setStorageMode("github");
-        */
       } catch (e) {}
       if (!getStorageMode()) {
         if (landingView) landingView.classList.add("active");
         if (homeViewEl) homeViewEl.classList.remove("active");
         if (ganttViewEl) ganttViewEl.classList.remove("active");
-        /* GITHUB_STORAGE_DISABLED: landing GitHub option is commented out in HTML; handler restored when re-enabling
         document.getElementById("landingOptionGitHub")?.addEventListener("click", function () {
           setStorageMode("github");
           if (landingView) landingView.classList.remove("active");
@@ -11785,7 +11946,6 @@
           var openBtn = document.getElementById("sharedFileOpenModal");
           if (openBtn) openBtn.click();
         });
-        */
         document.getElementById("landingOptionSupabase")?.addEventListener("click", function () {
           setStorageMode("supabase");
           if (landingView) landingView.classList.remove("active");
@@ -11961,7 +12121,6 @@
         }
         function openSharedFileModal() {
           if (typeof window.openStorageModal === "function") window.openStorageModal();
-          /* GITHUB_STORAGE_DISABLED: open to external (supabase or local_storage) instead of github */
           if (window.switchStorageTab) window.switchStorageTab("external");
           try {
             if (urlInput) urlInput.value = localStorage.getItem(SHARED_FILE_URL_KEY) || "";
@@ -12465,6 +12624,7 @@
             task: sampleTaskNames[i],
             phase: p.id,
             party: "Unassigned",
+            status: "Not started",
             star: false,
             overview: "",
             subTasks: [],
@@ -12544,6 +12704,331 @@
           if (newCard) newCard.scrollIntoView({ behavior: "smooth", block: "nearest" });
         });
       }
+      function smartMapColumns(headers) {
+        var normalized = headers.map(function (h) { return (h == null ? "" : String(h)).toLowerCase().replace(/\s+/g, " ").trim(); });
+        var map = { task: null, start: null, end: null, party: null, phase: null };
+        var taskPatterns = ["task", "name", "title", "activity", "item", "description", "work package", "wbs", "summary"];
+        var startPatterns = ["start", "begin", "from", "planned start", "start date", "started", "baseline start"];
+        var endPatterns = ["end", "finish", "to", "due", "deadline", "planned end", "end date", "completed", "finish date", "target end"];
+        var partyPatterns = ["assignee", "owner", "responsible", "person", "team", "who", "resource", "member"];
+        var phasePatterns = ["phase", "status", "stage", "category", "state", "type", "priority"];
+        function bestMatch(patterns) {
+          for (var i = 0; i < normalized.length; i++) {
+            var n = normalized[i];
+            if (!n) continue;
+            for (var p = 0; p < patterns.length; p++) {
+              if (n.indexOf(patterns[p]) !== -1 || patterns[p].indexOf(n) !== -1) return i;
+            }
+          }
+          return null;
+        }
+        map.task = bestMatch(taskPatterns);
+        map.start = bestMatch(startPatterns);
+        map.end = bestMatch(endPatterns);
+        map.party = bestMatch(partyPatterns);
+        map.party = map.party !== null ? map.party : (map.task !== 0 ? 0 : null);
+        map.phase = bestMatch(phasePatterns);
+        if (map.task === null && headers.length > 0) map.task = 0;
+        return map;
+      }
+      var EXCEL_PHASE_COLORS = ["#EAB308", "#0D9488", "#0284C7", "#14B8A6", "#6366F1", "#F97316", "#E11D48", "#7C3AED"];
+      function buildPhasesFromExcelRows(rows, columnMap) {
+        var phaseCol = columnMap.phase;
+        var seen = {};
+        var order = [];
+        if (phaseCol != null && rows.length > 0) {
+          for (var r = 0; r < rows.length; r++) {
+            var val = rows[r][phaseCol];
+            var name = (val != null && val !== "") ? String(val).trim() : "";
+            if (name && !seen[name.toLowerCase()]) {
+              seen[name.toLowerCase()] = true;
+              order.push(name);
+            }
+          }
+        }
+        if (order.length === 0) {
+          return [{ id: "discovery", name: "Discovery", color: EXCEL_PHASE_COLORS[0], sprints: 2 }];
+        }
+        var slug = typeof slugify === "function" ? slugify : function (t) { return String(t || "").trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "phase"; };
+        return order.map(function (name, i) {
+          var id = slug(name) || "phase-" + i;
+          return { id: id, name: name, color: EXCEL_PHASE_COLORS[i % EXCEL_PHASE_COLORS.length], sprints: 2 };
+        });
+      }
+      function parseExcelDate(val, baseDate) {
+        if (val == null || val === "") return null;
+        if (val instanceof Date) return val;
+        if (typeof val === "number") {
+          var d = new Date((val - 25569) * 86400 * 1000);
+          return isNaN(d.getTime()) ? null : d;
+        }
+        var s = String(val).trim();
+        if (!s) return null;
+        var m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (m) return new Date(parseInt(m[1], 10), parseInt(m[2], 10) - 1, parseInt(m[3], 10));
+        m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+        if (m) return new Date(parseInt(m[3], 10), parseInt(m[1], 10) - 1, parseInt(m[2], 10));
+        m = s.match(/^(\d{1,2})-(\d{1,2})-(\d{4})/);
+        if (m) return new Date(parseInt(m[3], 10), parseInt(m[2], 10) - 1, parseInt(m[1], 10));
+        var parsed = Date.parse(s);
+        return isNaN(parsed) ? null : new Date(parsed);
+      }
+      function excelRowsToTasks(rows, columnMap, phases) {
+        var baseDate = new Date();
+        baseDate.setHours(0, 0, 0, 0);
+        var phaseIds = phases.map(function (p) { return p.id; });
+        var phaseByName = {};
+        phases.forEach(function (p) { phaseByName[p.name.toLowerCase().trim()] = p.id; });
+        return rows.map(function (row, idx) {
+          var taskName = (columnMap.task != null && row[columnMap.task] != null) ? String(row[columnMap.task]).trim() : "";
+          if (!taskName) taskName = "Task " + (idx + 1);
+          var startDate = columnMap.start != null ? parseExcelDate(row[columnMap.start], baseDate) : null;
+          var endDate = columnMap.end != null ? parseExcelDate(row[columnMap.end], baseDate) : null;
+          if (!startDate && endDate) startDate = new Date(endDate.getTime());
+          if (startDate && !endDate) endDate = new Date(startDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+          if (!startDate) {
+            startDate = new Date(baseDate.getTime() + idx * 7 * 24 * 60 * 60 * 1000);
+            endDate = new Date(startDate.getTime() + 7 * 24 * 60 * 60 * 1000 - 1);
+          }
+          var party = (columnMap.party != null && row[columnMap.party] != null) ? String(row[columnMap.party]).trim() : "Unassigned";
+          var phaseVal = (columnMap.phase != null && row[columnMap.phase] != null) ? String(row[columnMap.phase]).trim() : "";
+          var phaseId = phaseByName[phaseVal.toLowerCase()] || (phases[0] && phases[0].id) || "discovery";
+          startDate.setHours(0, 0, 0, 0);
+          endDate.setHours(23, 59, 59, 999);
+          var startStr = (startDate.getMonth() + 1) + "/" + startDate.getDate();
+          var endStr = (endDate.getMonth() + 1) + "/" + endDate.getDate();
+          return {
+            task: taskName,
+            phase: phaseId,
+            phaseSecondary: null,
+            party: party,
+            start: startStr,
+            end: endStr,
+            startDate: startDate.toISOString(),
+            endDate: endDate.toISOString(),
+            star: false,
+            overview: "",
+            subTasks: [],
+            blockers: [],
+            links: [],
+            dependsOn: null
+          };
+        });
+      }
+      async function createNewBoardFromExcel(toSave, phasesFromExcel, boardNameFromFile) {
+        if (typeof window.hasWriteAccess === "function" && !window.hasWriteAccess()) return;
+        var defaultPhases = phasesFromExcel && phasesFromExcel.length > 0
+          ? phasesFromExcel.map(function (p) { return { id: p.id, name: p.name, color: p.color || "#737373", sprints: p.sprints != null ? p.sprints : 2 }; })
+          : (typeof DEFAULT_PHASES !== "undefined" ? DEFAULT_PHASES : []).map(function (p) { return { id: p.id, name: p.name, color: p.color || "#737373", sprints: 2 }; });
+        if (defaultPhases.length === 0) defaultPhases = [{ id: "discovery", name: "Discovery", color: "#EAB308", sprints: 2 }];
+        var baseName = (boardNameFromFile && String(boardNameFromFile).trim()) ? String(boardNameFromFile).trim().replace(/\.(xlsx|xls|csv)$/i, "") : "From Excel";
+        if (window.ganttStorage && window.ganttStorage.isCloudEnabled()) {
+          var name = getUniqueProjectName(baseName);
+          var newId;
+          try {
+            newId = await window.ganttStorage.createBoard(name);
+          } catch (err) {
+            if (typeof showToast === "function") showToast("Could not create project. Try again or log out and back in.", { type: "error" });
+            return;
+          }
+          if (newId) {
+            try {
+              await window.ganttStorage.saveTasks(newId, toSave);
+              if (typeof window.ganttStorage.saveSettings === "function") window.ganttStorage.saveSettings(newId, { phases: defaultPhases });
+            } catch (e) { console.warn("Could not save tasks:", e); }
+            ensureProjectInList(newId, name);
+            homeEditProjectId = newId;
+            renderHomeView();
+            requestAnimationFrame(function () {
+              var card = document.querySelector(".home-project-card.edit-mode");
+              if (card) card.scrollIntoView({ behavior: "smooth", block: "nearest" });
+            });
+          } else {
+            if (typeof showToast === "function") showToast("Could not create project.", { type: "error" });
+          }
+          return;
+        }
+        var newId = "p-" + Date.now();
+        try {
+          localStorage.setItem("gantt-tasks-" + newId, JSON.stringify(toSave));
+          localStorage.setItem("gantt-settings-" + newId, JSON.stringify({ phases: defaultPhases }));
+          if (window.notifySharedDataChanged) window.notifySharedDataChanged();
+        } catch (e) { console.warn("Could not save:", e); }
+        ensureProjectInList(newId, getUniqueProjectName(baseName));
+        homeEditProjectId = newId;
+        renderHomeView();
+        requestAnimationFrame(function () {
+          var card = document.querySelector(".home-project-card.edit-mode");
+          if (card) card.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        });
+      }
+      var excelSyncModalData = { rows: null, headers: null, columnMap: null, fileName: null };
+      function openExcelSyncModal() {
+        var overlay = document.getElementById("excelSyncModalOverlay");
+        var stepUpload = document.getElementById("excelSyncStepUpload");
+        var stepPreview = document.getElementById("excelSyncStepPreview");
+        var fileInput = document.getElementById("excelSyncFileInput");
+        var errorEl = document.getElementById("excelSyncError");
+        if (!overlay) {
+          if (typeof showToast === "function") showToast("Excel sync modal not found.", { type: "error" });
+          return;
+        }
+        if (!stepUpload || !stepPreview || !fileInput) {
+          if (typeof showToast === "function") showToast("Excel sync setup error. Refresh the page.", { type: "error" });
+          return;
+        }
+        excelSyncModalData.rows = null;
+        excelSyncModalData.headers = null;
+        excelSyncModalData.columnMap = null;
+        excelSyncModalData.fileName = null;
+        stepUpload.style.display = "";
+        stepPreview.style.display = "none";
+        if (errorEl) { errorEl.style.display = "none"; errorEl.textContent = ""; }
+        if (fileInput) fileInput.value = "";
+        overlay.style.display = "flex";
+        overlay.classList.add("visible");
+        overlay.setAttribute("aria-hidden", "false");
+      }
+      function closeExcelSyncModal() {
+        var overlay = document.getElementById("excelSyncModalOverlay");
+        if (overlay) {
+          overlay.style.display = "";
+          overlay.classList.remove("visible");
+          overlay.setAttribute("aria-hidden", "true");
+        }
+      }
+      window.openExcelSyncModal = openExcelSyncModal;
+      window.closeExcelSyncModal = closeExcelSyncModal;
+      (function initExcelSyncModal() {
+        var overlay = document.getElementById("excelSyncModalOverlay");
+        var fileInput = document.getElementById("excelSyncFileInput");
+        var stepUpload = document.getElementById("excelSyncStepUpload");
+        var stepPreview = document.getElementById("excelSyncStepPreview");
+        var rowCountEl = document.getElementById("excelSyncRowCount");
+        var mappingSummaryEl = document.getElementById("excelSyncMappingSummary");
+        var previewTable = document.getElementById("excelSyncPreviewTable");
+        var chooseAnother = document.getElementById("excelSyncChooseAnother");
+        var createBoardBtn = document.getElementById("excelSyncCreateBoard");
+        var closeBtn = document.getElementById("excelSyncModalClose");
+        var errorEl = document.getElementById("excelSyncError");
+        var fileLabel = document.querySelector(".excel-sync-file-label-inner");
+        function showError(msg) {
+          if (errorEl) { errorEl.textContent = msg; errorEl.style.display = "block"; }
+        }
+        function hideError() {
+          if (errorEl) { errorEl.style.display = "none"; errorEl.textContent = ""; }
+        }
+        function onFileChosen(file) {
+          hideError();
+          if (!file) return;
+          excelSyncModalData.fileName = file.name || null;
+          var ext = (file.name || "").toLowerCase();
+          var reader = new FileReader();
+          reader.onload = function (e) {
+            try {
+              var data = e.target && e.target.result;
+              var wb;
+              if (ext.endsWith(".csv")) {
+                var csv = typeof data === "string" ? data : new TextDecoder().decode(data);
+                var lines = csv.split(/\r?\n/).filter(function (l) { return l.length; });
+                var headers = lines.length ? lines[0].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(function (c) { return c.replace(/^"|"$/g, "").trim(); }) : [];
+                var rows = [];
+                for (var i = 1; i < lines.length; i++) {
+                  var cells = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(function (c) { return c.replace(/^"|"$/g, "").trim(); });
+                  var row = {};
+                  headers.forEach(function (h, j) { row[j] = cells[j] !== undefined ? cells[j] : ""; });
+                  rows.push(row);
+                }
+                excelSyncModalData.headers = headers.map(function (_, i) { return String(i); });
+                excelSyncModalData.rows = rows.map(function (r) { var o = {}; headers.forEach(function (h, i) { o[i] = r[i]; }); return o; });
+              } else {
+                if (typeof XLSX === "undefined") { showError("Excel library not loaded. Refresh the page."); return; }
+                wb = XLSX.read(data, { type: "binary", cellDates: true });
+                var firstSheet = wb.SheetNames[0];
+                if (!firstSheet) { showError("No sheet found in the file."); return; }
+                var sheet = wb.Sheets[firstSheet];
+                var aoa = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
+                if (!aoa.length) { showError("Sheet is empty."); return; }
+                var headers = aoa[0].map(function (c) { return c != null ? String(c) : ""; });
+                var rows = [];
+                for (var r = 1; r < aoa.length; r++) {
+                  var row = {};
+                  aoa[r].forEach(function (cell, c) { row[c] = cell; });
+                  rows.push(row);
+                }
+                excelSyncModalData.headers = headers;
+                excelSyncModalData.rows = rows;
+              }
+              if (!excelSyncModalData.rows.length) { showError("No data rows found."); return; }
+              var phases = (typeof getProjectPhases === "function" && currentProjectId) ? getProjectPhases(currentProjectId) : (typeof DEFAULT_PHASES !== "undefined" ? DEFAULT_PHASES.map(function (p) { return { id: p.id, name: p.name, color: p.color || "#737373" }; }) : [{ id: "discovery", name: "Discovery", color: "#EAB308" }]);
+              excelSyncModalData.columnMap = smartMapColumns(excelSyncModalData.headers);
+              var map = excelSyncModalData.columnMap;
+              var parts = [];
+              if (map.task != null) parts.push("Task \u2192 " + (excelSyncModalData.headers[map.task] || "col " + map.task));
+              if (map.start != null) parts.push("Start \u2192 " + (excelSyncModalData.headers[map.start] || "col " + map.start));
+              if (map.end != null) parts.push("End \u2192 " + (excelSyncModalData.headers[map.end] || "col " + map.end));
+              if (map.party != null) parts.push("Assignee \u2192 " + (excelSyncModalData.headers[map.party] || "col " + map.party));
+              if (map.phase != null) parts.push("Phase \u2192 " + (excelSyncModalData.headers[map.phase] || "col " + map.phase));
+              if (rowCountEl) rowCountEl.textContent = excelSyncModalData.rows.length;
+              if (mappingSummaryEl) mappingSummaryEl.textContent = parts.length ? parts.join("; ") : "Auto-detected.";
+              if (previewTable) {
+                var thead = "<tr>";
+                excelSyncModalData.headers.forEach(function (h) { thead += "<th>" + (h != null ? String(h).replace(/</g, "&lt;") : "") + "</th>"; });
+                thead += "</tr>";
+                var tbody = "";
+                for (var i = 0; i < Math.min(5, excelSyncModalData.rows.length); i++) {
+                  tbody += "<tr>";
+                  for (var j = 0; j < excelSyncModalData.headers.length; j++) {
+                    var cell = excelSyncModalData.rows[i][j];
+                    tbody += "<td>" + (cell != null && cell !== "" ? String(cell).replace(/</g, "&lt;").substring(0, 40) : "\u2014") + "</td>";
+                  }
+                  tbody += "</tr>";
+                }
+                previewTable.innerHTML = thead + tbody;
+              }
+              stepUpload.style.display = "none";
+              stepPreview.style.display = "block";
+            } catch (err) {
+              showError(err && err.message ? err.message : "Could not read file.");
+            }
+          };
+          if (ext.endsWith(".csv")) reader.readAsText(file);
+          else reader.readAsBinaryString(file);
+        }
+        if (fileInput) {
+          fileInput.addEventListener("change", function () {
+            var f = fileInput.files && fileInput.files[0];
+            onFileChosen(f);
+          });
+        }
+        if (document.querySelector(".excel-sync-file-label")) {
+          document.querySelector(".excel-sync-file-label").addEventListener("click", function () { fileInput && fileInput.click(); });
+        }
+        if (chooseAnother) chooseAnother.addEventListener("click", function () {
+          stepPreview.style.display = "none";
+          stepUpload.style.display = "";
+          if (fileInput) fileInput.value = "";
+          hideError();
+        });
+        if (createBoardBtn) createBoardBtn.addEventListener("click", async function () {
+          var rows = excelSyncModalData.rows || [];
+          var columnMap = excelSyncModalData.columnMap || {};
+          var phases = buildPhasesFromExcelRows(rows, columnMap);
+          var toSave = excelRowsToTasks(rows, columnMap, phases);
+          var boardName = excelSyncModalData.fileName ? String(excelSyncModalData.fileName).trim().replace(/\.(xlsx|xls|csv)$/i, "").trim() : null;
+          try {
+            await createNewBoardFromExcel(toSave, phases, boardName);
+            closeExcelSyncModal();
+            if (typeof showToast === "function") showToast("Board created from Excel.", { type: "success" });
+          } catch (err) {
+            showError(err && err.message ? err.message : "Could not create board.");
+          }
+        });
+        if (closeBtn) closeBtn.addEventListener("click", closeExcelSyncModal);
+        if (overlay) overlay.addEventListener("click", function (e) {
+          if (e.target === overlay) closeExcelSyncModal();
+        });
+      })();
       const homeFabBtn = document.getElementById("homeFab");
       const homeFabMobileBtn = document.getElementById("homeFabMobile");
       const homeNewBoardMenu = document.getElementById("homeNewBoardMenu");
@@ -12603,6 +13088,8 @@
       homeNewBoardMenu?.addEventListener("click", async (e) => {
         const item = e.target.closest(".fab-phase-menu-item[data-action]");
         if (!item || item.disabled) return;
+        e.preventDefault();
+        e.stopPropagation();
         const action = item.dataset.action;
         closeHomeNewBoardMenu();
         if (action === "scratch") {
@@ -12623,8 +13110,28 @@
           } catch (err) {
             if (typeof showToast === "function") showToast("Could not create shared board.", { type: "error" });
           }
+        } else if (action === "excel") {
+          try {
+            var openModal = window.openExcelSyncModal;
+            if (openModal) openModal(); else if (typeof openExcelSyncModal === "function") openExcelSyncModal();
+          } catch (err) {
+            if (typeof showToast === "function") showToast("Could not open Excel sync.", { type: "error" });
+          }
         }
       });
+      document.addEventListener("click", function (e) {
+        var excelBtn = e.target.closest("#homeNewBoardExcelItem");
+        if (!excelBtn) return;
+        e.preventDefault();
+        e.stopPropagation();
+        closeHomeNewBoardMenu();
+        try {
+          if (window.openExcelSyncModal) window.openExcelSyncModal();
+          else if (typeof openExcelSyncModal === "function") openExcelSyncModal();
+        } catch (err) {
+          if (typeof showToast === "function") showToast("Could not open Excel sync.", { type: "error" });
+        }
+      }, true);
       document.addEventListener("click", async (e) => {
         const actionBtn = e.target.closest(".home-empty-state-action-btn[data-action]");
         if (!actionBtn) return;
@@ -12679,8 +13186,7 @@
         });
       })();
       await handleRoute();
-      /* GITHUB_STORAGE_DISABLED: only init shared file UI for Supabase; restore "|| getStorageMode() === \"github\"" to re-enable */
-      if (getStorageMode() === "supabase") initSharedFile();
+      if (getStorageMode() === "supabase" || getStorageMode() === "github") initSharedFile();
       if (typeof window.updateWriteAccessUI === "function") window.updateWriteAccessUI();
       if (typeof window.__doLoadFromStoredUrl === "function") window.__doLoadFromStoredUrl();
       else if (typeof window.__fetchSharedUpdates === "function") window.__fetchSharedUpdates();
