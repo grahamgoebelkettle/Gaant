@@ -80,7 +80,7 @@
     }
     h1 {
       font-size: 32px;
-      font-weight: 700;
+      font-weight: 400;
       line-height: 1.3;
       letter-spacing: -0.02em;
       margin: 0 0 4px 0;
@@ -102,6 +102,8 @@
       min-height: 0;
       container-type: inline-size;
       container-name: gantt;
+      display: flex;
+      flex-direction: column;
     }
     .gantt-grid {
       display: flex;
@@ -437,6 +439,13 @@
       }
       .phase-confirm-popup .phase-confirm-move:hover,
       .detach-confirm-popup .detach-confirm-detach:hover {
+        color: #171717;
+      }
+      .share-modal-copy {
+        color: #171717;
+      }
+      .collaborators-avatar,
+      .collaborators-dropdown-user-avatar {
         color: #171717;
       }
     }
@@ -2628,6 +2637,12 @@
       border-color: var(--color-general-primary-active);
       color: #fff;
     }
+    @media (prefers-color-scheme: dark) {
+      .task-detail-done-btn,
+      .task-detail-done-btn:hover {
+        color: #171717;
+      }
+    }
     .task-detail-view-value {
       font-size: 14px;
       color: var(--text-secondary);
@@ -2921,6 +2936,8 @@
       transition-duration: 0.25s;
       transition-timing-function: ease;
       min-width: 0;
+      min-height: 0;
+      overflow: hidden;
     }
     .app-view.active {
       opacity: 1;
@@ -3170,6 +3187,9 @@
     #homeView.active ~ #ganttView #ganttDependencyLine,
     #homeView.active ~ #ganttView #ganttChildConnectorsContainer,
     #homeView.active ~ #ganttView .gantt-dependency-unlink-btn {
+      display: none !important;
+    }
+    body:has(#homeView.active) .add-task-fab {
       display: none !important;
     }
     #homeView.active {
@@ -4174,19 +4194,12 @@
     .gantt-wrapper:has(#ganttEmptyState:not(.hidden)) .gantt-grid {
       flex: 0 0 auto;
     }
-    .gantt-wrapper:has(#ganttEmptyState:not(.hidden)) .gantt-empty-state {
-      flex: 1 1 0;
-      min-height: 0;
-    }
     @media (max-width: 480px) {
       .gantt-wrapper { overflow: visible; flex: 0 1 auto; }
       .gantt-wrapper .gantt-grid { flex: 0 1 auto; }
     }
     .gantt-empty-state {
-      position: sticky;
-      top: 0;
-      left: 0;
-      z-index: 2;
+      flex-shrink: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -4195,12 +4208,10 @@
       background: var(--bg-surface);
       color: var(--text-secondary);
       text-align: center;
-      padding: 16px 24px;
-      flex: 1 1 0;
-      min-height: 280px;
-      width: 100%;
+      padding: 40px 24px;
+      min-height: 200px;
       box-sizing: border-box;
-      border-top: 1px solid var(--border-strong);
+      border-top: 1px solid var(--border-default);
     }
     .gantt-empty-state.hidden { display: none !important; }
     .settings-auto-populate-section.hidden { display: none !important; }
@@ -4210,22 +4221,31 @@
     .gantt-empty-state .btn-empty-secondary {
       display: inline-flex;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
       gap: 8px;
-      padding: 12px 24px;
-      font-size: 14px;
-      font-weight: 600;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 500;
       border-radius: var(--button-radius);
-      border: 1px solid var(--border-strong);
-      background: var(--bg-surface);
-      color: var(--text-primary);
       cursor: pointer;
       font-family: inherit;
+      transition: opacity 0.2s, background 0.15s;
     }
-    .gantt-empty-state .btn-empty-primary:hover,
+    .gantt-empty-state .btn-empty-primary {
+      background: var(--color-general-primary);
+      color: var(--bg-body);
+      border: none;
+      font-weight: 600;
+    }
+    .gantt-empty-state .btn-empty-primary:hover { opacity: 0.9; }
+    .gantt-empty-state .btn-empty-secondary {
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      border: 1px solid var(--border-strong);
+    }
     .gantt-empty-state .btn-empty-secondary:hover { background: var(--bg-hover); }
     .gantt-empty-state .btn-empty-primary svg,
-    .gantt-empty-state .btn-empty-secondary svg { width: 18px; height: 18px; flex-shrink: 0; }
+    .gantt-empty-state .btn-empty-secondary svg { width: 16px; height: 16px; flex-shrink: 0; }
     .task-chevron {
       display: inline-flex;
       margin-right: 8px;
@@ -4396,7 +4416,7 @@
     </div>
   </div>
 
-  <div id="ganttView" class="app-view" style="position:relative">
+  <div id="ganttView" class="app-view">
     <a href="#/" class="home-back-link" id="homeBackLink">← All boards</a>
     <div class="collaborators-avatar-bar" id="collaboratorsAvatarBar" style="display:none" aria-label="Collaborators on this board">
       <div class="collaborators-avatar-trigger" id="collaboratorsAvatarTrigger">
@@ -4512,15 +4532,15 @@
       <svg class="gantt-dependency-line gantt-all-dependency-lines" id="ganttAllDependencyLines" aria-hidden="true"></svg>
       <!-- Data rows populated by JS -->
     </div>
-    <div id="ganttEmptyState" class="gantt-empty-state hidden" aria-live="polite">
+    <div class="gantt-empty-state hidden" id="ganttEmptyState" aria-live="polite">
       <span class="empty-title">No tasks yet</span>
       <p>Configure phases and settings, or add sample tasks to explore the chart.</p>
       <div class="gantt-empty-state-actions">
-        <button type="button" class="btn-empty-primary" id="ganttEmptyConfigure">
+        <button type="button" class="btn-empty-secondary" id="ganttEmptyConfigure">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z"/><circle cx="12" cy="12" r="2.5" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
           Configure project
         </button>
-        <button type="button" class="btn-empty-secondary" id="ganttEmptyPopulate">
+        <button type="button" class="btn-empty-primary" id="ganttEmptyPopulate">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0 1 18 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.25m-8.25-3 1.5 1.5 3-3.75"/></svg>
           Add sample tasks
         </button>
@@ -5436,11 +5456,18 @@
 
     let tasks = [];
 
+    function resolveDependsOnIndex(val) {
+      if (val == null) return null;
+      if (typeof val === "number" && !isNaN(val) && val >= 0) return val;
+      if (typeof val === "string" && /^\d+$/.test(val)) return parseInt(val, 10);
+      return null;
+    }
     function parseTaskRow(t) {
       const links = Array.isArray(t.links) ? t.links : (Array.isArray(t.dependencies) ? t.dependencies : []);
       const migratedLinks = (t.jiraTicket && t.jiraTicket.trim()) ? [t.jiraTicket.trim(), ...links] : links;
       const startDate = t.startDate ? new Date(t.startDate) : null;
       const endDate = t.endDate ? new Date(t.endDate) : null;
+      const dependsOn = resolveDependsOnIndex(t.dependsOn);
       return {
         ...t,
         startDate,
@@ -5451,7 +5478,7 @@
         subTasks: Array.isArray(t.subTasks) ? t.subTasks : [],
         blockers: Array.isArray(t.blockers) ? t.blockers : [],
         links: migratedLinks,
-        dependsOn: typeof t.dependsOn === "number" ? t.dependsOn : null,
+        dependsOn: dependsOn,
         phaseSecondary: t.phaseSecondary && t.phaseSecondary !== t.phase ? t.phaseSecondary : null
       };
     }
@@ -5602,6 +5629,7 @@
           const links = Array.isArray(t.links) ? t.links : (Array.isArray(t.dependencies) ? t.dependencies : []);
           const startDate = t.startDate ? new Date(t.startDate) : null;
           const endDate = t.endDate ? new Date(t.endDate) : null;
+          const dependsOn = resolveDependsOnIndex(t.dependsOn);
           return {
             ...t,
             startDate,
@@ -5612,7 +5640,7 @@
             subTasks: Array.isArray(t.subTasks) ? t.subTasks : [],
             blockers: Array.isArray(t.blockers) ? t.blockers : [],
             links,
-            dependsOn: typeof t.dependsOn === "number" ? t.dependsOn : null,
+            dependsOn,
             phaseSecondary: t.phaseSecondary && t.phaseSecondary !== t.phase ? t.phaseSecondary : null
           };
         });
@@ -5782,8 +5810,8 @@
       if (row) {
         const startInp = row.querySelector('.gantt-date-start');
         const endInp = row.querySelector('.gantt-date-end');
-        if (startInp) startInp.value = task.start;
-        if (endInp) endInp.value = task.end;
+        if (startInp) { startInp.value = task.start; startInp.title = task.startDate ? formatDateFull(task.startDate) : ""; }
+        if (endInp) { endInp.value = task.end; endInp.title = task.endDate ? formatDateFull(task.endDate) : ""; }
       }
     }
 
@@ -5826,6 +5854,11 @@
     function formatDate(d) {
       if (!d) return "";
       return (d.getMonth() + 1) + "/" + d.getDate();
+    }
+    function formatDateFull(d) {
+      if (!d || !d.getTime || isNaN(d.getTime())) return "";
+      const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+      return months[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear();
     }
 
     function parseDateStr(str) {
@@ -6061,9 +6094,16 @@
         weekStart = new Date(anchor);
         weekStart.setDate(weekStart.getDate() - weekStart.getDay());
       } else {
-        const start = minDate || maxDate;
-        weekStart = new Date(start);
+        // Default: anchor to current week so moving the default task doesn't shift the chart
+        const today = new Date();
+        weekStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
         weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+        // Extend chart left only if a task is earlier than current week so it stays visible
+        if (minDate && minDate.getTime() < weekStart.getTime()) {
+          const earlier = new Date(minDate);
+          earlier.setDate(earlier.getDate() - earlier.getDay());
+          weekStart = earlier;
+        }
       }
       WEEK_START = weekStart;
       const projectStart = getProjectStartDate();
@@ -6842,9 +6882,10 @@
       const depText = depRow?.querySelector(".gantt-bar-tooltip-text");
       const depUnlinkWrap = depRow?.querySelector(".gantt-bar-tooltip-dep-unlink-wrap");
       const depUnlinkBtn = depUnlinkWrap?.querySelector(".gantt-bar-tooltip-dep-unlink");
+      const depIdx = resolveDependsOnIndex(task.dependsOn);
       if (depRow && depText) {
-        if (typeof task.dependsOn === "number" && tasks[task.dependsOn]) {
-          const primary = tasks[task.dependsOn];
+        if (depIdx !== null && tasks[depIdx]) {
+          const primary = tasks[depIdx];
           depText.textContent = "Depends on: " + ((primary.star ? "★ " : "") + (primary.task || "Task"));
           depRow.style.display = "";
           depRow.style.color = getPhaseColor(primary.phase || PHASES[0]?.id);
@@ -6853,7 +6894,8 @@
             depUnlinkBtn.onclick = (e) => {
               e.stopPropagation();
               const t = tasks[index];
-              const p = t && typeof t.dependsOn === "number" ? tasks[t.dependsOn] : null;
+              const parentIdx = t ? resolveDependsOnIndex(t.dependsOn) : null;
+              const p = parentIdx !== null ? tasks[parentIdx] : null;
               if (!t || !p) return;
               pushTasksUndo();
               t.dependsOn = null;
@@ -7155,8 +7197,8 @@
           const dateCell = bar.closest(".gantt-row")?.querySelector(".gantt-date-cell");
           const startInp = dateCell?.querySelector('.gantt-date-start');
           const endInp = dateCell?.querySelector('.gantt-date-end');
-          if (startInp) startInp.value = t.start;
-          if (endInp) endInp.value = t.end;
+          if (startInp) { startInp.value = t.start; startInp.title = t.startDate ? formatDateFull(t.startDate) : ""; }
+          if (endInp) { endInp.value = t.end; endInp.title = t.endDate ? formatDateFull(t.endDate) : ""; }
           const rowPhaseWrap = bar.closest(".gantt-row")?.querySelector(".gantt-phase-dropdown-wrap");
           if (rowPhaseWrap && rowPhaseWrap._updateLabel) rowPhaseWrap._updateLabel(phaseId);
           const so = dateToOffset(t.startDate);
@@ -7709,9 +7751,15 @@
             lastBarChangeOriginalDurationMs = task.endDate.getTime() - task.startDate.getTime();
             lastBarChangeTaskIndex = index;
           }
-          durationHint = document.createElement("span");
-          durationHint.className = "gantt-bar-duration-hint";
-          bar.appendChild(durationHint);
+          var wrapper = bar.closest(".gantt-wrapper");
+          var existingHint = bar.querySelector(".gantt-bar-duration-hint-hover");
+          if (wrapper && wrapper.getAttribute("data-show-duration-on-bar") === "true" && existingHint) {
+            durationHint = existingHint;
+          } else {
+            durationHint = document.createElement("span");
+            durationHint.className = "gantt-bar-duration-hint";
+            bar.appendChild(durationHint);
+          }
           snapIndicator = document.createElement("span");
           snapIndicator.className = "gantt-bar-snap-indicator";
           snapIndicator.title = "Will snap to sprint";
@@ -7786,13 +7834,13 @@
           }
           const startInp = dateCell.querySelector('.gantt-date-start');
           const endInp = dateCell.querySelector('.gantt-date-end');
-          if (startInp) startInp.value = task.start;
-          if (endInp) endInp.value = task.end;
+          if (startInp) { startInp.value = task.start; startInp.title = task.startDate ? formatDateFull(task.startDate) : ""; }
+          if (endInp) { endInp.value = task.end; endInp.title = task.endDate ? formatDateFull(task.endDate) : ""; }
           propagateDependencyChanges(index, undefined, undefined, true);
         };
         const onUp = () => {
           hideGuide();
-          if (durationHint) durationHint.remove();
+          if (durationHint && !durationHint.classList.contains("gantt-bar-duration-hint-hover")) durationHint.remove();
           if (snapIndicator) snapIndicator.remove();
           if (dragStarted) bar.classList.remove("dragging");
           document.removeEventListener("mousemove", onMove);
@@ -7815,8 +7863,8 @@
             bar.style.width = ((endOffset - startOffset) / WEEKS) * 100 + "%";
             const startInp = dateCell.querySelector('.gantt-date-start');
             const endInp = dateCell.querySelector('.gantt-date-end');
-            if (startInp) startInp.value = task.start;
-            if (endInp) endInp.value = task.end;
+            if (startInp) { startInp.value = task.start; startInp.title = task.startDate ? formatDateFull(task.startDate) : ""; }
+            if (endInp) { endInp.value = task.end; endInp.title = task.endDate ? formatDateFull(task.endDate) : ""; }
             propagateDependencyChanges(index, undefined, undefined, false);
           }
           // Save tasks after move to persist phase changes
@@ -7943,8 +7991,8 @@
           setBarPhaseStyle(bar, task);
           const startInp = dateCell.querySelector('.gantt-date-start');
           const endInp = dateCell.querySelector('.gantt-date-end');
-          if (startInp) startInp.value = task.start;
-          if (endInp) endInp.value = task.end;
+          if (startInp) { startInp.value = task.start; startInp.title = task.startDate ? formatDateFull(task.startDate) : ""; }
+          if (endInp) { endInp.value = task.end; endInp.title = task.endDate ? formatDateFull(task.endDate) : ""; }
           propagateDependencyChanges(index, undefined, undefined, true);
         };
         const onUp = () => {
@@ -7968,8 +8016,8 @@
             bar.style.width = ((endOffset - startOffset) / WEEKS) * 100 + "%";
             const startInp = dateCell.querySelector('.gantt-date-start');
             const endInp = dateCell.querySelector('.gantt-date-end');
-            if (startInp) startInp.value = task.start;
-            if (endInp) endInp.value = task.end;
+            if (startInp) { startInp.value = task.start; startInp.title = task.startDate ? formatDateFull(task.startDate) : ""; }
+            if (endInp) { endInp.value = task.end; endInp.title = task.endDate ? formatDateFull(task.endDate) : ""; }
             propagateDependencyChanges(index, undefined, undefined, false);
           }
           if (typeof onBarChangeEnd === "function") onBarChangeEnd(index);
@@ -7985,9 +8033,11 @@
         bar.classList.add("resizing");
         lastBarChangeOriginalStartDate = new Date(task.startDate);
         lastBarChangeOriginalEndDate = new Date(task.endDate);
-        const durationHint = document.createElement("span");
-        durationHint.className = "gantt-bar-duration-hint";
-        bar.appendChild(durationHint);
+        var wrapperRight = bar.closest(".gantt-wrapper");
+        var existingHintRight = bar.querySelector(".gantt-bar-duration-hint-hover");
+        const durationHint = (wrapperRight && wrapperRight.getAttribute("data-show-duration-on-bar") === "true" && existingHintRight)
+          ? existingHintRight
+          : (function() { var el = document.createElement("span"); el.className = "gantt-bar-duration-hint"; bar.appendChild(el); return el; })();
         const snapIndicator = document.createElement("span");
         snapIndicator.className = "gantt-bar-snap-indicator";
         snapIndicator.title = "Will snap to sprint";
@@ -8047,13 +8097,13 @@
           setBarPhaseStyle(bar, task);
           const startInp = dateCell.querySelector('.gantt-date-start');
           const endInp = dateCell.querySelector('.gantt-date-end');
-          if (startInp) startInp.value = task.start;
-          if (endInp) endInp.value = task.end;
+          if (startInp) { startInp.value = task.start; startInp.title = task.startDate ? formatDateFull(task.startDate) : ""; }
+          if (endInp) { endInp.value = task.end; endInp.title = task.endDate ? formatDateFull(task.endDate) : ""; }
           propagateDependencyChanges(index, undefined, undefined, true);
         };
         const onUp = () => {
           hideGuide();
-          durationHint.remove();
+          if (!durationHint.classList.contains("gantt-bar-duration-hint-hover")) durationHint.remove();
           snapIndicator.remove();
           bar.classList.remove("resizing");
           document.removeEventListener("mousemove", onMove);
@@ -8068,7 +8118,7 @@
             currentWidth = ((endOffset - startOffset) / WEEKS) * 100;
             bar.style.width = Math.max(2, currentWidth) + "%";
             const endInp = dateCell.querySelector('.gantt-date-end');
-            if (endInp) endInp.value = task.end;
+            if (endInp) { endInp.value = task.end; endInp.title = task.endDate ? formatDateFull(task.endDate) : ""; }
             propagateDependencyChanges(index, undefined, undefined, false);
           }
           if (typeof onBarChangeEnd === "function") onBarChangeEnd(index);
@@ -8431,11 +8481,13 @@
       startInput.className = "gantt-date-start";
       startInput.placeholder = "Start";
       startInput.value = task.start || "";
+      startInput.title = task.startDate ? formatDateFull(task.startDate) : "";
       const endInput = document.createElement("input");
       endInput.type = "text";
       endInput.className = "gantt-date-end";
       endInput.placeholder = "End";
       endInput.value = task.end || "";
+      endInput.title = task.endDate ? formatDateFull(task.endDate) : "";
       const updateFromInputs = () => {
         const startParsed = parseDateStr(startInput.value);
         const endParsed = parseDateStr(endInput.value);
@@ -8445,16 +8497,19 @@
           task.startDate = startDate;
           task.start = formatDate(startDate);
           startInput.value = task.start;
+          startInput.title = formatDateFull(task.startDate);
         }
         if (endDate) {
           task.endDate = endDate;
           task.end = formatDate(endDate);
           endInput.value = task.end;
+          endInput.title = formatDateFull(task.endDate);
         }
         if (startDate && endDate && task.startDate.getTime() > task.endDate.getTime()) {
           task.endDate = new Date(task.startDate.getTime());
           task.end = task.start;
           endInput.value = task.end;
+          endInput.title = formatDateFull(task.endDate);
         }
         if (startDate || endDate) {
           if (bar) {
@@ -8597,13 +8652,15 @@
       const resolvedPhaseId = phaseId || PHASES[0]?.id || "";
       let startDate, endDate;
       const phaseIdx = PHASES.findIndex(p => p.id === resolvedPhaseId);
-      if (resolvedPhaseId && phaseIdx >= 0 && typeof getPhaseStartWeekOffset === "function" && typeof offsetToDate === "function") {
+      const projectStart = getProjectStartDate();
+      const defaultBase = projectStart || new Date();
+      if (resolvedPhaseId && phaseIdx >= 0 && typeof getPhaseStartWeekOffset === "function") {
         const startWeekOffset = getPhaseStartWeekOffset(phaseIdx);
-        startDate = offsetToDate(startWeekOffset);
+        const base = projectStart && typeof startOfWeek === "function" ? startOfWeek(projectStart) : WEEK_START;
+        startDate = new Date(base.getTime() + startWeekOffset * WEEK_MS);
         endDate = new Date(startDate.getTime() + 6 * 24 * 60 * 60 * 1000); // one week from phase start
       } else {
-        const defaultStart = getProjectStartDate() || new Date();
-        startDate = new Date(defaultStart.getFullYear(), defaultStart.getMonth(), defaultStart.getDate());
+        startDate = new Date(defaultBase.getFullYear(), defaultBase.getMonth(), defaultBase.getDate());
         endDate = new Date(startDate.getTime() + 6 * 24 * 60 * 60 * 1000);
       }
       const newTask = { task: "New task", phase: resolvedPhaseId, party: "Unassigned", start: "", end: "", startDate, endDate, star: false, overview: "", subTasks: [], blockers: [], links: [], dependsOn: null };
@@ -8681,7 +8738,7 @@
       updateEmptyState();
       deselectBar();
       collapseDetail(false);
-      const existingRows = grid.querySelectorAll(".gantt-row[draggable]");
+      const existingRows = grid.querySelectorAll(".gantt-row:not(.gantt-header-sticky)");
       existingRows.forEach(r => r.remove());
       tasks.forEach((task, i) => {
         const row = renderTaskRow(task, i);
@@ -8942,8 +8999,8 @@
             if (dateCell) {
               const startInp = dateCell.querySelector('.gantt-date-start');
               const endInp = dateCell.querySelector('.gantt-date-end');
-              if (startInp) startInp.value = task.start;
-              if (endInp) endInp.value = task.end;
+              if (startInp) { startInp.value = task.start; startInp.title = task.startDate ? formatDateFull(task.startDate) : ""; }
+              if (endInp) { endInp.value = task.end; endInp.title = task.endDate ? formatDateFull(task.endDate) : ""; }
             }
             const barEl = document.querySelector('.gantt-bar[data-index="' + taskIndex + '"]');
             if (barEl) {
@@ -9529,6 +9586,40 @@
       const allowIndependentDependencies = !!document.getElementById("settingsIndependentDependencies")?.checked;
       const showDurationOnBar = !!document.getElementById("settingsShowDurationOnBar")?.checked;
       const s = loadProjectSettings() || {};
+      // When project start date changes, shift all tasks by the same delta so they stay relative to phases
+      const oldProjectStart = getProjectStartDate();
+      const newProjectStart = (function() {
+        if (!projectStartDateRaw || typeof projectStartDateRaw !== "string") return null;
+        const parts = projectStartDateRaw.trim().match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+        if (!parts) return null;
+        const d = new Date(parseInt(parts[1], 10), parseInt(parts[2], 10) - 1, parseInt(parts[3], 10));
+        return isNaN(d.getTime()) ? null : d;
+      })();
+      if (newProjectStart && tasks.some(function(t) { return t.startDate && t.endDate; })) {
+        var refStart = oldProjectStart;
+        if (!refStart) {
+          var minTaskStart = null;
+          tasks.forEach(function(t) {
+            if (t.startDate && (!minTaskStart || t.startDate.getTime() < minTaskStart.getTime())) minTaskStart = t.startDate;
+          });
+          if (minTaskStart) {
+            refStart = new Date(minTaskStart.getFullYear(), minTaskStart.getMonth(), minTaskStart.getDate());
+            refStart.setDate(refStart.getDate() - refStart.getDay());
+          }
+        }
+        if (refStart && newProjectStart.getTime() !== refStart.getTime()) {
+          var deltaMs = newProjectStart.getTime() - refStart.getTime();
+          tasks.forEach(function(t) {
+            if (t.startDate && t.endDate) {
+              t.startDate = new Date(t.startDate.getTime() + deltaMs);
+              t.endDate = new Date(t.endDate.getTime() + deltaMs);
+              t.start = formatDate(t.startDate);
+              t.end = formatDate(t.endDate);
+            }
+          });
+          saveTasks();
+        }
+      }
       if (phaseDurationMode === "fixed" && moveTasksWhenSprintExtended && PHASES.length === phases.length) {
         const base = getProjectStartDate() || WEEK_START;
         const baseMs = new Date(base.getFullYear(), base.getMonth(), base.getDate()).getTime();
@@ -10054,15 +10145,15 @@
       return name === "" || name === "my first task";
     }
     function updateEmptyState() {
-      const emptyEl = document.getElementById("ganttEmptyState");
-      if (!emptyEl) return;
+      const rowEl = document.getElementById("ganttEmptyState");
+      if (!rowEl) return;
       const s = loadProjectSettings();
       var readOnly = typeof window.hasWriteAccess === "function" && !window.hasWriteAccess();
       var dismissed = !!s?.emptyStateDismissed;
       if (readOnly || dismissed || !isPlaceholderOnlyProject()) {
-        emptyEl.classList.add("hidden");
+        rowEl.classList.add("hidden");
       } else {
-        emptyEl.classList.remove("hidden");
+        rowEl.classList.remove("hidden");
       }
       if (typeof updateAutoPopulateSectionVisibility === "function") updateAutoPopulateSectionVisibility();
     }
@@ -10133,8 +10224,17 @@
       if (realtimeUnsubscribe) { realtimeUnsubscribe(); realtimeUnsubscribe = null; }
       const avatarBar = document.getElementById("collaboratorsAvatarBar");
       if (avatarBar) avatarBar.style.display = "none";
+      const sameProject = currentProjectId === id;
+      currentProjectId = id;
+      ensureProjectInList(id);
+      if (homeView) homeView.classList.remove("active");
+      if (ganttView) ganttView.classList.add("active");
+      if (!sameProject) initGantt();
       if (window.ganttStorage?.isCloudEnabled()) {
         await window.ganttStorage.ensureBoardDataLoaded(id);
+        tasks = loadTasks();
+        if (typeof updateEmptyState === "function") updateEmptyState();
+        if (typeof updateChartRange === "function") updateChartRange();
         const showPresence = UUID_REGEX.test(id);
         const subscribe = window.ganttStorage.subscribeToBoardRealtime;
         if (typeof subscribe === "function") {
@@ -10161,21 +10261,11 @@
           }
         }
       }
-      const sameProject = currentProjectId === id;
-      currentProjectId = id;
-      ensureProjectInList(id);
-      if (!sameProject) initGantt();
       if (typeof window.updateWriteAccessUI === "function") window.updateWriteAccessUI();
       else {
         var addFab = document.getElementById("addTaskFab");
         if (addFab) addFab.style.display = "";
       }
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          if (homeView) homeView.classList.remove("active");
-          if (ganttView) ganttView.classList.add("active");
-        });
-      });
     }
     function runSamplePopulate() {
       if (!isPlaceholderOnlyProject()) {
@@ -10411,6 +10501,7 @@
       document.body.appendChild(addBtn);
       tasks = loadTasks();
       addedPlaceholderThisSession = false;
+      if (typeof computeChartRange === "function") computeChartRange();
       tasks.forEach((_, i) => { if (tasks.some(t => t.dependsOn === i)) propagateDependencyChanges(i); });
       if (tasks.some(function (t) { return t.dependsOn != null; }) && typeof showLinkedTasksToast === "function") showLinkedTasksToast();
       updateEmptyState();
