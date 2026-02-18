@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Adjustable Gantt Chart</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -75,6 +75,7 @@
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
       margin: 0;
       padding: 24px;
+      padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
       background: var(--bg-body);
       color: var(--text-primary);
       font-size: 14px;
@@ -83,10 +84,12 @@
       display: flex;
       flex-direction: column;
       height: 100vh;
+      height: 100dvh;
       overflow: hidden;
     }
-    @media (max-width: 480px) {
+    @media (max-width: 480px) and (orientation: portrait) {
       body { padding-left: 8px; padding-right: 8px; overflow-x: hidden; }
+      #ganttView { width: 100%; max-width: 100vw; box-sizing: border-box; }
     }
     body.gantt-view-active { padding-left: 0; padding-right: 0; }
     #ganttView.active { width: 100%; display: flex; flex-direction: column; align-items: stretch; justify-content: flex-start; }
@@ -109,7 +112,10 @@
       font-weight: 400;
       color: var(--text-secondary);
       margin: 0;
-      max-width:640px;
+      max-width: 640px;
+      overflow-wrap: break-word;
+      word-break: break-word;
+      white-space: normal;
     }
     .gantt-wrapper {
       position: relative;
@@ -346,6 +352,13 @@
     }
     .task-cell-phase-pill-label { white-space: nowrap; }
     .task-cell-phase-pill-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .task-cell-right-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+      margin-left: auto;
+    }
     @media (min-width: 769px) {
       .task-cell-phase-pill { display: none !important; }
     }
@@ -668,7 +681,7 @@
       border-radius: 8px;
       border: 1px solid #404040;
       box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-      z-index: 10000;
+      z-index: 999999;
       opacity: 0;
       visibility: hidden;
       transition: opacity var(--motion-duration-normal) var(--motion-easing-decelerate), transform var(--motion-duration-normal) var(--motion-easing-decelerate), visibility var(--motion-duration-normal) var(--motion-easing-decelerate);
@@ -715,6 +728,18 @@
       opacity: 1;
       visibility: visible;
       transform: translateX(-50%) translateY(0);
+    }
+    @media (max-width: 768px) {
+      .gantt-toast {
+        left: 12px;
+        right: 12px;
+        width: auto;
+        bottom: 100px;
+        transform: translateY(20px);
+      }
+      .gantt-toast.visible {
+        transform: translateY(0);
+      }
     }
     .gantt-toast.error {
       background: #3d2a2a;
@@ -1123,10 +1148,21 @@
       max-width: none;
       opacity: 1;
       visibility: visible;
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      border: 1px solid var(--border-default);
+      box-shadow: var(--shadow-sm);
     }
+    .gantt-bar-tooltip.gantt-bar-tooltip-static .gantt-bar-tooltip-title { color: var(--text-primary); }
+    .gantt-bar-tooltip.gantt-bar-tooltip-static .gantt-bar-tooltip-row { color: var(--text-secondary); }
+    .gantt-bar-tooltip.gantt-bar-tooltip-static .gantt-bar-tooltip-actions { border-top-color: var(--border-default); }
+    .gantt-bar-tooltip.gantt-bar-tooltip-static .gantt-bar-tooltip-move-label { color: var(--text-tertiary); }
+    .gantt-bar-tooltip.gantt-bar-tooltip-static .gantt-bar-tooltip-phase-dropdown .gantt-phase-dropdown-trigger { color: var(--text-primary); }
+    .gantt-bar-tooltip.gantt-bar-tooltip-static .gantt-bar-tooltip-phase-dropdown .gantt-phase-dropdown-trigger .phase-chevron { color: var(--text-tertiary); }
+    .gantt-bar-tooltip.gantt-bar-tooltip-static .gantt-bar-tooltip-dep-unlink { color: var(--color-general-primary); }
     .gantt-bar-tooltip.has-actions { pointer-events: auto; }
-    .gantt-bar-tooltip-actions { margin-top: 8px; padding-top: 8px; border-top: 1px solid #404040; display: flex; flex-direction: column; gap: 6px; }
-    .gantt-bar-tooltip-move-label { font-size: 11px; font-weight: 600; color: #a3a3a3; text-transform: uppercase; letter-spacing: 0.04em; }
+    .gantt-bar-tooltip-actions { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-default); display: flex; flex-direction: column; gap: 6px; }
+    .gantt-bar-tooltip-move-label { font-size: 11px; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.04em; }
     .gantt-bar-tooltip-title { font-weight: 600; margin-bottom: 4px; }
     .gantt-bar-tooltip-row {
       display: flex;
@@ -1167,8 +1203,8 @@
     }
     .add-task-fab {
       position: fixed;
-      bottom: 24px;
-      right: 24px;
+      bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+      right: calc(24px + env(safe-area-inset-right, 0px));
       width: 56px;
       height: 56px;
       border-radius: 50%;
@@ -1425,10 +1461,10 @@
         left: 0;
         right: 0;
         padding: 16px;
-        background: var(--bg-body);
-        border-top: 1px solid var(--border-default);
+        background: transparent;
+        border-top: none;
         z-index: 1000;
-        box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
+        box-shadow: none;
       }
       .home-mobile-fab-bar .home-new-project-btn {
         width: 100%;
@@ -1436,7 +1472,10 @@
         padding: 14px 20px;
         font-size: 16px;
       }
-      #homeView.active { padding-bottom: 88px; }
+      .home-mobile-fab-bar {
+        padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+      }
+      #homeView.active { padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px)); }
     }
     @media (prefers-color-scheme: dark) {
       .home-new-project-btn {
@@ -1591,6 +1630,12 @@
     .gantt-bar-tooltip-phase-dropdown .gantt-phase-dropdown-option:hover {
       background: #262626 !important;
     }
+    .gantt-bar-tooltip.gantt-bar-tooltip-static .gantt-bar-tooltip-phase-dropdown .gantt-phase-dropdown-option {
+      color: var(--text-primary) !important;
+    }
+    .gantt-bar-tooltip.gantt-bar-tooltip-static .gantt-bar-tooltip-phase-dropdown .gantt-phase-dropdown-option:hover {
+      background: var(--bg-hover) !important;
+    }
     .gantt-bar-tooltip-phase-dropdown .gantt-phase-dropdown-option.selected {
       font-weight: 600;
       color: #fafafa !important;
@@ -1688,13 +1733,33 @@
       gap: 24px;
       flex-shrink: 0;
     }
-    .page-header-title-wrap { flex: 1; min-width: 0; }
+    .page-header-title-wrap { flex: 1; min-width: 0; max-width: 100%; overflow-wrap: break-word; word-break: break-word; }
     .page-header-title-wrap h1,
     .page-header-title-wrap .subtitle {
       cursor: text;
       border-radius: 4px;
       padding: 2px 4px;
       margin: -2px -4px;
+      overflow-wrap: break-word;
+      word-break: break-word;
+      white-space: normal;
+    }
+    .board-info-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px 20px;
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--text-tertiary);
+      user-select: none;
+    }
+    .board-info-strip .board-info-label {
+      color: var(--text-secondary);
+      margin-right: 4px;
+    }
+    .board-info-strip .board-info-item {
+      white-space: nowrap;
+      min-width: 0;
     }
     .page-header-title-wrap h1:focus,
     .page-header-title-wrap .subtitle:focus {
@@ -1709,15 +1774,21 @@
       background: transparent;
       color: var(--text-secondary);
       border-radius: var(--button-radius);
-      color: #737373;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
     }
-    .settings-btn:hover { color: var(--text-primary); background: var(--bg-hover); }
-    .settings-btn svg { width: 20px; height: 20px; transition: transform 0.3s ease; }
+    .settings-btn:hover { color: var(--text-primary); background: transparent; }
+    .settings-btn svg { width: 18px; height: 18px; transition: transform 0.3s ease; }
     .settings-btn:hover svg { transform: rotate(90deg); }
+    #ganttView #settingsBtn {
+      position: fixed;
+      top: max(12px, env(safe-area-inset-top, 0px));
+      right: max(12px, env(safe-area-inset-right, 0px));
+      margin: 0;
+      z-index: 1000;
+    }
     .share-modal-overlay {
       position: fixed;
       inset: 0;
@@ -2754,8 +2825,8 @@
     .gantt-task-cell .task-chevron { transform: rotate(-90deg); }
     .gantt-row.expanded .gantt-task-cell .task-chevron { transform: rotate(0deg); }
     .gantt-detail-row {
-      background: var(--bg-body);
-      border-bottom: 1px solid var(--border-default);
+      background: var(--bg-subtle);
+      border-bottom: 1px solid var(--border-subtle);
       padding: 8px 24px 20px 32px;
       flex-shrink: 0;
       position: sticky;
@@ -3010,7 +3081,7 @@
       min-width: 0;
     }
     .task-detail-link-card-title {
-      font-weight: 500;
+      font-weight: 400;
       font-size: 14px;
       color: var(--text-primary);
       white-space: nowrap;
@@ -3075,17 +3146,46 @@
     .task-detail-mobile-summary {
       display: none;
     }
+    .task-detail-mobile-floating-actions {
+      display: none !important;
+    }
     @media (max-width: 480px) {
-      #ganttView { min-width: 0; max-width: 100vw; overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-      #ganttView .page-header { padding-top: 16px; min-width: 0; }
-      .gantt-wrapper { max-width: 100%; min-width: 0; box-sizing: border-box; overflow: visible; flex: 0 1 auto; min-height: 0; }
+      #ganttView { min-width: 0; max-width: 100vw; overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; box-sizing: border-box; }
+      #ganttView .page-header { padding-top: 16px; min-width: 0; max-width: 100%; }
+      #ganttView .page-header-title-wrap { max-width: 100%; }
+      #ganttView .page-header .subtitle { max-width: 100%; }
+      #ganttView .board-info-strip { min-width: 0; display: flex !important; }
+      #ganttView .board-info-strip .board-info-item { white-space: normal; overflow-wrap: break-word; }
+      .gantt-wrapper { max-width: 100%; min-width: 0; box-sizing: border-box; overflow-x: hidden; flex: 0 1 auto; min-height: 0; }
       .gantt-wrapper .gantt-grid { max-width: 100%; min-width: 0; }
       .gantt-header-sticky { min-width: 0; max-width: 100%; }
+    }
+    /* Mobile portrait only: minimal task view (task + status), hide bars and phase header */
+    @media (max-width: 480px) and (orientation: portrait) {
       .gantt-header-sticky .phase-header-row {
         display: none !important;
       }
+      /* Header row same 2-col grid; fixed 56px status col so task col gets remainder and fits viewport */
+      #ganttHeaderRow.gantt-header {
+        grid-template-columns: minmax(0, 1fr) 56px;
+        min-width: 0;
+        max-width: 100%;
+      }
+      #ganttHeaderRow.gantt-header .gantt-cell:nth-child(n+3) {
+        display: none !important;
+      }
+      #ganttHeaderRow.gantt-header .gantt-cell:first-child {
+        grid-column: 1;
+        min-width: 0;
+      }
+      #ganttHeaderRow.gantt-header .gantt-cell:nth-child(2) {
+        display: flex !important;
+        grid-column: 2;
+        justify-content: flex-end;
+        padding: 10px 16px 10px 0;
+      }
       .gantt-row:not(.gantt-header) {
-        grid-template-columns: minmax(0, 1fr) minmax(72px, max-content);
+        grid-template-columns: minmax(0, 1fr) 56px;
         min-width: 0;
         max-width: 100%;
         min-height: 52px;
@@ -3098,8 +3198,8 @@
         min-width: 0;
         max-width: 100%;
         box-sizing: border-box;
-        overflow: visible;
-        padding: 14px 10px;
+        overflow: hidden;
+        padding: 14px 8px 14px 16px;
       }
       .gantt-row:not(.gantt-header) .gantt-cell:nth-child(2),
       .gantt-row:not(.gantt-header) .gantt-status-cell {
@@ -3107,9 +3207,10 @@
         grid-column: 2;
         align-items: center;
         justify-content: flex-end;
-        padding: 14px 10px 14px 0;
+        padding: 14px 8px 14px 0;
         flex-shrink: 0;
         min-width: 0;
+        overflow: hidden;
       }
       .gantt-row .gantt-phase-cell .gantt-phase-dropdown-wrap {
         flex-shrink: 0;
@@ -3140,23 +3241,84 @@
         word-break: break-word;
       }
       .gantt-row .gantt-task-cell {
-        overflow: visible;
+        overflow: hidden;
         font-size: 16px;
+        display: grid;
+        grid-template-columns: 1fr auto auto;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+      }
+      .gantt-row .gantt-task-cell .task-name-wrap {
+        min-width: 0;
+        grid-column: 1;
+      }
+      .gantt-row .gantt-task-cell .task-cell-phase-pill {
+        grid-column: 2;
+        margin-left: 0;
+      }
+      .gantt-row .gantt-task-cell .task-actions {
+        grid-column: 3;
+      }
+      /* Portrait: phase + icons in one group at the right; constrain so row fits viewport */
+      .gantt-row .gantt-task-cell {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        min-width: 0;
+        overflow: hidden;
+      }
+      .gantt-row .gantt-task-cell .task-name-wrap {
+        flex: 1;
+        min-width: 0;
+      }
+      .gantt-row .gantt-task-cell .task-cell-right-group {
+        margin-left: auto;
+        flex-shrink: 0;
+        min-width: 0;
+      }
+      .gantt-row .gantt-task-cell .task-cell-phase-pill {
+        margin-left: 0;
+        flex-shrink: 0;
+      }
+      .gantt-row .gantt-task-cell .task-actions {
+        flex-shrink: 0;
       }
       .task-cell-phase-pill {
         display: flex !important;
         align-items: center;
         gap: 4px;
         flex-shrink: 0;
-        margin-left: auto;
+        margin-left: 0;
         font-size: 12px;
         color: var(--text-secondary);
       }
       .task-cell-phase-pill-label {
         white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 56px;
+      }
+      .gantt-row .gantt-task-cell .task-actions .gantt-delete-btn,
+      .gantt-row .gantt-task-cell .task-actions .gantt-duplicate-btn,
+      .gantt-row .gantt-task-cell .task-actions .task-rename-btn {
+        width: 28px;
+        height: 28px;
+        min-width: 28px;
+      }
+      .gantt-row .gantt-task-cell .task-actions .gantt-delete-btn svg,
+      .gantt-row .gantt-task-cell .task-actions .gantt-duplicate-btn svg,
+      .gantt-row .gantt-task-cell .task-actions .task-rename-btn svg {
+        width: 14px;
+        height: 14px;
+      }
+      .gantt-row .gantt-task-cell .task-cell-right-group {
+        gap: 4px;
       }
       .gantt-detail-row {
         padding: 20px 10px 24px;
+        max-width: 100%;
+        box-sizing: border-box;
       }
       .gantt-detail-row-inner {
         max-height: none;
@@ -3173,10 +3335,64 @@
         grid-column: 1 / -1;
         width: 100%;
       }
+      /* Always show action icons on mobile (no hover), aligned right in task row */
+      .gantt-row:not(.gantt-header) .gantt-task-cell .task-actions {
+        opacity: 1;
+      }
+      /* Task table fits viewport: no horizontal overflow */
+      .gantt-wrapper {
+        width: 100%;
+        max-width: 100%;
+      }
+      .gantt-chart-scroll {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        overflow-x: hidden;
+      }
+      .gantt-wrapper .gantt-grid {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        margin-left: 0;
+        margin-right: 0;
+      }
+      .gantt-header-sticky {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        margin-left: 0;
+        margin-right: 0;
+      }
     }
-    @media (max-width: 768px) {
+    /* Small viewport portrait (e.g. 481–768px): same minimal task view */
+    @media (min-width: 481px) and (max-width: 768px) and (orientation: portrait) {
+      .gantt-header-sticky .phase-header-row {
+        display: none !important;
+      }
+      /* Fixed 56px status col so task col fits viewport */
+      #ganttHeaderRow.gantt-header {
+        grid-template-columns: minmax(0, 1fr) 56px;
+        min-width: 0;
+        max-width: 100%;
+      }
+      #ganttHeaderRow.gantt-header .gantt-cell:nth-child(n+3) {
+        display: none !important;
+      }
+      #ganttHeaderRow.gantt-header .gantt-cell:first-child {
+        grid-column: 1;
+        min-width: 0;
+      }
+      #ganttHeaderRow.gantt-header .gantt-cell:nth-child(2) {
+        display: flex !important;
+        grid-column: 2;
+        justify-content: flex-end;
+        padding: 10px 8px 10px 0;
+      }
       .gantt-row:not(.gantt-header) {
-        grid-template-columns: minmax(0, 1fr) minmax(72px, max-content);
+        grid-template-columns: minmax(0, 1fr) 56px;
+        min-width: 0;
+        max-width: 100%;
       }
       .gantt-row:not(.gantt-header) .gantt-cell:nth-child(n+3) {
         display: none !important;
@@ -3196,17 +3412,189 @@
       .gantt-header .gantt-cell:nth-child(2) {
         text-align: right;
       }
+      .gantt-row .gantt-task-cell {
+        display: grid;
+        grid-template-columns: 1fr auto auto;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+      }
+      .gantt-row .gantt-task-cell .task-name-wrap {
+        min-width: 0;
+        grid-column: 1;
+      }
+      .gantt-row .gantt-task-cell .task-cell-phase-pill {
+        grid-column: 2;
+        margin-left: 0;
+      }
+      .gantt-row .gantt-task-cell .task-actions {
+        grid-column: 3;
+      }
+      /* Portrait: phase + icons in one group at the right of the row (red box area) */
+      .gantt-row .gantt-task-cell {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+      }
+      .gantt-row .gantt-task-cell .task-name-wrap {
+        flex: 1;
+        min-width: 0;
+      }
+      .gantt-row .gantt-task-cell .task-cell-right-group {
+        margin-left: auto;
+        flex-shrink: 0;
+      }
+      .gantt-row .gantt-task-cell .task-cell-phase-pill {
+        margin-left: 0;
+        flex-shrink: 0;
+      }
+      .gantt-row .gantt-task-cell .task-actions {
+        flex-shrink: 0;
+      }
       .task-cell-phase-pill {
         display: flex !important;
         align-items: center;
         gap: 4px;
         flex-shrink: 0;
-        margin-left: auto;
+        margin-left: 0;
         font-size: 12px;
         color: var(--text-secondary);
       }
       .task-cell-phase-pill-label {
         white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 56px;
+      }
+      .gantt-row .gantt-task-cell {
+        overflow: hidden;
+      }
+      .gantt-row .gantt-task-cell .task-actions .gantt-delete-btn,
+      .gantt-row .gantt-task-cell .task-actions .gantt-duplicate-btn,
+      .gantt-row .gantt-task-cell .task-actions .task-rename-btn {
+        width: 28px;
+        height: 28px;
+        min-width: 28px;
+      }
+      .gantt-row .gantt-task-cell .task-actions .gantt-delete-btn svg,
+      .gantt-row .gantt-task-cell .task-actions .gantt-duplicate-btn svg,
+      .gantt-row .gantt-task-cell .task-actions .task-rename-btn svg {
+        width: 14px;
+        height: 14px;
+      }
+      .gantt-row .gantt-task-cell .task-cell-right-group {
+        gap: 4px;
+      }
+      /* Always show action icons on mobile (no hover) */
+      .gantt-row:not(.gantt-header) .gantt-task-cell .task-actions {
+        opacity: 1;
+      }
+    }
+    /* Mobile portrait: hide sprint view selector, move settings to top right; keep board info visible */
+    @media (max-width: 768px) and (orientation: portrait) {
+      #ganttView { overflow-x: hidden; }
+      #ganttView .page-header .chart-controls label[for="viewMode"],
+      #ganttView .page-header .chart-controls #viewMode {
+        display: none !important;
+      }
+      #ganttView .page-header {
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-items: flex-start;
+      }
+      #ganttView .page-header .chart-controls {
+        position: absolute;
+        top: 0;
+        right: 0;
+      }
+      #ganttView .page-header .page-header-title-wrap {
+        padding-right: 52px;
+      }
+      #ganttView .board-info-strip {
+        display: flex !important;
+        visibility: visible;
+      }
+      /* All portrait: table fits viewport, no horizontal scroll */
+      #ganttView { width: 100%; max-width: 100vw; box-sizing: border-box; }
+      .gantt-wrapper { width: 100%; max-width: 100%; min-width: 0; overflow-x: hidden; }
+      .gantt-chart-scroll { width: 100%; max-width: 100%; min-width: 0; overflow-x: hidden; }
+      .gantt-wrapper .gantt-grid {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        margin-left: 0;
+        margin-right: 0;
+      }
+      .gantt-header-sticky {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        margin-left: 0;
+        margin-right: 0;
+      }
+      .gantt-row { min-width: 0; }
+      .gantt-detail-row {
+        max-width: 100%;
+        box-sizing: border-box;
+      }
+      .gantt-detail-row .task-detail-toolbar {
+        right: 8px;
+      }
+    }
+    /* Mobile landscape: compact grid so task + timeline fit in viewport (no large gap) */
+    @media (max-width: 768px) and (orientation: landscape) {
+      .gantt-wrapper .gantt-row,
+      #ganttHeaderRow.gantt-header {
+        grid-template-columns: 140px 0fr 0fr 0fr 0fr repeat(var(--gantt-weeks, 8), var(--gantt-week-width, 1fr));
+      }
+      .gantt-wrapper .phase-header-row {
+        grid-template-columns: 140px 0fr 0fr 0fr 0fr repeat(var(--gantt-weeks, 8), var(--gantt-week-width, 1fr));
+      }
+      .gantt-wrapper .gantt-row .gantt-cell:nth-child(2),
+      .gantt-wrapper .gantt-row .gantt-cell:nth-child(3),
+      .gantt-wrapper .gantt-row .gantt-cell:nth-child(4),
+      .gantt-wrapper .gantt-row .gantt-cell:nth-child(5) {
+        overflow: hidden;
+        min-width: 0;
+        padding: 0;
+        border: none;
+      }
+      .gantt-wrapper .gantt-row .gantt-cell:nth-child(1),
+      .gantt-wrapper .gantt-row .gantt-cell:nth-child(n+6) {
+        min-width: 0;
+      }
+      .gantt-wrapper .gantt-timeline-cell {
+        grid-column: 6 / -1;
+      }
+      .gantt-wrapper .phase-header-row .phase-header-cell:first-child {
+        grid-column: 1;
+      }
+      .gantt-wrapper .phase-header-timeline {
+        grid-column: 6 / -1;
+      }
+      /* Landscape: no phase label in row; show action icons only when row is expanded */
+      .gantt-wrapper .gantt-row .gantt-task-cell .task-cell-phase-pill {
+        display: none !important;
+      }
+      .gantt-wrapper .gantt-row:not(.gantt-header) .gantt-task-cell .task-actions {
+        opacity: 0;
+      }
+      .gantt-wrapper .gantt-row.expanded .gantt-task-cell .task-actions {
+        opacity: 1;
+      }
+    }
+    /* Mobile (portrait + landscape): always show task row action icons (no hover on touch) — overridden for landscape above */
+    @media (max-width: 768px) {
+      .gantt-row:not(.gantt-header) .gantt-task-cell .task-actions {
+        opacity: 1;
+      }
+    }
+    /* Mobile landscape: keep bars visible (no minimal-view collapse) — handled by portrait-only rules above */
+    @media (max-width: 768px) {
+      /* Bottom padding for FAB + iOS home indicator / safe area */
+      #ganttView.active {
+        padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
       }
       .gantt-detail-row .task-detail-toolbar {
         right: 10px;
@@ -3516,7 +3904,7 @@
       overflow-y: visible;
     }
     @media (max-width: 480px) {
-      #homeView.active { padding: 16px 10px 24px; }
+      #homeView.active { padding: 16px 10px calc(88px + env(safe-area-inset-bottom, 0px)); }
     }
     .home-sticky-header {
       flex-shrink: 0;
@@ -3561,6 +3949,13 @@
     }
     .home-settings-icon-btn svg { width: 18px; height: 18px; transition: transform 0.3s ease; }
     .home-settings-icon-btn:hover svg { transform: rotate(90deg); }
+    #homeSettingsBtn {
+      position: fixed;
+      top: max(12px, env(safe-area-inset-top, 0px));
+      right: max(12px, env(safe-area-inset-right, 0px));
+      margin: 0;
+      z-index: 1000;
+    }
     .home-shared-file-push { margin-top: 12px; }
     .home-shared-file-push .home-shared-file-label { margin-bottom: 4px; }
     .home-shared-file-status { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 0; }
@@ -4592,9 +4987,12 @@
       flex: 0 0 auto;
     }
     @media (max-width: 480px) {
-      .gantt-wrapper { overflow: visible; flex: 0 1 auto; }
-      .gantt-chart-scroll { overflow: visible; flex: 0 1 auto; }
-      .gantt-wrapper .gantt-grid { flex: 0 1 auto; }
+      .gantt-wrapper { overflow-x: hidden; overflow-y: visible; flex: 0 1 auto; max-width: 100%; }
+      .gantt-chart-scroll { overflow-x: hidden; overflow-y: auto; flex: 0 1 auto; max-width: 100%; }
+      .gantt-wrapper .gantt-grid { flex: 0 1 auto; min-width: 0; max-width: 100%; width: 100%; }
+    }
+    @media (max-width: 768px) and (orientation: portrait) {
+      .gantt-wrapper .gantt-grid { min-width: 0; max-width: 100%; width: 100%; }
     }
     .gantt-empty-state {
       flex-shrink: 0;
@@ -4685,6 +5083,7 @@
 <body>
   <div class="task-dependency-tooltip" id="taskDependencyTooltip" role="tooltip"></div>
   <div class="custom-tooltip" id="customTooltip" role="tooltip" aria-hidden="true"></div>
+  <div class="gantt-toast" id="ganttToast" role="status" aria-live="polite"></div>
   <div class="detach-confirm-popup" id="detachConfirmPopup" role="dialog" aria-labelledby="detachConfirmMsg">
     <div class="detach-confirm-msg" id="detachConfirmMsg"></div>
     <p class="detach-confirm-hint" id="detachConfirmHint">You can allow dependent tasks to have their own dates in Board settings → Tasks → Dependent tasks.</p>
@@ -4850,6 +5249,13 @@
       <div class="page-header-title-wrap">
         <h1 id="pageTitle">Project Schedule</h1>
         <p class="subtitle" id="pageDescription">Drag bars to reschedule • Drag edges to change dates • Drag rows to reorder • Click a row to expand details • Click cells to edit</p>
+        <div class="board-info-strip" id="boardInfoStrip" aria-label="Board summary">
+          <span class="board-info-item"><span class="board-info-label">Start</span> <span id="boardInfoStart">—</span></span>
+          <span class="board-info-item"><span class="board-info-label">End</span> <span id="boardInfoEnd">—</span></span>
+          <span class="board-info-item"><span class="board-info-label">Tasks</span> <span id="boardInfoTaskCount">0</span></span>
+          <span class="board-info-item"><span class="board-info-label">Current</span> <span id="boardInfoCurrentTasks">0</span></span>
+          <span class="board-info-item"><span class="board-info-label">Phase</span> <span id="boardInfoPhase">—</span></span>
+        </div>
       </div>
       <div class="chart-controls">
       <label for="viewMode">View:</label>
@@ -4924,7 +5330,6 @@
     </div>
   </div>
 
-  <div class="gantt-toast" id="ganttToast" role="status" aria-live="polite"></div>
   <div class="share-modal-overlay" id="shareModalOverlay" role="dialog" aria-labelledby="shareModalTitle" aria-modal="true" style="display:none">
     <div class="share-modal">
       <h3 id="shareModalTitle">Share board</h3>
@@ -7234,6 +7639,53 @@
       toolbar.appendChild(editBtn);
       toolbar.appendChild(doneBtn);
       detailRow.appendChild(toolbar);
+      var floatingActions = document.createElement("div");
+      floatingActions.className = "task-detail-mobile-floating-actions";
+      var floatingPhase = document.createElement("div");
+      floatingPhase.className = "task-detail-floating-phase";
+      var floatingPhaseDot = document.createElement("span");
+      floatingPhaseDot.className = "task-detail-floating-phase-dot";
+      var phaseId = typeof PHASES !== "undefined" && PHASES.length ? (task.phase || PHASES[0].id) : "";
+      floatingPhaseDot.style.background = typeof getPhaseColor === "function" ? getPhaseColor(phaseId) : "#737373";
+      var phaseName = typeof PHASES !== "undefined" && PHASES.length ? (PHASES.find(function (p) { return p.id === phaseId; })?.name || phaseId) : phaseId;
+      floatingPhase.appendChild(floatingPhaseDot);
+      floatingPhase.appendChild(document.createTextNode(phaseName || "—"));
+      floatingActions.appendChild(floatingPhase);
+      var floatingBtns = document.createElement("div");
+      floatingBtns.className = "task-detail-floating-actions-btns";
+      function triggerRowButton(className) {
+        var row = grid.querySelector(".gantt-row.expanded");
+        if (row) {
+          var btn = row.querySelector(className);
+          if (btn) btn.click();
+        }
+      }
+      var renameSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>';
+      var duplicateSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+      var deleteSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>';
+      var editFloatingBtn = document.createElement("button");
+      editFloatingBtn.type = "button";
+      editFloatingBtn.className = "task-detail-floating-btn";
+      editFloatingBtn.title = "Rename";
+      editFloatingBtn.innerHTML = renameSvg;
+      editFloatingBtn.addEventListener("click", function () { triggerRowButton(".task-rename-btn"); });
+      var dupFloatingBtn = document.createElement("button");
+      dupFloatingBtn.type = "button";
+      dupFloatingBtn.className = "task-detail-floating-btn";
+      dupFloatingBtn.title = "Duplicate";
+      dupFloatingBtn.innerHTML = duplicateSvg;
+      dupFloatingBtn.addEventListener("click", function () { triggerRowButton(".gantt-duplicate-btn"); });
+      var delFloatingBtn = document.createElement("button");
+      delFloatingBtn.type = "button";
+      delFloatingBtn.className = "task-detail-floating-btn";
+      delFloatingBtn.title = "Delete";
+      delFloatingBtn.innerHTML = deleteSvg;
+      delFloatingBtn.addEventListener("click", function () { triggerRowButton(".gantt-delete-btn"); });
+      floatingBtns.appendChild(editFloatingBtn);
+      floatingBtns.appendChild(dupFloatingBtn);
+      floatingBtns.appendChild(delFloatingBtn);
+      floatingActions.appendChild(floatingBtns);
+      detailRow.appendChild(floatingActions);
       container.appendChild(contentArea);
       if (detailEditMode) {
         editBtn.style.display = "none";
@@ -9128,6 +9580,48 @@
       return { startDate, endDate };
     }
 
+    function updateBoardInfoStrip() {
+      const startEl = document.getElementById("boardInfoStart");
+      const endEl = document.getElementById("boardInfoEnd");
+      const countEl = document.getElementById("boardInfoTaskCount");
+      const currentEl = document.getElementById("boardInfoCurrentTasks");
+      const phaseEl = document.getElementById("boardInfoPhase");
+      if (!startEl || !endEl || !countEl || !currentEl || !phaseEl) return;
+      let startDate = getProjectStartDate();
+      let endDate = getProjectEndDate();
+      let minDate = null, maxDate = null;
+      tasks.forEach(t => {
+        if (t.startDate) minDate = minDate ? new Date(Math.min(minDate.getTime(), t.startDate.getTime())) : new Date(t.startDate);
+        if (t.endDate) maxDate = maxDate ? new Date(Math.max(maxDate.getTime(), t.endDate.getTime())) : new Date(t.endDate);
+      });
+      if (!startDate && minDate) startDate = minDate;
+      if (!endDate && maxDate) endDate = maxDate;
+      startEl.textContent = startDate ? formatDateFull(startDate) : "—";
+      endEl.textContent = endDate ? formatDateFull(endDate) : "—";
+      countEl.textContent = String(tasks.length);
+      const today = new Date();
+      const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
+      const todayEnd = todayStart + 24 * 60 * 60 * 1000 - 1;
+      const currentCount = tasks.filter(t => {
+        if (!t.startDate || !t.endDate) return false;
+        const tStart = new Date(t.startDate.getFullYear(), t.startDate.getMonth(), t.startDate.getDate()).getTime();
+        const tEnd = new Date(t.endDate.getFullYear(), t.endDate.getMonth(), t.endDate.getDate(), 23, 59, 59, 999).getTime();
+        return tStart <= todayEnd && tEnd >= todayStart;
+      }).length;
+      currentEl.textContent = String(currentCount);
+      let currentPhaseName = "—";
+      if (PHASES.length > 0 && typeof WEEK_START !== "undefined") {
+        for (let i = 0; i < PHASES.length; i++) {
+          const range = getPhaseDateRange(i, WEEK_START);
+          if (range && today.getTime() >= range.startDate.getTime() && today.getTime() <= range.endDate.getTime()) {
+            currentPhaseName = PHASES[i].name || PHASES[i].id || "—";
+            break;
+          }
+        }
+      }
+      phaseEl.textContent = currentPhaseName;
+    }
+
     function renderPhaseHeaders() {
       if (PHASES.length === 0) {
         const html = '<div class="phase-header-cell" style="grid-column:1/span 5"></div><div class="phase-header-timeline"><div class="phase-header-cell phase-header-empty" style="flex:1;background:var(--bg-hover);color:var(--text-tertiary);font-size:12px;">Add phases in Board settings</div></div>';
@@ -9226,7 +9720,9 @@
       pillLabel.textContent = phaseName || "—";
       phasePill.appendChild(pillDot);
       phasePill.appendChild(pillLabel);
-      taskCell.appendChild(phasePill);
+      const rightGroup = document.createElement("div");
+      rightGroup.className = "task-cell-right-group";
+      rightGroup.appendChild(phasePill);
       const renameBtn = document.createElement("button");
       renameBtn.className = "task-rename-btn";
       renameBtn.type = "button";
@@ -9313,6 +9809,8 @@
       });
       taskActions.appendChild(duplicateBtn);
       taskActions.appendChild(deleteBtn);
+      rightGroup.appendChild(taskActions);
+      taskCell.appendChild(rightGroup);
       taskCell.appendChild(taskActions);
       const STATUS_OPTIONS = ["Not started", "In progress", "Done", "Blocked"];
       const statusCell = document.createElement("div");
@@ -9832,6 +10330,7 @@
       renderPhaseHeaders();
       renderTasks();
       saveTasks();
+      if (typeof updateBoardInfoStrip === "function") updateBoardInfoStrip();
     }
 
     function showDetachConfirm(anchorEl, message, options) {
