@@ -16,6 +16,8 @@
            url('TT Norms Pro Trial 4-000/TT_Norms_Pro_Trial_Regular.woff') format('woff');
     }
     :root {
+      --font-heading: 'TT Norms Pro', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      --font-body: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
       /* Motion — reusable across pages and elements */
       --motion-duration-fast: 150ms;
       --motion-duration-normal: 200ms;
@@ -84,7 +86,7 @@
     .motion-slow { transition-duration: var(--motion-duration-slow); transition-timing-function: var(--motion-easing-decelerate); }
     * { box-sizing: border-box; }
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      font-family: var(--font-body);
       margin: 0;
       padding: 24px;
       padding-bottom: env(safe-area-inset-bottom, 0px);
@@ -108,13 +110,12 @@
     #ganttView.active .page-header,
     #ganttView.active .home-back-link { padding-left: 24px; padding-right: 24px; }
     #ganttView.active .collaborators-avatar-bar { padding-left: 24px; padding-right: 24px; }
-    /* TEMPORARY: headers use TT Norms Pro (test font) */
-    h1, h2 {
-      font-family: 'TT Norms Pro', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    h1, h2, h3, h4, h5, h6 {
+      font-family: var(--font-heading);
     }
     h1 {
-      font-size: 32px;
-      font-weight: 400;
+      font-size: 28px;
+      font-weight: 300;
       line-height: 1.3;
       letter-spacing: -0.02em;
       margin: 0 0 4px 0;
@@ -494,7 +495,7 @@
       border-radius: var(--button-radius);
       border: none;
       cursor: pointer;
-      font-family: inherit;
+      font-family: var(--font-body);
     }
     .detach-confirm-popup .detach-confirm-cancel {
       background: #404040;
@@ -558,6 +559,7 @@
     }
     .phase-select-menu.visible { opacity: 1; visibility: visible; }
     .phase-select-menu-title {
+      font-family: var(--font-heading);
       padding: 8px 14px 6px;
       font-weight: 500;
       font-size: 12px;
@@ -576,7 +578,7 @@
       background: transparent;
       color: #fafafa;
       font-size: 13px;
-      font-family: inherit;
+      font-family: var(--font-body);
       text-align: left;
       width: 100%;
     }
@@ -834,7 +836,7 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      font-family: inherit;
+      font-family: var(--font-body);
     }
     .gantt-toast-btn-secondary:hover {
       background: rgba(255,255,255,0.14);
@@ -866,7 +868,7 @@
       font-size: 13px;
       font-weight: 500;
       padding: 6px 12px;
-      font-family: inherit;
+      font-family: var(--font-body);
     }
     .gantt-drag-guide {
       position: fixed;
@@ -976,7 +978,7 @@
       border: none;
       background: transparent;
       font-size: 13px;
-      font-family: inherit;
+      font-family: var(--font-body);
       color: var(--text-secondary);
     }
     .gantt-date-input-wrap input[type="text"]:focus { outline: none; }
@@ -1012,7 +1014,7 @@
       background: var(--bg-surface);
       color: var(--text-primary);
       font-size: 13px;
-      font-family: inherit;
+      font-family: var(--font-body);
     }
     .gantt-party-input:focus { outline: none; border-color: var(--color-general-primary); }
     .gantt-timeline-cell {
@@ -1302,7 +1304,7 @@
       border-radius: 9999px;
       border: none;
       cursor: pointer;
-      font-family: inherit;
+      font-family: var(--font-body);
       background: transparent;
       color: rgba(0, 0, 0, 0.5);
       transition: background 0.2s, color 0.2s;
@@ -1321,7 +1323,7 @@
       border-radius: 9999px;
       border: none;
       cursor: pointer;
-      font-family: inherit;
+      font-family: var(--font-body);
       background: transparent;
       color: rgba(0, 0, 0, 0.5);
       transition: background 0.2s, color 0.2s;
@@ -1340,7 +1342,7 @@
       border-radius: 9999px;
       border: none;
       cursor: pointer;
-      font-family: inherit;
+      font-family: var(--font-body);
       background: transparent;
       color: rgba(0, 0, 0, 0.5);
       transition: background 0.2s, color 0.2s;
@@ -1367,7 +1369,7 @@
       border-radius: 9999px;
       border: none;
       cursor: pointer;
-      font-family: inherit;
+      font-family: var(--font-body);
       background: transparent;
       color: rgba(0, 0, 0, 0.5);
       transition: background 0.2s, color 0.2s;
@@ -1437,6 +1439,7 @@
     }
     .fab-phase-menu.visible { opacity: 1; visibility: visible; }
     .fab-phase-menu-title {
+      font-family: var(--font-heading);
       padding: 8px 14px 6px;
       font-weight: 500;
       font-size: 12px;
@@ -1455,7 +1458,7 @@
       background: transparent;
       color: #fafafa;
       font-size: 13px;
-      font-family: inherit;
+      font-family: var(--font-body);
       text-align: left;
       width: 100%;
     }
@@ -1600,7 +1603,7 @@
       border-radius: var(--button-radius);
       border: none;
       cursor: pointer;
-      font-family: inherit;
+      font-family: var(--font-body);
       background: var(--color-general-primary);
       color: var(--bg-body);
       transition: opacity 0.2s;
@@ -1640,7 +1643,7 @@
       border: 1px solid var(--border-default);
       border-radius: 8px;
       cursor: pointer;
-      font-family: inherit;
+      font-family: var(--font-body);
     }
     .home-readonly-badge:hover { background: var(--bg-hover); }
     .home-readonly-badge-dot {
@@ -1709,7 +1712,7 @@
       border: none;
       background: transparent;
       font-size: 13px;
-      font-family: inherit;
+      font-family: var(--font-body);
       cursor: pointer;
       padding: 2px 0;
       color: inherit;
@@ -1730,7 +1733,7 @@
       border: none;
       background: transparent;
       font-size: 13px;
-      font-family: inherit;
+      font-family: var(--font-body);
       cursor: pointer;
       color: inherit;
       text-align: left;
@@ -1784,7 +1787,7 @@
       gap: 8px;
       padding: 6px 10px;
       font-size: 13px;
-      font-family: inherit;
+      font-family: var(--font-body);
       cursor: pointer;
       border: none;
       background: transparent;
@@ -1873,7 +1876,7 @@
       border: none;
       background: transparent;
       font-size: 13px;
-      font-family: inherit;
+      font-family: var(--font-body);
       cursor: pointer;
       color: inherit;
       text-align: center;
@@ -1921,7 +1924,7 @@
       gap: 8px;
       padding: 6px 10px;
       font-size: 13px;
-      font-family: inherit;
+      font-family: var(--font-body);
       cursor: pointer;
       border: none;
       background: transparent;
@@ -2002,6 +2005,9 @@
       margin: 0;
       z-index: 1000;
     }
+    @media (min-width: 769px) {
+      #ganttView #settingsBtn { display: none !important; }
+    }
     .share-modal-overlay {
       position: fixed;
       inset: 0;
@@ -2041,7 +2047,7 @@
       border: 1px solid var(--border-default);
       border-radius: 8px;
       font-size: 14px;
-      font-family: inherit;
+      font-family: var(--font-body);
       background: var(--bg-subtle);
       color: var(--text-primary);
     }
@@ -2216,7 +2222,7 @@
       color: var(--text-primary);
       border-radius: var(--input-radius);
       font-size: 14px;
-      font-family: inherit;
+      font-family: var(--font-body);
     }
     .settings-section input[type="date"]::-webkit-calendar-picker-indicator {
       opacity: 0.8;
@@ -2239,6 +2245,130 @@
       background-size: 12px;
     }
     .settings-section textarea { min-height: 80px; resize: vertical; }
+    .settings-title-with-emoji {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      position: relative;
+    }
+    .settings-title-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .settings-emoji-trigger-wrap {
+      flex-shrink: 0;
+    }
+    .settings-emoji-trigger {
+      width: 40px;
+      height: 40px;
+      padding: 0 6px 0 8px;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--input-radius);
+      background: transparent;
+      color: var(--text-primary);
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      transition: border-color var(--motion-duration-fast) var(--motion-easing), background var(--motion-duration-fast) var(--motion-easing);
+    }
+    .settings-emoji-trigger:hover { border-color: var(--border-default); background: var(--bg-subtle); }
+    .settings-emoji-trigger:focus { outline: none; border-color: var(--color-general-primary); }
+    .settings-emoji-trigger-value { line-height: 1; }
+    .settings-emoji-trigger-value:empty::before { content: "—"; color: var(--text-tertiary); font-size: 14px; }
+    .settings-emoji-trigger-chevron { flex-shrink: 0; opacity: 0.6; }
+    .settings-emoji-dropdown {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      margin-top: 4px;
+      min-width: 280px;
+      max-height: 320px;
+      padding: 8px;
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      background: var(--bg-surface);
+      flex-direction: column;
+      gap: 8px;
+      box-sizing: border-box;
+      z-index: 100;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    }
+    .settings-title-with-emoji.open .settings-emoji-dropdown {
+      display: flex;
+    }
+    .settings-emoji-categories {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      flex-shrink: 0;
+      padding: 4px 0;
+      border-bottom: 1px solid var(--border-subtle);
+      background: var(--bg-subtle);
+      border-radius: 6px 6px 0 0;
+      margin: -8px -8px 0 -8px;
+      padding: 6px 8px;
+    }
+    .settings-emoji-cat-btn {
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      border: none;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--text-tertiary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.15s, background 0.15s;
+    }
+    .settings-emoji-cat-btn:hover { color: var(--text-secondary); background: rgba(0,0,0,0.04); }
+    .settings-emoji-cat-btn.active { color: var(--color-general-primary); background: rgba(37,99,235,0.08); }
+    .settings-emoji-cat-btn svg { width: 18px; height: 18px; }
+    .settings-emoji-search {
+      flex-shrink: 0;
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid var(--border-strong);
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: var(--font-body);
+      background: var(--bg-subtle);
+      color: var(--text-primary);
+    }
+    .settings-emoji-search::placeholder { color: var(--text-tertiary); }
+    .settings-emoji-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      overflow-y: auto;
+      max-height: 160px;
+    }
+    .settings-emoji-grid-btn {
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      border: none;
+      border-radius: 6px;
+      background: transparent;
+      font-size: 20px;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background var(--motion-duration-fast) var(--motion-easing);
+    }
+    .settings-emoji-grid-btn:hover { background: var(--bg-subtle); }
+    .settings-emoji-grid-btn.none { font-size: 14px; color: var(--text-tertiary); }
+    .settings-title-input { flex: 1; min-width: 0; }
     .settings-checkbox-label {
       display: flex;
       align-items: center;
@@ -2333,7 +2463,7 @@
       color: var(--text-secondary);
       font-size: 14px;
       font-weight: 500;
-      font-family: inherit;
+      font-family: var(--font-body);
       cursor: pointer;
       transition: background 0.15s, color 0.15s, border 0.15s;
     }
@@ -2347,7 +2477,7 @@
       box-shadow: inset 0 0 0 1px var(--border-strong);
     }
     .settings-hint { display: block; margin-top: 6px; font-size: 12px; color: var(--text-tertiary); }
-    .settings-hint kbd { display: inline-block; padding: 1px 5px; font-size: 11px; font-family: inherit; background: var(--bg-hover); border: 1px solid var(--border-default); border-radius: 4px; }
+    .settings-hint kbd { display: inline-block; padding: 1px 5px; font-size: 11px; font-family: var(--font-body); background: var(--bg-hover); border: 1px solid var(--border-default); border-radius: 4px; }
     .settings-section input:focus,
     .settings-section textarea:focus,
     .settings-section select:focus { outline: none; border-color: var(--color-general-primary); }
@@ -2423,7 +2553,7 @@
       background: transparent;
       border-radius: var(--button-radius);
       cursor: pointer;
-      font-family: inherit;
+      font-family: var(--font-body);
       box-sizing: border-box;
     }
     .settings-add-phase:hover { background: transparent; border-color: var(--border-strong); }
@@ -2438,12 +2568,14 @@
       display: flex;
     }
     .settings-phase-list-header-phase {
+      font-family: var(--font-heading);
       flex: 1;
       font-size: 12px;
       font-weight: 500;
       color: var(--text-tertiary);
     }
     .settings-phase-list-header-sprints {
+      font-family: var(--font-heading);
       width: 100px;
       min-width: 100px;
       font-size: 12px;
@@ -2483,7 +2615,7 @@
       font-size: 16px;
       line-height: 1;
       cursor: pointer;
-      font-family: inherit;
+      font-family: var(--font-body);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -2499,7 +2631,7 @@
       background: transparent;
       color: var(--text-primary);
       font-size: 13px;
-      font-family: inherit;
+      font-family: var(--font-body);
       text-align: center;
       -moz-appearance: textfield;
       appearance: textfield;
@@ -2523,7 +2655,7 @@
       background: transparent;
       color: var(--text-primary);
       font-size: 14px;
-      font-family: inherit;
+      font-family: var(--font-body);
       text-align: left;
       cursor: pointer;
       display: flex;
@@ -2622,7 +2754,7 @@
       background-color: transparent;
       color: var(--text-primary);
       font-size: 14px;
-      font-family: inherit;
+      font-family: var(--font-body);
       text-align: left;
       cursor: pointer;
       appearance: none;
@@ -2666,11 +2798,50 @@
       background: transparent;
       color: var(--text-primary);
       font-size: 14px;
-      font-family: inherit;
+      font-family: var(--font-body);
       text-align: left;
       cursor: pointer;
     }
     .settings-dependent-option:hover { background: var(--bg-hover); }
+    .client-name-autocomplete-wrap {
+      position: relative;
+      width: 100%;
+    }
+    .client-name-autocomplete-panel {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      margin-top: 4px;
+      padding: 8px 0;
+      border: 1px solid var(--border-strong);
+      border-radius: 6px;
+      background: var(--bg-surface);
+      box-shadow: var(--shadow-md);
+      z-index: 100;
+      max-height: 280px;
+      overflow-y: auto;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .client-name-autocomplete-wrap.open .client-name-autocomplete-panel {
+      display: flex;
+    }
+    .client-name-autocomplete-option {
+      display: block;
+      width: 100%;
+      padding: 8px 14px;
+      border: none;
+      background: transparent;
+      color: var(--text-primary);
+      font-size: 13px;
+      font-family: var(--font-body);
+      font-weight: 500;
+      text-align: left;
+      cursor: pointer;
+    }
+    .client-name-autocomplete-option:hover { background: var(--bg-hover); }
     .settings-dependent-divider {
       height: 1px;
       margin: 8px 0;
@@ -2706,7 +2877,7 @@
       border: none !important;
       box-shadow: none !important;
       padding: 0;
-      font-family: inherit;
+      font-family: var(--font-body);
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -2727,7 +2898,7 @@
       border: none;
       border-radius: 4px;
       cursor: pointer;
-      font-family: inherit;
+      font-family: var(--font-body);
     }
     .settings-palette-option .settings-palette-rename-btn:hover {
       color: var(--text-primary);
@@ -2750,11 +2921,11 @@
     .settings-party-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
     .settings-party-item { display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: var(--bg-hover); border-radius: 6px; font-size: 13px; }
     .settings-party-item span { flex: 1; min-width: 0; }
-    .settings-party-item button { flex-shrink: 0; padding: 2px 8px; font-size: 12px; color: var(--text-tertiary); background: transparent; border: none; border-radius: 4px; cursor: pointer; font-family: inherit; }
+    .settings-party-item button { flex-shrink: 0; padding: 2px 8px; font-size: 12px; color: var(--text-tertiary); background: transparent; border: none; border-radius: 4px; cursor: pointer; font-family: var(--font-body); }
     .settings-party-item button:hover { color: #b91c1c; background: rgba(185,28,28,0.1); }
     .settings-add-party-row { display: flex; flex-direction: column; gap: 8px; width: 100%; box-sizing: border-box; }
     .settings-add-party-row .settings-add-phase { width: 100%; margin-top: 0; }
-    .settings-party-input { flex: 1; min-width: 0; padding: 10px 14px; font-size: 14px; border: 1px solid var(--border-strong); border-radius: var(--input-radius); font-family: inherit; min-height: 40px; box-sizing: border-box; }
+    .settings-party-input { flex: 1; min-width: 0; padding: 10px 14px; font-size: 14px; border: 1px solid var(--border-strong); border-radius: var(--input-radius); font-family: var(--font-body); min-height: 40px; box-sizing: border-box; }
     .settings-auto-populate-btn {
       width: 100%;
       margin-top: 8px;
@@ -2766,14 +2937,48 @@
       border: 1px solid var(--border-strong);
       border-radius: var(--button-radius);
       cursor: pointer;
-      font-family: inherit;
+      font-family: var(--font-body);
       box-sizing: border-box;
     }
     .settings-auto-populate-btn:hover {
       background: var(--bg-hover);
     }
+    .settings-logo-upload { display: flex; flex-direction: column; gap: 8px; }
+    .settings-logo-dropzone {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 80px;
+      padding: 16px;
+      border: 2px dashed var(--border-strong);
+      border-radius: 8px;
+      background: var(--bg-subtle);
+      cursor: pointer;
+      transition: border-color var(--motion-duration-fast) var(--motion-easing), background var(--motion-duration-fast) var(--motion-easing);
+    }
+    .settings-logo-dropzone:hover, .settings-logo-dropzone.dragover { border-color: var(--color-general-primary); background: var(--accent-subtle, rgba(109, 40, 217, 0.06)); }
+    .settings-logo-placeholder { font-size: 13px; color: var(--text-primary); text-align: center; }
+    .settings-logo-preview {
+      width: 80px;
+      height: 64px;
+      max-width: 100%;
+      max-height: 64px;
+      flex-shrink: 0;
+      background-color: currentColor;
+      color: var(--text-primary, #525252);
+      -webkit-mask-image: var(--logo-url);
+      mask-image: var(--logo-url);
+      -webkit-mask-size: contain;
+      mask-size: contain;
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+      -webkit-mask-position: center;
+      mask-position: center;
+    }
+    .settings-logo-remove { align-self: flex-start; padding: 6px 12px; font-size: 12px; color: var(--text-secondary); background: transparent; border: 1px solid var(--border-default); border-radius: 6px; cursor: pointer; font-family: var(--font-body); }
+    .settings-logo-remove:hover { color: var(--text-primary); border-color: var(--border-strong); background: var(--bg-subtle); }
     .settings-export-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
-    .settings-export-btn { display: flex; align-items: center; gap: 8px; width: 100%; padding: 10px 14px; border: 1px solid var(--border-default); border-radius: var(--button-radius); background: var(--bg-subtle); color: var(--text-primary); font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; text-align: left; transition: border-color var(--motion-duration-fast) var(--motion-easing), background var(--motion-duration-fast) var(--motion-easing); }
+    .settings-export-btn { display: flex; align-items: center; gap: 8px; width: 100%; padding: 10px 14px; border: 1px solid var(--border-default); border-radius: var(--button-radius); background: var(--bg-subtle); color: var(--text-primary); font-size: 13px; font-weight: 500; cursor: pointer; font-family: var(--font-body); text-align: left; transition: border-color var(--motion-duration-fast) var(--motion-easing), background var(--motion-duration-fast) var(--motion-easing); }
     .settings-export-btn:hover { border-color: var(--border-strong); background: var(--bg-hover); }
     .settings-export-btn-icon { font-size: 11px; opacity: 0.8; }
     .settings-export-json-wrap { margin-top: 12px; }
@@ -2862,7 +3067,7 @@
       background: transparent;
       color: var(--text-primary);
       cursor: pointer;
-      font-family: inherit;
+      font-family: var(--font-body);
     }
     .settings-cancel-btn:hover {
       background: var(--bg-hover);
@@ -2906,7 +3111,7 @@
       border: 1px solid var(--border-strong);
       border-radius: 6px;
       font-size: 14px;
-      font-family: inherit;
+      font-family: var(--font-body);
       cursor: pointer;
     }
     .chart-controls select:focus { outline: none; border-color: var(--color-general-primary); }
@@ -3154,7 +3359,7 @@
       color: var(--text-primary);
       border-radius: 6px;
       font-size: 14px;
-      font-family: inherit;
+      font-family: var(--font-body);
     }
     .task-detail-field select {
       padding-right: 40px;
@@ -3374,7 +3579,7 @@
       background: var(--bg-surface);
       color: var(--text-primary);
       font-size: 14px;
-      font-family: inherit;
+      font-family: var(--font-body);
       cursor: pointer;
       transition: border-color 0.15s, background 0.15s;
     }
@@ -4146,7 +4351,7 @@
       width: 100%;
       padding: 20px 24px;
       text-align: left;
-      font-family: inherit;
+      font-family: var(--font-body);
       font-size: 15px;
       font-weight: 500;
       color: var(--color-general-primary);
@@ -4196,6 +4401,10 @@
       margin-bottom: 16px;
     }
     #homeView h1 { margin-bottom: 8px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .home-project-count-badge-wrap {
+      display: inline-flex;
+      position: relative;
+    }
     .home-project-count-badge {
       display: inline-flex;
       align-items: center;
@@ -4206,15 +4415,78 @@
       font-size: 13px;
       font-weight: 500;
       border-radius: 100px;
-      background: var(--color-general-primary);
-      color: var(--bg-body);
+      background: var(--bg-body);
+      color: var(--color-general-primary);
+      border: 1px solid var(--color-general-primary);
+    }
+    .home-project-count-badge-tooltip {
+      position: absolute;
+      left: 50%;
+      top: calc(100% + 8px);
+      transform: translateX(-50%);
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 1.5;
+      color: var(--text-primary);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: 8px;
+      box-shadow: var(--shadow-menu);
+      white-space: pre-line;
+      text-align: left;
+      min-width: 120px;
+      max-width: 280px;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      visibility: hidden;
+      transition: opacity 0.15s, visibility 0.15s;
+    }
+    .home-project-count-badge-wrap:hover .home-project-count-badge-tooltip:not(:empty) {
+      opacity: 1;
+      visibility: visible;
     }
     .home-subtitle { color: var(--text-secondary); margin: 0 0 24px 0; font-size: 14px; }
+    .home-client-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .home-client-filter-chip {
+      padding: 6px 12px;
+      font-size: 13px;
+      font-weight: 500;
+      border-radius: 100px;
+      border: 1px solid var(--border-default);
+      background: transparent;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-family: var(--font-body);
+      transition: background 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+    }
+    .home-client-filter-chip:hover:not(.active) {
+      background: var(--bg-surface);
+      box-shadow: 0 0 12px rgba(0,0,0,0.08), 0 0 24px rgba(0,0,0,0.06);
+      color: var(--text-primary);
+    }
+    @media (prefers-color-scheme: dark) {
+      .home-client-filter-chip:hover:not(.active) {
+        box-shadow: 0 0 12px rgba(0,0,0,0.25), 0 0 24px rgba(0,0,0,0.15);
+      }
+    }
+    .home-client-filter-chip.active {
+      background: var(--color-general-primary);
+      color: var(--bg-body);
+      border-color: var(--color-general-primary);
+      box-shadow: 0 0 10px rgba(0,0,0,0.15);
+    }
     .home-shared-file { margin-bottom: 24px; }
     .home-shared-file-label { display: block; font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; }
     .home-shared-file-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .home-shared-file-input { flex: 1; min-width: 200px; padding: 8px 10px; font-size: 13px; border: 1px solid var(--border-default); border-radius: var(--input-radius); font-family: inherit; }
-    .home-shared-file-btn { padding: 8px 12px; font-size: 13px; border-radius: var(--button-radius); border: 1px solid var(--border-strong); background: var(--bg-surface); color: var(--text-primary); cursor: pointer; font-family: inherit; }
+    .home-shared-file-input { flex: 1; min-width: 200px; padding: 8px 10px; font-size: 13px; border: 1px solid var(--border-default); border-radius: var(--input-radius); font-family: var(--font-body); }
+    .home-shared-file-btn { padding: 8px 12px; font-size: 13px; border-radius: var(--button-radius); border: 1px solid var(--border-strong); background: var(--bg-surface); color: var(--text-primary); cursor: pointer; font-family: var(--font-body); }
     .home-shared-file-btn:hover { background: var(--bg-hover); }
     .home-settings-icon-btn {
       width: 40px;
@@ -4259,7 +4531,7 @@
     @keyframes home-sync-dot-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     .home-shared-file-status-text { font-size: 13px; color: var(--text-secondary); }
     .home-shared-file-status-text strong { color: var(--text-primary); font-weight: 500; }
-    .home-shared-file-open-btn { padding: 8px 16px; font-size: 14px; font-weight: 500; border-radius: var(--button-radius); border: 1px solid var(--border-strong); background: var(--bg-surface); color: var(--text-primary); cursor: pointer; font-family: inherit; }
+    .home-shared-file-open-btn { padding: 8px 16px; font-size: 14px; font-weight: 500; border-radius: var(--button-radius); border: 1px solid var(--border-strong); background: var(--bg-surface); color: var(--text-primary); cursor: pointer; font-family: var(--font-body); }
     .home-shared-file-open-btn:hover { background: var(--bg-hover); }
     .shared-file-modal-overlay { position: fixed; inset: 0; background: transparent; z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 24px; backdrop-filter: blur(var(--modal-blur)); -webkit-backdrop-filter: blur(var(--modal-blur)); opacity: 0; pointer-events: none; transition: var(--modal-overlay-transition); }
     .shared-file-modal-overlay.visible { opacity: 1; pointer-events: auto; }
@@ -4282,7 +4554,7 @@
     .shared-file-modal label { display: block; font-size: 12px; font-weight: 500; color: var(--text-secondary); margin-bottom: 4px; }
     .shared-file-input-wrap { display: flex; align-items: stretch; margin-bottom: 12px; border: 1px solid var(--border-strong); border-radius: var(--input-radius); background: var(--bg-surface); transition: box-shadow var(--motion-duration-fast) var(--motion-easing); }
     .shared-file-input-wrap:focus-within { box-shadow: 0 0 0 1px var(--color-general-primary); outline: none; }
-    .shared-file-input-wrap input { flex: 1; min-width: 0; padding: 10px 12px; border: none; border-radius: var(--input-radius) 0 0 var(--input-radius); font-size: 14px; box-sizing: border-box; background: transparent; color: var(--text-primary); font-family: inherit; }
+    .shared-file-input-wrap input { flex: 1; min-width: 0; padding: 10px 12px; border: none; border-radius: var(--input-radius) 0 0 var(--input-radius); font-size: 14px; box-sizing: border-box; background: transparent; color: var(--text-primary); font-family: var(--font-body); }
     .shared-file-input-wrap input::placeholder { color: var(--text-tertiary); opacity: 1; }
     .shared-file-input-wrap input:focus { outline: none; }
     .shared-file-input-icons { display: flex; align-items: center; justify-content: center; gap: 2px; padding: 0 6px 0 8px; flex-shrink: 0; background: transparent; border-radius: 0 var(--input-radius) var(--input-radius) 0; border-left: 1px solid var(--border-subtle); }
@@ -4371,7 +4643,7 @@
     .project-setup-phase-row .project-setup-phase-grip { width: 20px; flex-shrink: 0; color: var(--text-tertiary); cursor: grab; display: flex; align-items: center; justify-content: center; }
     .project-setup-phase-row .project-setup-phase-grip:active { cursor: grabbing; }
     .project-setup-phase-row input[type="color"] { width: 32px; height: 32px; padding: 2px; border: 1px solid var(--border-strong); border-radius: var(--input-radius); cursor: pointer; background-color: transparent; }
-    .project-setup-phase-row input[type="text"] { flex: 1; padding: 10px 12px; border: 1px solid var(--border-strong); border-radius: var(--input-radius); font-size: 14px; font-family: inherit; background-color: transparent; color: var(--text-primary); }
+    .project-setup-phase-row input[type="text"] { flex: 1; padding: 10px 12px; border: 1px solid var(--border-strong); border-radius: var(--input-radius); font-size: 14px; font-family: var(--font-body); background-color: transparent; color: var(--text-primary); }
     .project-setup-phase-remove { width: 28px; height: 28px; padding: 0; border: none; border-radius: 6px; background: var(--bg-hover); color: var(--text-secondary); font-size: 18px; line-height: 1; cursor: pointer; flex-shrink: 0; }
     .project-setup-phase-remove:hover { background: var(--border-strong); color: var(--text-primary); }
     .project-setup-phase-remove:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -4386,8 +4658,8 @@
     .project-setup-team-row .project-setup-team-remove { padding: 4px 8px; font-size: 12px; border: none; border-radius: 6px; background: var(--bg-hover); color: var(--text-secondary); cursor: pointer; }
     .project-setup-team-row .project-setup-team-remove:hover { color: var(--text-primary); }
     .project-setup-team-add { display: flex; gap: 8px; margin-top: 8px; }
-    .project-setup-team-add input { flex: 1; padding: 10px 12px; border: 1px solid var(--border-strong); border-radius: var(--input-radius); font-size: 14px; font-family: inherit; background-color: transparent; color: var(--text-primary); min-height: 40px; box-sizing: border-box; }
-    .project-setup-team-add button { padding: 8px 14px; border-radius: var(--button-radius); border: 1px solid var(--border-strong); background: transparent; color: var(--text-primary); font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; }
+    .project-setup-team-add input { flex: 1; padding: 10px 12px; border: 1px solid var(--border-strong); border-radius: var(--input-radius); font-size: 14px; font-family: var(--font-body); background-color: transparent; color: var(--text-primary); min-height: 40px; box-sizing: border-box; }
+    .project-setup-team-add button { padding: 8px 14px; border-radius: var(--button-radius); border: 1px solid var(--border-strong); background: transparent; color: var(--text-primary); font-size: 13px; font-weight: 500; cursor: pointer; font-family: var(--font-body); }
     .project-setup-team-add button:hover { background: var(--bg-hover); }
     .project-setup-done-desc { margin-bottom: 16px; }
     .project-setup-done-actions { display: flex; justify-content: flex-start; }
@@ -4412,7 +4684,7 @@
       margin-left: -1px;
       text-align: left;
       cursor: pointer;
-      font-family: inherit;
+      font-family: var(--font-body);
       transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
     }
     .project-setup-tab-icon {
@@ -4433,7 +4705,7 @@
     .project-setup-actions #projectSetupNext { margin-left: 0; }
     .project-setup-actions #projectSetupNext.home-shared-file-open-btn--primary { flex-shrink: 0; }
     .storage-modal-tabs { display: flex; gap: 0; margin: 0 0 20px 0; border-bottom: 1px solid var(--border-default); }
-    .storage-modal-tab { padding: 10px 16px; font-size: 13px; font-weight: 500; color: var(--text-secondary); background: none; border: none; border-bottom: 1px solid transparent; margin-bottom: -1px; cursor: pointer; font-family: inherit; }
+    .storage-modal-tab { padding: 10px 16px; font-size: 13px; font-weight: 500; color: var(--text-secondary); background: none; border: none; border-bottom: 1px solid transparent; margin-bottom: -1px; cursor: pointer; font-family: var(--font-body); }
     .storage-modal-tab:hover { color: var(--text-primary); }
     .storage-modal-tab.active { color: var(--color-general-primary); border-bottom-color: var(--color-general-primary); }
     .storage-modal-tab .storage-tab-check { margin-left: 4px; }
@@ -4454,7 +4726,7 @@
       width: 100%;
       padding: 12px 14px;
       text-align: left;
-      font-family: inherit;
+      font-family: var(--font-body);
       background: transparent;
       border: 1px solid var(--border-default);
       border-radius: 8px;
@@ -4495,7 +4767,7 @@
     .storage-type-tile-content label { display: block; font-size: 12px; font-weight: 500; color: var(--text-secondary); margin-bottom: 4px; }
     .storage-type-tile-content .shared-file-input-wrap { display: flex; align-items: stretch; border: 1px solid var(--border-strong); border-radius: var(--input-radius); background: transparent; transition: box-shadow var(--motion-duration-fast) var(--motion-easing); }
     .storage-type-tile-content .shared-file-input-wrap:focus-within { box-shadow: 0 0 0 1px var(--color-general-primary); outline: none; }
-    .storage-type-tile-content .shared-file-input-wrap input { flex: 1; min-width: 0; padding: 10px 12px; border: none; border-radius: var(--input-radius) 0 0 var(--input-radius); font-size: 14px; box-sizing: border-box; background: transparent; color: var(--text-primary); font-family: inherit; }
+    .storage-type-tile-content .shared-file-input-wrap input { flex: 1; min-width: 0; padding: 10px 12px; border: none; border-radius: var(--input-radius) 0 0 var(--input-radius); font-size: 14px; box-sizing: border-box; background: transparent; color: var(--text-primary); font-family: var(--font-body); }
     .storage-type-tile-content .shared-file-input-icons { display: flex; align-items: center; gap: 2px; padding: 0 6px 0 8px; flex-shrink: 0; border-left: 1px solid var(--border-subtle); }
     .storage-type-tile-content .shared-file-input-icon { width: 28px; height: 28px; min-height: 28px; padding: 0; border: none; border-radius: 4px; background: transparent; color: var(--text-secondary); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
     .storage-type-tile-content .shared-file-input-icon:hover { background: var(--bg-hover); color: var(--text-primary); }
@@ -4518,7 +4790,7 @@
       width: 100%;
       padding: 16px 18px;
       text-align: left;
-      font-family: inherit;
+      font-family: var(--font-body);
       background: transparent;
       border: 1px solid var(--border-default);
       border-radius: 10px;
@@ -4569,7 +4841,7 @@
       background: var(--bg-surface);
       color: var(--text-primary);
       cursor: pointer;
-      font-family: inherit;
+      font-family: var(--font-body);
     }
     .gantt-auth-btn:hover { background: var(--bg-hover); }
     .gantt-auth-user { font-size: 13px; color: var(--text-secondary); margin-right: 4px; }
@@ -4590,7 +4862,7 @@
       background: var(--bg-surface);
       color: var(--text-secondary);
       cursor: pointer;
-      font-family: inherit;
+      font-family: var(--font-body);
       transition: background 0.2s, color 0.2s;
     }
     .gantt-auth-user-trigger:hover {
@@ -4630,7 +4902,7 @@
       background: none;
       border: none;
       cursor: pointer;
-      font-family: inherit;
+      font-family: var(--font-body);
       text-decoration: none;
       box-sizing: border-box;
     }
@@ -4649,6 +4921,7 @@
       background: var(--border-default);
     }
     .gantt-auth-dropdown-section-title {
+      font-family: var(--font-heading);
       padding: 8px 14px 4px;
       font-size: 11px;
       font-weight: 500;
@@ -4686,7 +4959,7 @@
     .gantt-auth-modal .auth-remember { display: flex; align-items: center; gap: 8px; margin: 10px 0 14px 0; font-size: 13px; color: var(--text-secondary); }
     .gantt-auth-modal .auth-remember input { width: auto; margin: 0; }
     .gantt-auth-modal .auth-use-different { font-size: 12px; color: var(--text-tertiary); margin-top: 16px; }
-    .gantt-auth-modal .auth-use-different button { background: none; border: none; color: var(--text-secondary); cursor: pointer; text-decoration: underline; font-size: 12px; padding: 0; font-family: inherit; }
+    .gantt-auth-modal .auth-use-different button { background: none; border: none; color: var(--text-secondary); cursor: pointer; text-decoration: underline; font-size: 12px; padding: 0; font-family: var(--font-body); }
     .gantt-auth-modal .auth-use-different button:hover { color: var(--text-primary); }
     .gantt-auth-modal .auth-use-different-sep { margin: 0 6px; color: var(--text-tertiary); }
     .gantt-auth-modal .auth-project-hint { font-size: 11px; color: var(--text-tertiary); margin: 10px 0 0 0; word-break: break-all; }
@@ -4697,7 +4970,7 @@
     .home-project-list {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
+      gap: 24px;
       width: 100%;
     }
     .home-project-list.is-empty {
@@ -4792,7 +5065,7 @@
       background: var(--color-general-primary);
       color: var(--bg-body);
       cursor: pointer;
-      font-family: inherit;
+      font-family: var(--font-body);
       flex-shrink: 0;
       display: flex;
       align-items: center;
@@ -4823,7 +5096,7 @@
       background: var(--color-general-primary);
       color: var(--bg-body);
       cursor: pointer;
-      font-family: inherit;
+      font-family: var(--font-body);
       margin-top: 16px;
       transition: opacity 0.2s;
     }
@@ -4855,7 +5128,7 @@
       background: transparent;
       color: var(--text-primary);
       cursor: pointer;
-      font-family: inherit;
+      font-family: var(--font-body);
       transition: background 0.2s, border-color 0.2s;
       min-width: 0;
       max-width: 220px;
@@ -5010,10 +5283,11 @@
       align-items: stretch;
       padding: 0;
       background: var(--bg-surface);
-      border: 1px solid var(--border-default);
+      border: 1px solid rgba(0,0,0,0.04);
       border-radius: 8px;
-      box-shadow: var(--shadow-sm);
+      box-shadow: none;
       overflow: hidden;
+      transition: border-color 0.35s ease-in-out, box-shadow 0.35s ease-in-out;
       animation: home-project-card-appear 0.35s ease-out forwards;
       animation-fill-mode: both;
     }
@@ -5034,21 +5308,25 @@
       to { opacity: 1; transform: translateY(0); }
     }
     .home-project-card { cursor: pointer; }
-    .home-project-card:hover { border-color: var(--border-strong); }
+    .home-project-card:hover { border-color: var(--border-default); box-shadow: 0 0 12px rgba(0,0,0,0.08), 0 0 24px rgba(0,0,0,0.06); }
+    @media (prefers-color-scheme: dark) {
+      .home-project-card { border-color: rgba(255,255,255,0.04); }
+      .home-project-card:hover { box-shadow: 0 0 12px rgba(0,0,0,0.25), 0 0 24px rgba(0,0,0,0.15); }
+    }
     .home-project-card .home-project-card-body {
       display: flex;
       flex-direction: column;
       gap: 8px;
       flex: 1;
       min-width: 0;
-      padding: 14px 16px 16px;
+      padding: 20px 24px 20px;
     }
     .home-project-card .home-project-card-footer {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 8px;
-      padding: 0 16px 16px;
+      padding: 0 24px 20px;
       margin-top: auto;
     }
     .home-project-card .home-project-card-footer .home-project-footer-actions {
@@ -5077,6 +5355,43 @@
       border-radius: 0;
       background: var(--bg-subtle, #f5f5f5);
       contain: layout;
+      position: relative;
+    }
+    .home-project-card-logo {
+      width: 96px;
+      height: 96px;
+      max-width: 96px;
+      max-height: 96px;
+      flex-shrink: 0;
+      pointer-events: none;
+      background-color: currentColor;
+      color: var(--text-secondary, #525252);
+      -webkit-mask-image: var(--logo-url);
+      mask-image: var(--logo-url);
+      -webkit-mask-size: contain;
+      mask-size: contain;
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+      -webkit-mask-position: center;
+      mask-position: center;
+    }
+    .home-project-timeline-preview.home-preview-logo-only {
+      flex-direction: column;
+      gap: 12px;
+    }
+    .home-project-timeline-preview.home-preview-logo-only .home-project-card-logo {
+      flex-shrink: 0;
+    }
+    .home-project-card-client-name {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary, #525252);
+      text-align: center;
+      flex-shrink: 0;
+      max-width: 160px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     @media (prefers-color-scheme: dark) {
       .home-project-timeline-preview { background: var(--bg-subtle, #262626); }
@@ -5100,17 +5415,38 @@
       color: var(--text-secondary, #525252);
     }
     .home-project-info { display: flex; flex-direction: column; gap: 8px; flex: 1; min-width: 0; }
-    .home-project-name { font-weight: 500; font-size: 20px; color: var(--text-primary); line-height: 1.3; }
-    .home-project-description { font-size: 15px; color: var(--text-secondary); line-height: 1.45; }
-    .home-project-row { width: 100%; font-size: 14px; color: var(--text-secondary); }
-    .home-project-card.edit-mode .home-project-card-body { padding: 16px; }
-    .home-project-card.edit-mode .home-project-card-footer { padding: 0 16px 16px; }
+    .home-project-name-row { display: flex; align-items: center; gap: 8px; width: 100%; min-width: 0; }
+    .home-project-name-row .home-project-name-input { flex: 1; min-width: 0; }
+    .home-project-emoji { font-size: 1.25em; line-height: 1; flex-shrink: 0; }
+    .home-project-name {
+      font-family: var(--font-heading);
+      font-weight: 400;
+      font-size: 18px;
+      color: var(--text-primary);
+      line-height: 1.3;
+    }
+    .home-project-description {
+      font-family: var(--font-body);
+      font-size: 15px;
+      font-weight: 400;
+      color: var(--text-tertiary);
+      line-height: 1.45;
+    }
+    .home-project-row {
+      font-family: var(--font-body);
+      width: 100%;
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--text-tertiary);
+    }
+    .home-project-card.edit-mode .home-project-card-body { padding: 20px 24px 20px; }
+    .home-project-card.edit-mode .home-project-card-footer { padding: 0 24px 20px; }
     .home-project-card.edit-mode .home-project-name-input,
     .home-project-card.edit-mode .home-project-desc-input {
       width: 100%;
       padding: 8px 10px;
       font-size: 14px;
-      font-family: inherit;
+      font-family: var(--font-body);
       border: 1px solid var(--border-strong);
       border-radius: 6px;
       background: var(--bg-surface);
@@ -5131,11 +5467,12 @@
       background: var(--color-general-primary);
       color: var(--bg-body);
       cursor: pointer;
-      font-family: inherit;
+      font-family: var(--font-body);
     }
     .home-project-done-btn:hover { opacity: 0.9; }
-    .home-project-task-count { font-weight: 500; color: var(--text-secondary); }
+    .home-project-task-count { font-family: var(--font-body); font-weight: 500; color: var(--text-tertiary); }
     .home-project-phase-tag {
+      font-family: var(--font-body);
       display: inline-block;
       padding: 3px 10px;
       font-size: 12px;
@@ -5146,6 +5483,7 @@
     }
     .home-project-card-footer .home-project-phase-tag { margin-top: 0; }
     .home-project-local-tag {
+      font-family: var(--font-body);
       display: inline-block;
       padding: 3px 8px;
       font-size: 11px;
@@ -5169,7 +5507,7 @@
       background: none;
       color: var(--text-secondary);
       cursor: pointer;
-      font-family: inherit;
+      font-family: var(--font-body);
       transition: color 0.2s;
     }
     .home-project-action-btn:hover {
@@ -5192,7 +5530,7 @@
       background: none;
       color: var(--text-tertiary);
       cursor: pointer;
-      font-family: inherit;
+      font-family: var(--font-body);
       transition: color 0.2s;
     }
     .home-project-delete-btn svg {
@@ -5211,9 +5549,10 @@
     .home-back-link {
       display: inline-flex;
       align-items: center;
+      align-self: flex-start;
       gap: 6px;
       margin-bottom: 16px;
-      color: var(--text-secondary);
+      color: var(--text-tertiary);
       text-decoration: none;
       font-size: 14px;
     }
@@ -5311,7 +5650,7 @@
       border: none;
       cursor: pointer;
       text-align: left;
-      font-family: inherit;
+      font-family: var(--font-body);
     }
     .collaborators-dropdown-invite:hover {
       background: var(--bg-hover);
@@ -5407,7 +5746,7 @@
       font-weight: 500;
       border-radius: var(--button-radius);
       cursor: pointer;
-      font-family: inherit;
+      font-family: var(--font-body);
       transition: opacity 0.2s, background 0.15s;
     }
     .gantt-empty-state .btn-empty-primary {
@@ -5559,7 +5898,7 @@
   <div id="homeView" class="app-view">
     <div class="home-sticky-header">
       <div class="home-header-row">
-        <h1><span id="homePageTitle">Boards</span> <span class="home-project-count-badge" id="homeProjectCountBadge" contenteditable="false">0</span></h1>
+        <h1><span id="homePageTitle">Boards</span> <span class="home-project-count-badge-wrap" id="homeProjectCountBadgeWrap"><span class="home-project-count-badge" id="homeProjectCountBadge" contenteditable="false">0</span><span class="home-project-count-badge-tooltip" id="homeProjectCountBadgeTooltip" role="tooltip"></span></span></h1>
         <div class="home-header-actions">
           <div class="gantt-auth-wrap gantt-auth-user-menu" id="ganttAuthWrap" style="display: none;">
             <button type="button" class="gantt-auth-user-trigger" id="ganttAuthUserTrigger" aria-label="Account menu" aria-expanded="false" aria-haspopup="true">
@@ -5595,6 +5934,7 @@
       </div>
       <p class="home-subtitle" id="homePageDescription">Create and open boards. Each board has its own tasks and settings.</p>
     </div>
+    <div class="home-client-filters" id="homeClientFilters"></div>
     <div class="home-project-list" id="homeProjectList"></div>
     <div class="home-mobile-fab-bar" id="homeMobileFabBar" aria-hidden="true">
       <button type="button" class="home-new-project-btn home-mobile-fab-trigger" id="homeFabMobile" aria-label="New board" data-tooltip-disabled="Read-only: add an access token in Sync Settings to create boards.">+ New board</button>
@@ -5786,11 +6126,37 @@
               </div>
               <small class="settings-hint">When on, each board card on the home screen shows a small timeline preview.</small>
             </div>
+            <div class="settings-section">
+              <div class="settings-toggle-row">
+                <label for="settingsShowLogosInCards" class="settings-toggle-label">Show client logos in cards</label>
+                <label class="settings-toggle-switch" aria-hidden="true">
+                  <input type="checkbox" id="settingsShowLogosInCards" checked>
+                  <span class="settings-toggle-slider"></span>
+                </label>
+              </div>
+              <small class="settings-hint">When on, board cards display the client logo in the preview area (if one is set in Board settings).</small>
+            </div>
           </div>
           <div id="settingsGeneralBoard" class="settings-general-context" style="display: none;">
             <div class="settings-section">
               <label>Title</label>
-              <input type="text" id="settingsTitle" placeholder="Board title">
+              <div class="settings-title-with-emoji" id="settingsEmojiSection">
+                <div class="settings-title-row">
+                  <div class="settings-emoji-trigger-wrap" id="settingsEmojiTriggerWrap">
+                    <button type="button" class="settings-emoji-trigger" id="settingsEmojiTrigger" aria-label="Choose board icon" aria-haspopup="listbox" aria-expanded="false">
+                      <span class="settings-emoji-trigger-value" id="settingsEmojiTriggerValue">—</span>
+                      <svg class="settings-emoji-trigger-chevron" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                    </button>
+                  </div>
+                  <input type="text" id="settingsTitle" placeholder="Board title" class="settings-title-input">
+                </div>
+                <div class="settings-emoji-dropdown" id="settingsEmojiDropdown" role="listbox" aria-hidden="true">
+                  <input type="text" class="settings-emoji-search" id="settingsEmojiSearch" placeholder="Search..." aria-label="Search emoji">
+                  <div class="settings-emoji-categories" id="settingsEmojiCategories"></div>
+                  <div class="settings-emoji-grid" id="settingsEmojiGrid"></div>
+                </div>
+              </div>
+              <small class="settings-hint">Icon appears before the title on the board and home cards.</small>
             </div>
             <div class="settings-section">
               <label>Description</label>
@@ -5807,11 +6173,24 @@
               <small class="settings-hint">When set, the timeline is capped at this date; the board won't extend beyond it.</small>
             </div>
             <div class="settings-section">
-              <button type="button" class="settings-export-btn" id="settingsExportPdf">
-                <span class="settings-export-btn-icon" aria-hidden="true">Print</span>
-                Print / Save as PDF
-              </button>
-              <small class="settings-hint" style="margin-top: 8px; display: block;">Uses your browser's print dialog. Choose "Save as PDF" to export. Enable Background graphics if bars do not appear.</small>
+              <label for="settingsClientName">Client name</label>
+              <div class="client-name-autocomplete-wrap" id="settingsClientNameWrap">
+                <input type="text" id="settingsClientName" placeholder="Search for a client or type one" autocomplete="off">
+                <div class="client-name-autocomplete-panel" id="settingsClientNamePanel" role="listbox"></div>
+              </div>
+              <small class="settings-hint">Optional. Type or select from existing clients. Shown with the logo on board cards.</small>
+            </div>
+            <div class="settings-section">
+              <label>Client logo</label>
+              <div class="settings-logo-upload" id="settingsLogoUpload">
+                <div class="settings-logo-dropzone" id="settingsLogoDropzone">
+                  <input type="file" id="settingsLogoInput" accept="image/*" hidden>
+                  <span class="settings-logo-placeholder" id="settingsLogoPlaceholder">Drop logo here or click to upload</span>
+                  <div class="settings-logo-preview" id="settingsLogoPreview" role="img" aria-hidden="true" hidden></div>
+                </div>
+                <button type="button" class="settings-logo-remove" id="settingsLogoRemove" style="display:none">Remove logo</button>
+              </div>
+              <small class="settings-hint">Shown on the board card preview on the home page. PNG, JPG, or SVG recommended.</small>
             </div>
           </div>
         </div>
@@ -6171,6 +6550,26 @@
               <small class="settings-hint" style="margin-bottom: 4px;">Optional.</small>
               <textarea id="projectSetupDesc" placeholder="What’s this project about?" rows="2"></textarea>
             </div>
+            <div class="settings-section">
+              <label for="projectSetupClientName">Client name</label>
+              <div class="client-name-autocomplete-wrap" id="projectSetupClientNameWrap">
+                <input type="text" id="projectSetupClientName" placeholder="Search for a client or type one" autocomplete="off">
+                <div class="client-name-autocomplete-panel" id="projectSetupClientNamePanel" role="listbox"></div>
+              </div>
+              <small class="settings-hint">Optional. Type or select from existing clients. Shown with the logo on board cards.</small>
+            </div>
+            <div class="settings-section">
+              <label>Client logo</label>
+              <div class="settings-logo-upload" id="projectSetupLogoUpload">
+                <div class="settings-logo-dropzone" id="projectSetupLogoDropzone">
+                  <input type="file" id="projectSetupLogoInput" accept="image/*" hidden>
+                  <span class="settings-logo-placeholder" id="projectSetupLogoPlaceholder">Drop logo here or click to upload</span>
+                  <div class="settings-logo-preview" id="projectSetupLogoPreview" role="img" aria-hidden="true" hidden></div>
+                </div>
+                <button type="button" class="settings-logo-remove" id="projectSetupLogoRemove" style="display:none">Remove logo</button>
+              </div>
+              <small class="settings-hint">Shown on the board card preview on the home page. PNG, JPG, or SVG recommended.</small>
+            </div>
           </div>
           <div class="project-setup-step" id="projectSetupStep2" data-step="2" style="display:none">
             <h4 class="project-setup-step-title">Project dates</h4>
@@ -6379,6 +6778,37 @@
       { name: "Forest", colors: ["#22C55E", "#16A34A", "#15803D", "#166534", "#14532D"] },
       { name: "Slate", colors: ["#64748B", "#475569", "#334155", "#1E293B", "#0F172A"] }
     ];
+    const EMOJI_BY_GROUP = [
+      { group: "Objects", emojis: ["📊","📅","🚀","⭐","🎯","💡","🔧","📦","✨","🏆","📈","🎨","🔥","📋","📁","🗂️","📌","✏️","📝","📱","💻","⏰","🔔"] },
+      { group: "Smileys", emojis: ["😀","😊","👍","🎉","🥳","🙌","💪","🤝","❤️","💜","🌟","✨","😎","🤓"] },
+      { group: "Travel & Places", emojis: ["✈️","🌍","🏠","🏢","🏆","🗺️","📍","🌐","🚀","⛵","🏔️","🌅"] },
+      { group: "Activities", emojis: ["⚽","🎮","🎵","🎬","📸","🎯","🏃","🚴","🧗","🎪","🎭"] },
+      { group: "Animals & Nature", emojis: ["🌱","🌿","🌳","🌸","🦋","🐝","🦊","🐻","🦁","🐯","🐼"] },
+      { group: "Food & Drink", emojis: ["☕","🍕","🍎","🥑","🍋","🥗","🍰","🥤"] },
+      { group: "Symbols", emojis: ["✔️","✓","→","⬅️","➡️","🔴","🟢","🔵","🟡","💯"] }
+    ];
+    const EMOJI_RECENT_KEY = "gantt-emoji-recent";
+    const EMOJI_CATEGORIES = [
+      { id: "recent", name: "Recently used" },
+      { id: "all", name: "All emojis" }
+    ];
+    const EMOJI_GROUP_TO_SLUG = { "Objects": "objects", "Smileys": "smileys_emotion", "Travel & Places": "travel_places", "Activities": "activities", "Animals & Nature": "animals_nature", "Food & Drink": "food_drink", "Symbols": "symbols" };
+    const EMOJI_CAT_ICONS = {
+      recent: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
+      all: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>'
+    };
+    function getRecentEmojis() { try { const s = localStorage.getItem(EMOJI_RECENT_KEY); return s ? JSON.parse(s) : []; } catch { return []; } }
+    function addToRecentEmoji(emoji) { if (!emoji) return; const recent = getRecentEmojis().filter(e => e !== emoji); recent.unshift(emoji); try { localStorage.setItem(EMOJI_RECENT_KEY, JSON.stringify(recent.slice(0, 24))); } catch {} }
+    const EMOJI_SEARCH_INDEX = { "📊":"chart","📅":"calendar","🚀":"rocket","⭐":"star","🎯":"target","💡":"idea","🔧":"tools","📦":"box","✨":"sparkle","🏆":"trophy","📈":"growth","🎨":"art","🔥":"fire","📋":"clipboard","📁":"folder","📌":"pin","✏️":"pencil","📝":"note","📱":"phone","💻":"laptop","⏰":"clock","😀":"smile","😊":"happy","👍":"thumbs","🎉":"party","❤️":"heart","🌟":"star","✈️":"plane","🌍":"world","🏠":"home","🏢":"office","🌱":"plant","☕":"coffee","✔️":"check" };
+    let EMOJI_FULL_DATA = null;
+    async function loadFullEmojiData() {
+      if (EMOJI_FULL_DATA) return EMOJI_FULL_DATA;
+      try {
+        const r = await fetch("https://unpkg.com/unicode-emoji-json@0.8.0/data-by-group.json");
+        if (r.ok) EMOJI_FULL_DATA = await r.json();
+      } catch (e) {}
+      return EMOJI_FULL_DATA;
+    }
     let PHASES = [...DEFAULT_PHASES.map(p => ({ ...p }))];
 
     const PROJECTS_LIST_KEY = "gantt-projects";
@@ -6415,6 +6845,7 @@
     }
     let currentProjectId = null;
     let homeEditProjectId = null;
+    let homeClientFilterSelected = "";
     let realtimeUnsubscribe = null;
 
     function slugify(text) {
@@ -6636,9 +7067,34 @@
       } catch { return false; }
     }
 
-    function renderHomeTimelinePreview(projectId, containerEl) {
+    function renderHomeTimelinePreview(projectId, containerEl, showLogos, showBars) {
       if (!containerEl || !document.body.contains(containerEl)) return;
       containerEl.innerHTML = "";
+      const logoUrl = (showLogos !== false) ? getProjectClientLogo(projectId) : "";
+      if (logoUrl) {
+        containerEl.classList.add("home-timeline-empty", "home-preview-logo-only");
+        const logoEl = document.createElement("div");
+        logoEl.className = "home-project-card-logo";
+        logoEl.style.setProperty("--logo-url", "url(" + logoUrl + ")");
+        logoEl.setAttribute("role", "img");
+        logoEl.setAttribute("aria-hidden", "true");
+        containerEl.appendChild(logoEl);
+        return;
+      }
+      if (showBars === false) {
+        containerEl.classList.add("home-timeline-empty");
+        if (showLogos !== false) {
+          const clientName = getProjectClientName(projectId);
+          if (clientName) {
+            containerEl.classList.add("home-preview-logo-only");
+            const nameEl = document.createElement("span");
+            nameEl.className = "home-project-card-client-name";
+            nameEl.textContent = clientName;
+            containerEl.appendChild(nameEl);
+          }
+        }
+        return;
+      }
       const bars = getProjectTasksForPreview(projectId);
       if (bars.length === 0) {
         containerEl.classList.add("home-timeline-empty");
@@ -7335,12 +7791,104 @@
 
     function loadPageHeader() {
       const s = loadProjectSettings();
-      if (s) return { title: s.title || DEFAULT_PAGE_TITLE, description: s.description || DEFAULT_PAGE_DESCRIPTION };
-      return { title: DEFAULT_PAGE_TITLE, description: DEFAULT_PAGE_DESCRIPTION };
+      if (s) return { title: s.title || DEFAULT_PAGE_TITLE, description: s.description || DEFAULT_PAGE_DESCRIPTION, emoji: s.emoji || "" };
+      return { title: DEFAULT_PAGE_TITLE, description: DEFAULT_PAGE_DESCRIPTION, emoji: "" };
     }
-    function savePageHeader(title, description) {
+    function savePageHeader(title, description, emoji) {
       const s = loadProjectSettings() || {};
-      saveProjectSettings({ ...s, title: title || DEFAULT_PAGE_TITLE, description: description || DEFAULT_PAGE_DESCRIPTION });
+      saveProjectSettings({ ...s, title: title || DEFAULT_PAGE_TITLE, description: description || DEFAULT_PAGE_DESCRIPTION, emoji: emoji || "" });
+    }
+    function getProjectEmoji(projectId) {
+      if (!projectId) return "";
+      if (window.ganttStorage?.isCloudEnabled()) {
+        const s = window.ganttStorage.loadSettings(projectId);
+        if (s && typeof s.emoji === "string" && s.emoji.trim()) return s.emoji.trim();
+        return "";
+      }
+      try {
+        const raw = localStorage.getItem("gantt-settings-" + projectId);
+        if (!raw) return "";
+        const s = JSON.parse(raw);
+        return (s.emoji && typeof s.emoji === "string" && s.emoji.trim()) ? s.emoji.trim() : "";
+      } catch { return ""; }
+    }
+    function getProjectClientName(projectId) {
+      if (!projectId) return "";
+      if (window.ganttStorage?.isCloudEnabled()) {
+        const s = window.ganttStorage.loadSettings(projectId);
+        if (s && typeof s.clientName === "string" && s.clientName.trim()) return s.clientName.trim();
+        return "";
+      }
+      try {
+        const raw = localStorage.getItem("gantt-settings-" + projectId);
+        if (!raw) return "";
+        const s = JSON.parse(raw);
+        return (s.clientName && typeof s.clientName === "string" && s.clientName.trim()) ? s.clientName.trim() : "";
+      } catch { return ""; }
+    }
+    function getAllClientNames() {
+      const projects = loadProjectsList();
+      const names = [];
+      projects.forEach(function(p) {
+        const cn = getProjectClientName(p.id);
+        if (cn && names.indexOf(cn) < 0) names.push(cn);
+      });
+      return names.sort();
+    }
+    function refreshClientNamePanel(panelEl, inputEl) {
+      if (!panelEl || !inputEl) return;
+      const q = (inputEl.value || "").trim().toLowerCase();
+      const names = getAllClientNames().filter(function(n) { return !q || n.toLowerCase().indexOf(q) >= 0; });
+      panelEl.innerHTML = "";
+      names.forEach(function(name) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "client-name-autocomplete-option";
+        btn.textContent = name;
+        btn.setAttribute("role", "option");
+        btn.addEventListener("click", function() {
+          inputEl.value = name;
+          panelEl.closest(".client-name-autocomplete-wrap")?.classList.remove("open");
+          inputEl.focus();
+        });
+        panelEl.appendChild(btn);
+      });
+    }
+    function setupClientNameAutocomplete(inputId, wrapId, panelId) {
+      const input = document.getElementById(inputId);
+      const wrap = document.getElementById(wrapId);
+      const panel = document.getElementById(panelId);
+      if (!input || !wrap || !panel) return;
+      input.addEventListener("focus", function() {
+        refreshClientNamePanel(panel, input);
+        wrap.classList.add("open");
+      });
+      input.addEventListener("input", function() {
+        refreshClientNamePanel(panel, input);
+        wrap.classList.add("open");
+      });
+      input.addEventListener("blur", function() {
+        setTimeout(function() {
+          if (!panel.contains(document.activeElement) && document.activeElement !== input) wrap.classList.remove("open");
+        }, 150);
+      });
+      document.addEventListener("click", function(e) {
+        if (wrap.classList.contains("open") && !wrap.contains(e.target)) wrap.classList.remove("open");
+      });
+    }
+    function getProjectClientLogo(projectId) {
+      if (!projectId) return "";
+      if (window.ganttStorage?.isCloudEnabled()) {
+        const s = window.ganttStorage.loadSettings(projectId);
+        if (s && typeof s.clientLogo === "string" && s.clientLogo.startsWith("data:")) return s.clientLogo;
+        return "";
+      }
+      try {
+        const raw = localStorage.getItem("gantt-settings-" + projectId);
+        if (!raw) return "";
+        const s = JSON.parse(raw);
+        return (s.clientLogo && typeof s.clientLogo === "string" && s.clientLogo.startsWith("data:")) ? s.clientLogo : "";
+      } catch { return ""; }
     }
     function formatDate(d) {
       if (!d) return "";
@@ -7895,6 +8443,16 @@
         if (panel) panel.classList.remove("drop-up");
         const trigger = w.querySelector(".settings-palette-trigger");
         if (trigger) trigger.setAttribute("aria-expanded", "false");
+        closedDropdown = true;
+      });
+      document.querySelectorAll(".settings-title-with-emoji.open").forEach(w => {
+        w.classList.remove("open");
+        const trigger = w.querySelector(".settings-emoji-trigger");
+        if (trigger) trigger.setAttribute("aria-expanded", "false");
+        closedDropdown = true;
+      });
+      document.querySelectorAll(".client-name-autocomplete-wrap.open").forEach(w => {
+        w.classList.remove("open");
         closedDropdown = true;
       });
       document.querySelectorAll(".gantt-auth-user-menu.open").forEach(w => {
@@ -11318,6 +11876,8 @@
       if (nameEl) nameEl.value = (typeof localStorage !== "undefined" && localStorage.getItem(HOME_TITLE_KEY)) || DEFAULT_HOME_TITLE;
       if (descEl) descEl.value = (typeof localStorage !== "undefined" && localStorage.getItem(HOME_DESC_KEY)) || DEFAULT_HOME_DESC;
       if (previewEl) previewEl.checked = (typeof localStorage !== "undefined" && localStorage.getItem(HOME_TIMELINE_PREVIEWS_KEY) !== "false");
+      var logosEl = document.getElementById("settingsShowLogosInCards");
+      if (logosEl) logosEl.checked = (typeof localStorage !== "undefined" && localStorage.getItem(HOME_SHOW_LOGOS_KEY) !== "false");
     }
     function openSettingsModal() {
       openSettingsSidebar("board");
@@ -11325,6 +11885,33 @@
       const header = loadPageHeader();
       document.getElementById("settingsTitle").value = header.title;
       document.getElementById("settingsDescription").value = header.description;
+      const emoji = (header.emoji || "").trim();
+      const triggerVal = document.getElementById("settingsEmojiTriggerValue");
+      const triggerWrap = document.getElementById("settingsEmojiTriggerWrap");
+      if (triggerVal) triggerVal.textContent = emoji || "";
+      if (triggerWrap) triggerWrap.dataset.emoji = emoji;
+      const clientName = (s.clientName && typeof s.clientName === "string") ? s.clientName.trim() : "";
+      const clientLogo = (s.clientLogo && typeof s.clientLogo === "string" && s.clientLogo.startsWith("data:")) ? s.clientLogo : "";
+      const clientNameEl = document.getElementById("settingsClientName");
+      if (clientNameEl) clientNameEl.value = clientName;
+      const logoUpload = document.getElementById("settingsLogoUpload");
+      const logoPreview = document.getElementById("settingsLogoPreview");
+      const logoPlaceholder = document.getElementById("settingsLogoPlaceholder");
+      const logoRemove = document.getElementById("settingsLogoRemove");
+      if (logoUpload) logoUpload.dataset.clientLogo = clientLogo;
+      if (logoPreview) {
+        if (clientLogo) {
+          logoPreview.style.setProperty("--logo-url", "url(" + clientLogo + ")");
+          logoPreview.hidden = false;
+          if (logoPlaceholder) logoPlaceholder.hidden = true;
+          if (logoRemove) logoRemove.style.display = "";
+        } else {
+          logoPreview.hidden = true;
+          logoPreview.style.removeProperty("--logo-url");
+          if (logoPlaceholder) logoPlaceholder.hidden = false;
+          if (logoRemove) logoRemove.style.display = "none";
+        }
+      }
       const gapEl = document.getElementById("settingsDependencyGap");
       if (gapEl) gapEl.value = String(s.dependencyGapDays ?? 0);
       const dependentTrigger = document.getElementById("settingsDependentTrigger");
@@ -11652,12 +12239,14 @@
         var nameEl = document.getElementById("settingsHomeName");
         var homeDescEl = document.getElementById("settingsHomeDescription");
         var previewEl = document.getElementById("settingsTimelinePreviews");
+        var logosEl = document.getElementById("settingsShowLogosInCards");
         var name = (nameEl && nameEl.value ? nameEl.value.trim() : "") || DEFAULT_HOME_TITLE;
         var homeDesc = (homeDescEl && homeDescEl.value ? homeDescEl.value.trim() : "") || DEFAULT_HOME_DESC;
         try {
           localStorage.setItem(HOME_TITLE_KEY, name);
           localStorage.setItem(HOME_DESC_KEY, homeDesc);
           localStorage.setItem(HOME_TIMELINE_PREVIEWS_KEY, previewEl && previewEl.checked ? "true" : "false");
+          localStorage.setItem(HOME_SHOW_LOGOS_KEY, logosEl && logosEl.checked ? "true" : "false");
         } catch (e) {}
         var homeTitleEl = document.getElementById("homePageTitle");
         var pageDescEl = document.getElementById("homePageDescription");
@@ -11730,6 +12319,11 @@
       }
       const title = document.getElementById("settingsTitle").value.trim() || DEFAULT_PAGE_TITLE;
       const desc = document.getElementById("settingsDescription").value.trim() || DEFAULT_PAGE_DESCRIPTION;
+      const emojiWrap = document.getElementById("settingsEmojiTriggerWrap");
+      const emoji = (emojiWrap && emojiWrap.dataset.emoji) ? emojiWrap.dataset.emoji : "";
+      const clientName = (document.getElementById("settingsClientName")?.value || "").trim();
+      const logoUpload = document.getElementById("settingsLogoUpload");
+      const clientLogo = (logoUpload && logoUpload.dataset.clientLogo) ? logoUpload.dataset.clientLogo : "";
       const phases = [];
       const removedIds = PHASES.map(p => p.id).filter(id => !document.querySelector(`.settings-phase-item[data-phase-id="${id}"]`));
       document.querySelectorAll(".settings-phase-item").forEach((item, i) => {
@@ -11848,7 +12442,7 @@
         const spans = partyListContainer.querySelectorAll(".settings-party-item span");
         responsibleParties = [...spans].map(function(sp) { return (sp.textContent || "").trim(); }).filter(Boolean);
       }
-      saveProjectSettings({ ...s, title, description: desc, phases, paletteIndex, dependencyGapDays, rowAppearance, strokeMode, showDurationOnBar, projectStartDate, projectEndDate, phaseDurationMode, snapToSprint, moveTasksWhenSprintExtended, allowIndependentDependencies, linkAllTasks, responsibleParties, emptyStateDismissed: true });
+      saveProjectSettings({ ...s, title, description: desc, emoji, clientName, clientLogo, phases, paletteIndex, dependencyGapDays, rowAppearance, strokeMode, showDurationOnBar, projectStartDate, projectEndDate, phaseDurationMode, snapToSprint, moveTasksWhenSprintExtended, allowIndependentDependencies, linkAllTasks, responsibleParties, emptyStateDismissed: true });
       if (currentProjectId) ensureProjectInList(currentProjectId, title);
       applyRowAppearance();
       if (typeof updateEmptyState === "function") updateEmptyState();
@@ -11858,7 +12452,7 @@
       if (palette?.colors) PHASES.forEach((p, i) => { if (palette.colors[i]) p.color = palette.colors[i]; });
       const titleEl = document.getElementById("pageTitle");
       const descEl = document.getElementById("pageDescription");
-      if (titleEl) titleEl.textContent = title;
+      if (titleEl) titleEl.textContent = (emoji ? emoji + " " : "") + title;
       if (descEl) descEl.textContent = desc;
       tasks.forEach((_, i) => { if (tasks.some(t => t.dependsOn === i)) propagateDependencyChanges(i); });
       if (typeof renderPhaseHeaders === "function") renderPhaseHeaders();
@@ -12091,6 +12685,7 @@
     const HOME_TITLE_KEY = "gantt-home-title";
     const HOME_DESC_KEY = "gantt-home-description";
     const HOME_TIMELINE_PREVIEWS_KEY = "gantt-home-timeline-previews";
+    const HOME_SHOW_LOGOS_KEY = "gantt-home-show-logos";
     const DEFAULT_HOME_TITLE = "Boards";
     const DEFAULT_HOME_DESC = "Create and open boards. Each board has its own tasks and settings.";
     let homePageHeaderInited = false;
@@ -12126,17 +12721,37 @@
         });
       }
       let showPreviews = true;
+      let showLogos = true;
       try { showPreviews = localStorage.getItem(HOME_TIMELINE_PREVIEWS_KEY) !== "false"; } catch (e) {}
-      if (showPreviews) {
+      try { showLogos = localStorage.getItem(HOME_SHOW_LOGOS_KEY) !== "false"; } catch (e) {}
+      const showPreviewArea = showPreviews || showLogos;
+      if (showPreviewArea) {
         const previewWrap = document.createElement("div");
         previewWrap.className = "home-project-timeline-preview" + (isEditMode ? " home-timeline-empty" : "");
         if (isEditMode) {
+          const projectLogo = showLogos ? getProjectClientLogo(p.id) : "";
+          const projectClientName = showLogos ? getProjectClientName(p.id) : "";
+          if (projectLogo) {
+            previewWrap.classList.add("home-preview-logo-only");
+            const logoEl = document.createElement("div");
+            logoEl.className = "home-project-card-logo";
+            logoEl.style.setProperty("--logo-url", "url(" + projectLogo + ")");
+            logoEl.setAttribute("role", "img");
+            logoEl.setAttribute("aria-hidden", "true");
+            previewWrap.appendChild(logoEl);
+          } else if (projectClientName) {
+            previewWrap.classList.add("home-preview-logo-only");
+            const nameEl = document.createElement("span");
+            nameEl.className = "home-project-card-client-name";
+            nameEl.textContent = projectClientName;
+            previewWrap.appendChild(nameEl);
+          }
           const caption = document.createElement("span");
           caption.className = "home-timeline-preview-caption";
           caption.textContent = "Preview will load once tasks have been added.";
           previewWrap.appendChild(caption);
         } else {
-          const loadPreview = () => renderHomeTimelinePreview(p.id, previewWrap);
+          const loadPreview = () => renderHomeTimelinePreview(p.id, previewWrap, showLogos, showPreviews);
           if (window.ganttStorage?.isCloudEnabled()) {
             window.ganttStorage.ensureBoardDataLoaded(p.id).then(() => {
               setTimeout(loadPreview, 350);
@@ -12151,14 +12766,25 @@
       body.className = "home-project-card-body";
       const info = document.createElement("div");
       info.className = "home-project-info";
+      const projectEmoji = getProjectEmoji(p.id);
       if (isEditMode) {
+        const nameRow = document.createElement("div");
+        nameRow.className = "home-project-name-row";
+        if (projectEmoji) {
+          const emojiSpan = document.createElement("span");
+          emojiSpan.className = "home-project-emoji";
+          emojiSpan.textContent = projectEmoji;
+          emojiSpan.title = "Change in Board settings → General";
+          nameRow.appendChild(emojiSpan);
+        }
         const nameInput = document.createElement("input");
         nameInput.type = "text";
         nameInput.className = "home-project-name-input";
         nameInput.placeholder = "Board name";
         nameInput.value = p.name || "Untitled board";
         nameInput.addEventListener("click", (e) => e.stopPropagation());
-        info.appendChild(nameInput);
+        nameRow.appendChild(nameInput);
+        info.appendChild(nameRow);
         const descInput = document.createElement("textarea");
         descInput.className = "home-project-desc-input";
         descInput.placeholder = "Description (optional)";
@@ -12168,7 +12794,7 @@
       } else {
         const name = document.createElement("div");
         name.className = "home-project-name";
-        name.textContent = p.name || "Untitled board";
+        name.textContent = (projectEmoji ? projectEmoji + " " : "") + (p.name || "Untitled board");
         info.appendChild(name);
         const desc = getProjectDescription(p.id);
         if (desc) {
@@ -12295,7 +12921,9 @@
               if (cardEl) cardEl.remove();
               var projectsLeft = loadProjectsList();
               var badgeDel = document.getElementById("homeProjectCountBadge");
+              var tooltipDel = document.getElementById("homeProjectCountBadgeTooltip");
               if (badgeDel) badgeDel.textContent = String(projectsLeft.length);
+              if (tooltipDel) tooltipDel.textContent = projectsLeft.length > 0 ? projectsLeft.map(function(p) { return p.name || "Untitled board"; }).join("\n") : "";
               if (projectsLeft.length === 0) renderHomeView();
             } else {
               renderHomeView();
@@ -12316,7 +12944,9 @@
             var cardElLocal = listElLocal.querySelector("[data-project-id=\"" + p.id + "\"]");
             if (cardElLocal) cardElLocal.remove();
             var badgeLocal = document.getElementById("homeProjectCountBadge");
+            var tooltipLocal = document.getElementById("homeProjectCountBadgeTooltip");
             if (badgeLocal) badgeLocal.textContent = String(list.length);
+            if (tooltipLocal) tooltipLocal.textContent = list.length > 0 ? list.map(function(p) { return p.name || "Untitled board"; }).join("\n") : "";
             if (list.length === 0) renderHomeView();
           } else {
             renderHomeView();
@@ -12334,8 +12964,39 @@
       if (typeof window.hasWriteAccess === "function" && !window.hasWriteAccess()) homeEditProjectId = null;
       initHomePageHeader();
       const projects = loadProjectsList();
+      const clientNames = [];
+      const projectClientMap = {};
+      projects.forEach(function(p) {
+        const cn = typeof getProjectClientName === "function" ? getProjectClientName(p.id) : "";
+        projectClientMap[p.id] = cn;
+        if (cn && clientNames.indexOf(cn) < 0) clientNames.push(cn);
+      });
+      clientNames.sort();
+      const filtersEl = document.getElementById("homeClientFilters");
+      if (filtersEl) {
+        filtersEl.innerHTML = "";
+        filtersEl.style.display = clientNames.length > 0 ? "flex" : "none";
+        if (clientNames.length > 0) {
+          const chips = ["All"].concat(clientNames);
+          chips.forEach(function(label) {
+            const chip = document.createElement("button");
+            chip.type = "button";
+            chip.className = "home-client-filter-chip" + (homeClientFilterSelected === (label === "All" ? "" : label) ? " active" : "");
+            chip.textContent = label;
+            chip.dataset.client = label === "All" ? "" : label;
+            chip.addEventListener("click", function() {
+              homeClientFilterSelected = chip.dataset.client || "";
+              renderHomeView();
+            });
+            filtersEl.appendChild(chip);
+          });
+        }
+      }
+      const filteredProjects = homeClientFilterSelected ? projects.filter(function(p) { return projectClientMap[p.id] === homeClientFilterSelected; }) : projects;
       const badgeEl = document.getElementById("homeProjectCountBadge");
-      if (badgeEl) badgeEl.textContent = String(projects.length);
+      const tooltipEl = document.getElementById("homeProjectCountBadgeTooltip");
+      if (badgeEl) badgeEl.textContent = String(filteredProjects.length);
+      if (tooltipEl) tooltipEl.textContent = filteredProjects.length > 0 ? filteredProjects.map(function(p) { return p.name || "Untitled board"; }).join("\n") : "";
       listEl.innerHTML = "";
       if (projects.length === 0) {
         const emptyWrap = document.createElement("div");
@@ -12354,7 +13015,7 @@
         listEl.appendChild(emptyWrap);
         return;
       }
-      projects.forEach(p => {
+      filteredProjects.forEach(function(p) {
         const card = buildOneProjectCard(p);
         listEl.appendChild(card);
         if (card.classList.contains("edit-mode")) {
@@ -12524,6 +13185,27 @@
       var s = loadProjectSettings() || {};
       document.getElementById("projectSetupName").value = header.title || "";
       document.getElementById("projectSetupDesc").value = header.description || "";
+      var clientNameEl = document.getElementById("projectSetupClientName");
+      if (clientNameEl) clientNameEl.value = (s.clientName && typeof s.clientName === "string") ? s.clientName.trim() : "";
+      var setupLogoUpload = document.getElementById("projectSetupLogoUpload");
+      var setupLogoPreview = document.getElementById("projectSetupLogoPreview");
+      var setupLogoPlaceholder = document.getElementById("projectSetupLogoPlaceholder");
+      var setupLogoRemove = document.getElementById("projectSetupLogoRemove");
+      var setupClientLogo = (s.clientLogo && typeof s.clientLogo === "string" && s.clientLogo.startsWith("data:")) ? s.clientLogo : "";
+      if (setupLogoUpload) setupLogoUpload.dataset.clientLogo = setupClientLogo;
+      if (setupLogoPreview) {
+        if (setupClientLogo) {
+          setupLogoPreview.style.setProperty("--logo-url", "url(" + setupClientLogo + ")");
+          setupLogoPreview.hidden = false;
+          if (setupLogoPlaceholder) setupLogoPlaceholder.hidden = true;
+          if (setupLogoRemove) setupLogoRemove.style.display = "";
+        } else {
+          setupLogoPreview.hidden = true;
+          setupLogoPreview.style.removeProperty("--logo-url");
+          if (setupLogoPlaceholder) setupLogoPlaceholder.hidden = false;
+          if (setupLogoRemove) setupLogoRemove.style.display = "none";
+        }
+      }
       function toYYYYMMDD(raw) {
         if (!raw || typeof raw !== "string") return "";
         var trimmed = String(raw).trim();
@@ -12722,6 +13404,9 @@
     function projectSetupSaveAndClose() {
       var title = (document.getElementById("projectSetupName").value || "").trim() || DEFAULT_PAGE_TITLE;
       var desc = (document.getElementById("projectSetupDesc").value || "").trim() || DEFAULT_PAGE_DESCRIPTION;
+      var clientName = (document.getElementById("projectSetupClientName")?.value || "").trim();
+      var setupLogoUpload = document.getElementById("projectSetupLogoUpload");
+      var clientLogo = (setupLogoUpload && setupLogoUpload.dataset.clientLogo) ? setupLogoUpload.dataset.clientLogo : "";
       var startRaw = (document.getElementById("projectSetupStartDate").value || "").trim();
       var projectStartDate = startRaw || null;
       var endRaw = (document.getElementById("projectSetupEndDate").value || "").trim();
@@ -12751,16 +13436,17 @@
       var moveTasksWhenSprintExtended = !!document.getElementById("projectSetupMoveTasksWhenSprintExtended")?.checked;
       var snapToSprint = !!document.getElementById("projectSetupSnapToSprint")?.checked;
       var s = loadProjectSettings() || {};
-      saveProjectSettings({ ...s, title: title, description: desc, projectStartDate: projectStartDate, projectEndDate: projectEndDate, phases: phases, phaseDurationMode: phaseDurationMode, responsibleParties: responsibleParties, dependencyGapDays: dependencyGapDays, allowIndependentDependencies: allowIndependentDependencies, linkAllTasks: linkAllTasks, moveTasksWhenSprintExtended: moveTasksWhenSprintExtended, snapToSprint: snapToSprint, onboardingComplete: true });
+      saveProjectSettings({ ...s, title: title, description: desc, clientName: clientName, clientLogo: clientLogo, projectStartDate: projectStartDate, projectEndDate: projectEndDate, phases: phases, phaseDurationMode: phaseDurationMode, responsibleParties: responsibleParties, dependencyGapDays: dependencyGapDays, allowIndependentDependencies: allowIndependentDependencies, linkAllTasks: linkAllTasks, moveTasksWhenSprintExtended: moveTasksWhenSprintExtended, snapToSprint: snapToSprint, onboardingComplete: true });
       if (currentProjectId) ensureProjectInList(currentProjectId, title);
       if (linkAllTasks && typeof applyLinkAllTasks === "function") {
         applyLinkAllTasks();
         if (typeof saveTasks === "function") saveTasks();
       }
       PHASES = phases.map(function (p) { return { ...p, sprints: p.sprints ?? 2 }; });
+      var header = loadPageHeader();
       var titleEl = document.getElementById("pageTitle");
       var descEl = document.getElementById("pageDescription");
-      if (titleEl) titleEl.textContent = title;
+      if (titleEl) titleEl.textContent = (header.emoji ? header.emoji + " " : "") + title;
       if (descEl) descEl.textContent = desc;
       if (typeof applyRowAppearance === "function") applyRowAppearance();
       if (typeof renderPhaseHeaders === "function") renderPhaseHeaders();
@@ -13025,9 +13711,218 @@
       const header = loadPageHeader();
       const titleEl = document.getElementById("pageTitle");
       const descEl = document.getElementById("pageDescription");
-      if (titleEl) titleEl.textContent = header.title;
+      if (titleEl) titleEl.textContent = (header.emoji ? header.emoji + " " : "") + header.title;
       if (descEl) descEl.textContent = header.description;
       if (currentProjectId) ensureProjectInList(currentProjectId, header.title);
+      (function initEmojiDropdown() {
+        const section = document.getElementById("settingsEmojiSection");
+        const wrap = document.getElementById("settingsEmojiTriggerWrap");
+        const trigger = document.getElementById("settingsEmojiTrigger");
+        const triggerVal = document.getElementById("settingsEmojiTriggerValue");
+        const dropdown = document.getElementById("settingsEmojiDropdown");
+        const searchInput = document.getElementById("settingsEmojiSearch");
+        const categoriesEl = document.getElementById("settingsEmojiCategories");
+        const grid = document.getElementById("settingsEmojiGrid");
+        if (!section || !trigger || !dropdown || !grid) return;
+        let activeCategory = "recent";
+        function buildCategoryBar() {
+          if (!categoriesEl) return;
+          categoriesEl.innerHTML = "";
+          EMOJI_CATEGORIES.forEach((cat) => {
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "settings-emoji-cat-btn" + (activeCategory === cat.id ? " active" : "");
+            btn.title = cat.name;
+            btn.setAttribute("aria-label", cat.name);
+            btn.innerHTML = EMOJI_CAT_ICONS[cat.id] || "";
+            btn.addEventListener("click", () => {
+              activeCategory = cat.id;
+              categoriesEl.querySelectorAll(".settings-emoji-cat-btn").forEach((b) => b.classList.remove("active"));
+              btn.classList.add("active");
+              buildEmojiGrid(searchInput?.value || "", activeCategory);
+            });
+            categoriesEl.appendChild(btn);
+          });
+        }
+        function buildEmojiGrid(filter, categorySlug) {
+          grid.innerHTML = "";
+          const noneBtn = document.createElement("button");
+          noneBtn.type = "button";
+          noneBtn.className = "settings-emoji-grid-btn none";
+          noneBtn.textContent = "—";
+          noneBtn.title = "No icon";
+          noneBtn.addEventListener("click", () => selectEmoji(""));
+          grid.appendChild(noneBtn);
+          const q = (filter || "").toLowerCase().trim();
+          const cat = categorySlug || activeCategory;
+          const searching = !!q;
+          const addEmojiBtn = (emoji, title) => {
+            if (!emoji) return;
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "settings-emoji-grid-btn";
+            btn.textContent = emoji;
+            btn.title = title || "";
+            btn.addEventListener("click", () => selectEmoji(emoji));
+            grid.appendChild(btn);
+          };
+          if (cat === "recent" && !searching) {
+            const recent = getRecentEmojis();
+            recent.forEach((emoji) => addEmojiBtn(emoji, "Recent"));
+            if (recent.length === 0) {
+              const empty = document.createElement("span");
+              empty.className = "settings-emoji-grid-btn none";
+              empty.style.fontSize = "12px";
+              empty.textContent = "Pick an emoji to see it here";
+              grid.appendChild(empty);
+            }
+          } else if (EMOJI_FULL_DATA && Array.isArray(EMOJI_FULL_DATA)) {
+            EMOJI_FULL_DATA.forEach((g) => {
+              if (!searching && cat && cat !== "all" && g.slug !== cat) return;
+              (g.emojis || []).forEach((e) => {
+                const emoji = typeof e === "string" ? e : (e.emoji || "");
+                const name = (e.name || "").toLowerCase();
+                const slug = (e.slug || "").toLowerCase().replace(/_/g, " ");
+                if (!emoji) return;
+                if (q && !name.includes(q) && !slug.includes(q) && !emoji.includes(q)) return;
+                addEmojiBtn(emoji, e.name || g.name || "");
+              });
+            });
+          } else {
+            const matches = (emoji) => !q || (EMOJI_SEARCH_INDEX[emoji] && EMOJI_SEARCH_INDEX[emoji].includes(q)) || emoji.includes(q);
+            EMOJI_BY_GROUP.forEach(({ group, emojis }) => {
+              const slug = EMOJI_GROUP_TO_SLUG[group];
+              if (!searching && cat && cat !== "all" && slug !== cat) return;
+              emojis.forEach(emoji => {
+                if (!matches(emoji)) return;
+                addEmojiBtn(emoji, group);
+              });
+            });
+          }
+        }
+        function selectEmoji(emoji) {
+          if (emoji) addToRecentEmoji(emoji);
+          wrap.dataset.emoji = emoji;
+          triggerVal.textContent = emoji || "";
+          section.classList.remove("open");
+          trigger.setAttribute("aria-expanded", "false");
+        }
+        trigger.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const open = section.classList.toggle("open");
+          trigger.setAttribute("aria-expanded", open ? "true" : "false");
+          dropdown.setAttribute("aria-hidden", open ? "false" : "true");
+          if (open) {
+            buildCategoryBar();
+            buildEmojiGrid(searchInput?.value || "", activeCategory);
+            requestAnimationFrame(() => searchInput?.focus());
+            loadFullEmojiData().then(() => {
+              if (section.classList.contains("open")) buildEmojiGrid(searchInput?.value || "", activeCategory);
+            });
+          }
+        });
+        searchInput?.addEventListener("input", () => buildEmojiGrid(searchInput.value, activeCategory));
+        searchInput?.addEventListener("keydown", (e) => {
+          if (e.key === "Escape") {
+            section.classList.remove("open");
+            trigger.setAttribute("aria-expanded", "false");
+          }
+        });
+        document.addEventListener("click", (e) => {
+          if (section.classList.contains("open") && !section.contains(e.target)) {
+            section.classList.remove("open");
+            trigger.setAttribute("aria-expanded", "false");
+          }
+        });
+      })();
+      (function initLogoUpload() {
+        const dropzone = document.getElementById("settingsLogoDropzone");
+        const input = document.getElementById("settingsLogoInput");
+        const placeholder = document.getElementById("settingsLogoPlaceholder");
+        const preview = document.getElementById("settingsLogoPreview");
+        const removeBtn = document.getElementById("settingsLogoRemove");
+        const uploadWrap = document.getElementById("settingsLogoUpload");
+        if (!dropzone || !input || !uploadWrap) return;
+        function applyLogo(dataUrl) {
+          uploadWrap.dataset.clientLogo = dataUrl || "";
+          if (dataUrl) {
+            preview.style.setProperty("--logo-url", "url(" + dataUrl + ")");
+            preview.hidden = false;
+            placeholder.hidden = true;
+            removeBtn.style.display = "";
+          } else {
+            preview.hidden = true;
+            preview.style.removeProperty("--logo-url");
+            placeholder.hidden = false;
+            removeBtn.style.display = "none";
+          }
+        }
+        function handleFile(file) {
+          if (!file || !file.type.startsWith("image/")) return;
+          const r = new FileReader();
+          r.onload = () => { applyLogo(r.result); };
+          r.readAsDataURL(file);
+        }
+        dropzone.addEventListener("click", () => input.click());
+        dropzone.addEventListener("dragover", (e) => { e.preventDefault(); dropzone.classList.add("dragover"); });
+        dropzone.addEventListener("dragleave", () => dropzone.classList.remove("dragover"));
+        dropzone.addEventListener("drop", (e) => {
+          e.preventDefault();
+          dropzone.classList.remove("dragover");
+          const f = e.dataTransfer?.files?.[0];
+          if (f) handleFile(f);
+        });
+        input.addEventListener("change", () => {
+          const f = input.files?.[0];
+          if (f) handleFile(f);
+          input.value = "";
+        });
+        removeBtn?.addEventListener("click", (e) => { e.stopPropagation(); applyLogo(""); });
+      })();
+      (function initProjectSetupLogoUpload() {
+        var dropzone = document.getElementById("projectSetupLogoDropzone");
+        var input = document.getElementById("projectSetupLogoInput");
+        var placeholder = document.getElementById("projectSetupLogoPlaceholder");
+        var preview = document.getElementById("projectSetupLogoPreview");
+        var removeBtn = document.getElementById("projectSetupLogoRemove");
+        var uploadWrap = document.getElementById("projectSetupLogoUpload");
+        if (!dropzone || !input || !uploadWrap) return;
+        function applyLogo(dataUrl) {
+          uploadWrap.dataset.clientLogo = dataUrl || "";
+          if (dataUrl) {
+            preview.style.setProperty("--logo-url", "url(" + dataUrl + ")");
+            preview.hidden = false;
+            placeholder.hidden = true;
+            removeBtn.style.display = "";
+          } else {
+            preview.hidden = true;
+            preview.style.removeProperty("--logo-url");
+            placeholder.hidden = false;
+            removeBtn.style.display = "none";
+          }
+        }
+        function handleFile(file) {
+          if (!file || !file.type.startsWith("image/")) return;
+          var r = new FileReader();
+          r.onload = function() { applyLogo(r.result); };
+          r.readAsDataURL(file);
+        }
+        dropzone.addEventListener("click", function() { input.click(); });
+        dropzone.addEventListener("dragover", function(e) { e.preventDefault(); dropzone.classList.add("dragover"); });
+        dropzone.addEventListener("dragleave", function() { dropzone.classList.remove("dragover"); });
+        dropzone.addEventListener("drop", function(e) {
+          e.preventDefault();
+          dropzone.classList.remove("dragover");
+          var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+          if (f) handleFile(f);
+        });
+        input.addEventListener("change", function() {
+          var f = input.files && input.files[0];
+          if (f) handleFile(f);
+          input.value = "";
+        });
+        if (removeBtn) removeBtn.addEventListener("click", function(e) { e.stopPropagation(); applyLogo(""); });
+      })();
       document.getElementById("settingsBtn")?.addEventListener("click", openSettingsModal);
       document.getElementById("settingsBarStyle")?.addEventListener("click", (e) => {
         const opt = e.target.closest(".settings-segmented-option");
@@ -13148,6 +14043,10 @@
           }
         });
       })();
+      if (typeof setupClientNameAutocomplete === "function") {
+        setupClientNameAutocomplete("settingsClientName", "settingsClientNameWrap", "settingsClientNamePanel");
+        setupClientNameAutocomplete("projectSetupClientName", "projectSetupClientNameWrap", "projectSetupClientNamePanel");
+      }
       (function initPaletteDropdown() {
         const wrap = document.getElementById("settingsPaletteDropdownWrap");
         const trigger = document.getElementById("settingsPaletteTrigger");
@@ -13493,8 +14392,8 @@
                     }
                   }
                 } finally {
-                  allLinesEl.style.visibility = "visible";
-                  allLinesEl.style.pointerEvents = "auto";
+                  allLinesEl.style.visibility = "";
+                  allLinesEl.style.pointerEvents = "";
                 }
                 let previewColor = "#a3a3a3";
                 if (hoveredIdx !== null && !isNaN(hoveredIdx)) {
@@ -13520,8 +14419,8 @@
                   var elements = document.elementsFromPoint(e2.clientX, e2.clientY);
                   if (ganttWrapper) ganttWrapper.style.pointerEvents = prevWrapperPE || "";
                 } finally {
-                  allLinesEl.style.visibility = "visible";
-                  allLinesEl.style.pointerEvents = "auto";
+                  allLinesEl.style.visibility = "";
+                  allLinesEl.style.pointerEvents = "";
                 }
                 const overUnlinkBtn = Array.from(elements || []).find((el) => {
                   const btn = el.closest?.(".gantt-dependency-unlink-btn");
